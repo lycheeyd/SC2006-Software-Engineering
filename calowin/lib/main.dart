@@ -1,5 +1,4 @@
 import 'package:calowin/Pages/LoginPage.dart';
-import 'package:calowin/common/colors_and_fonts.dart';
 import 'package:flutter/material.dart';
 
 void main() {
