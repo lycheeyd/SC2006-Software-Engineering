@@ -1,6 +1,7 @@
+// homeScreen.dart
 import 'package:flutter/material.dart';
 import '../models/location.dart';
-import '../models/currentlocation.dart'; // Import the CurrentLocation model
+import '../models/currentlocation.dart';
 import '../services/apiService.dart';
 import '../models/travelmethod.dart';
 
@@ -10,11 +11,11 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final ApiService apiService = ApiService('http://your-backend-url');
+  final ApiService apiService = ApiService();
   List<Location> locations = [];
-  List<String> travelMethods = []; // Store fetched travel methods
+  List<String> travelMethods = [];
   Location? selectedLocation;
-  TravelMethod? selectedMethod;
+  String? selectedMethod; // Change to String
   CurrentLocation? userCurrentLocation;
   String? resultMessage;
 
@@ -23,13 +24,13 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _fetchLocations();
     _fetchCurrentLocation();
-    _fetchTravelMethods(); // Fetch travel methods on init
+    _fetchTravelMethods();
   }
 
   Future<void> _fetchLocations() async {
     try {
       locations = await apiService.fetchAvailableLocations();
-      setState(() {}); // Refresh UI after fetching locations
+      setState(() {});
     } catch (e) {
       print('Error fetching locations: $e');
     }
@@ -38,7 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _fetchCurrentLocation() async {
     try {
       userCurrentLocation = await apiService.fetchCurrentLocation();
-      setState(() {}); // Refresh UI after fetching current location
+      setState(() {});
     } catch (e) {
       print('Error fetching current location: $e');
     }
@@ -47,28 +48,28 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _fetchTravelMethods() async {
     try {
       travelMethods = await apiService.fetchTravelMethods();
-      setState(() {}); // Refresh UI after fetching travel methods
+      setState(() {});
     } catch (e) {
       print('Error fetching travel methods: $e');
     }
   }
 
- Future<void> _startTrip() async {
-  if (selectedLocation != null && selectedMethod != null) {
-    try {
-      final metrics = await apiService.startTrip(selectedLocation!, selectedMethod!);
-      print('Metrics received: $metrics');
+  Future<void> _startTrip() async {
+    if (selectedLocation != null && selectedMethod != null) {
+      try {
+        final metrics = await apiService.startTrip(selectedLocation!, selectedMethod!);
+        print('Metrics received: $metrics');
 
-      setState(() {
-        resultMessage = 'Calories burned: ${metrics['caloriesBurnt']}, Carbon saved: ${metrics['carbonSaved']} kg';
-      });
-    } catch (e) {
-      print('Error starting trip: $e');
+        setState(() {
+          resultMessage = 'Calories burned: ${metrics['caloriesBurnt']}, Carbon saved: ${metrics['carbonSaved']} kg';
+        });
+      } catch (e) {
+        print('Error starting trip: $e');
+      }
+    } else {
+      print('Please select a location and travel method.');
     }
-  } else {
-    print('Please select a location and travel method.');
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (userCurrentLocation != null) // Ensure userCurrentLocation is not null
+            if (userCurrentLocation != null)
               Text(
                 'Your current location: ${userCurrentLocation!.name} (${userCurrentLocation!.latitude}, ${userCurrentLocation!.longitude})',
                 style: TextStyle(fontSize: 16),
@@ -103,18 +104,18 @@ class _HomeScreenState extends State<HomeScreen> {
               }).toList(),
             ),
             SizedBox(height: 20),
-            DropdownButton<TravelMethod>(
+            DropdownButton<String>( // Change to String
               hint: Text('Select travel method'),
               value: selectedMethod,
-              onChanged: (TravelMethod? newValue) {
+              onChanged: (String? newValue) {
                 setState(() {
                   selectedMethod = newValue;
                 });
               },
-              items: TravelMethod.values.map((TravelMethod method) {
-                return DropdownMenuItem<TravelMethod>(
+              items: travelMethods.map((String method) {
+                return DropdownMenuItem<String>(
                   value: method,
-                  child: Text(method.toString().split('.').last),
+                  child: Text(method),
                 );
               }).toList(),
             ),
