@@ -1,1 +1,0 @@
-enum TravelMethod { WALK, CYCLE, PUBLIC_TRANSPORT, CAR }
