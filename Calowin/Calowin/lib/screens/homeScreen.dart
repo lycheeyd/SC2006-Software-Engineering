@@ -1,9 +1,9 @@
-// homeScreen.dart
 import 'package:flutter/material.dart';
 import '../models/location.dart';
 import '../models/currentlocation.dart';
 import '../services/apiService.dart';
 import '../models/travelmethod.dart';
+import 'achievementScreen.dart'; // Import AchievementScreen
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -15,9 +15,11 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Location> locations = [];
   List<String> travelMethods = [];
   Location? selectedLocation;
-  String? selectedMethod; // Change to String
+  String? selectedMethod;
   CurrentLocation? userCurrentLocation;
   String? resultMessage;
+
+  bool tripStarted = false; // Track if the trip is started
 
   @override
   void initState() {
@@ -61,7 +63,9 @@ class _HomeScreenState extends State<HomeScreen> {
         print('Metrics received: $metrics');
 
         setState(() {
-          resultMessage = 'Calories burned: ${metrics['caloriesBurnt']}, Carbon saved: ${metrics['carbonSaved']} kg';
+    
+          resultMessage = 'Calories burned: ${metrics['caloriesBurnt']}, Carbon saved: ${metrics['carbonSaved']} kg, Distance: ${metrics['distance'].toStringAsFixed(2)} km';
+          tripStarted = true; // Mark trip as started
         });
       } catch (e) {
         print('Error starting trip: $e');
@@ -69,6 +73,74 @@ class _HomeScreenState extends State<HomeScreen> {
     } else {
       print('Please select a location and travel method.');
     }
+  }
+
+  void _endTrip() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'End the trip and earn your rewards?',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          content: Text(
+            'We don\'t encourage cheating!',
+            style: TextStyle(fontSize: 16),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the pop-up
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the pop-up
+                _navigateToAchievement(); // Go to achievement screen
+              },
+              child: Text('Yes'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+ void _navigateToAchievement() {
+  if (selectedLocation != null && selectedMethod != null && userCurrentLocation != null) {
+    final metrics = resultMessage!.split(',');
+    final distance = double.parse(metrics[2].split(': ')[1].split(' ')[0]);
+    final caloriesBurnt = int.parse(metrics[0].split(': ')[1]);
+    final carbonSaved = int.parse(metrics[1].split(': ')[1].split(' ')[0]);
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AchievementScreen(
+          distance: distance,
+          destination: selectedLocation!.name,
+          currentLocation: userCurrentLocation!.name,
+          travelMethod: selectedMethod!,
+          caloriesBurnt: caloriesBurnt,
+          carbonSaved: carbonSaved,
+        ),
+      ),
+    ).then((_) {
+      _resetState(); // Reset state when coming back to home screen
+    });
+  }
+}
+
+
+  void _resetState() {
+    setState(() {
+      tripStarted = false; // Reset trip state
+      selectedLocation = null; // Reset location
+      selectedMethod = null; // Reset method
+      resultMessage = null; // Clear result message
+    });
   }
 
   @override
@@ -91,7 +163,7 @@ class _HomeScreenState extends State<HomeScreen> {
             DropdownButton<Location>(
               hint: Text('Select a destination'),
               value: selectedLocation,
-              onChanged: (Location? newValue) {
+              onChanged: tripStarted ? null : (Location? newValue) { // Disable dropdown if trip started
                 setState(() {
                   selectedLocation = newValue;
                 });
@@ -104,10 +176,10 @@ class _HomeScreenState extends State<HomeScreen> {
               }).toList(),
             ),
             SizedBox(height: 20),
-            DropdownButton<String>( // Change to String
+            DropdownButton<String>(
               hint: Text('Select travel method'),
               value: selectedMethod,
-              onChanged: (String? newValue) {
+              onChanged: tripStarted ? null : (String? newValue) { // Disable dropdown if trip started
                 setState(() {
                   selectedMethod = newValue;
                 });
@@ -120,10 +192,23 @@ class _HomeScreenState extends State<HomeScreen> {
               }).toList(),
             ),
             SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _startTrip,
-              child: Text('Start Trip'),
-            ),
+            if (!tripStarted)
+              ElevatedButton(
+                onPressed: _startTrip,
+                child: Text('Start Trip'),
+              )
+            else ...[
+              ElevatedButton(
+                onPressed: _endTrip,
+                child: Text('End Trip'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  _resetState();
+                },
+                child: Text('Delete Trip'),
+              ),
+            ],
             if (resultMessage != null)
               Padding(
                 padding: const EdgeInsets.only(top: 20),

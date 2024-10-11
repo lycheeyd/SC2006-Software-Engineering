@@ -6,6 +6,7 @@ public class Trip {
     private TravelMethod travelMethod;
     private int caloriesBurnt;
     private int carbonSaved;
+    private double distance;
 
     public Trip(CurrentLocation startLocation, Location destination, TravelMethod travelMethod) {
         this.startLocation = startLocation;
@@ -44,6 +45,14 @@ public class Trip {
 
     public void setCaloriesBurnt(int caloriesBurnt) {
         this.caloriesBurnt = caloriesBurnt;
+    }
+
+    public void setDistance(double distance){
+        this.distance = distance;
+    }
+
+    public double getDistance(){
+        return distance;
     }
 
     public int getCarbonSaved() {

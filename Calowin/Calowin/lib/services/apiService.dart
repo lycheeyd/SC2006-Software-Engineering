@@ -6,7 +6,7 @@ import '../models/travelmethod.dart';
 import '../models/currentlocation.dart';
 
 class ApiService {
-  final String baseUrl = "http://your-localurl:8080"; // use your local ip
+  final String baseUrl = "http://yourlocal-ip:8080"; // use your local ip
 
   ApiService();
 

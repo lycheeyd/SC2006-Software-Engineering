@@ -58,9 +58,11 @@ public class TripController {
     int caloriesBurned = calculateCalories(trip.getTravelMethod(), distance);
     int carbonSaved = calculateCarbon(trip.getTravelMethod(), distance);
 
+
     // Set the calculated values in the trip object
     trip.setCaloriesBurnt(caloriesBurned);
     trip.setCarbonSaved(carbonSaved);
+    trip.setDistance(distance);
 
     // Return the updated trip object with metrics
     return trip;
