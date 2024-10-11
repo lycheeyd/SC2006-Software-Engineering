@@ -11,7 +11,7 @@ class _MapcalcPageState extends State<MapcalcPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Sign Up Page")),
+      appBar: AppBar(title: const Text("Map Page")),
     );
   }
 }

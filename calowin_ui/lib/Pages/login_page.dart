@@ -19,7 +19,8 @@ class _LoginpageState extends State<Loginpage> {
   final String _password =
       "12345"; //should be retrived from database according to email
   void _handleLogin() {
-    if (_password != _inputPassword.text) {
+    if (_password != _inputPassword.text ||
+        _inputEmail.text != "test@gmail.com") {
       setState(() {
         {
           _wrongPW = true;
@@ -30,6 +31,11 @@ class _LoginpageState extends State<Loginpage> {
       Navigator.push(context,
           MaterialPageRoute(builder: (context) => const MapcalcPage()));
       _inputPassword.clear();
+      setState(() {
+        _wrongPW = false;
+        _inputPassword.clear();
+        _inputEmail.clear();
+      });
     }
   }
 
@@ -50,6 +56,10 @@ class _LoginpageState extends State<Loginpage> {
         borderSide: BorderSide(color: Colors.grey.shade400),
         borderRadius: BorderRadius.circular(8));
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: PrimaryColors.dullGreen,
+        foregroundColor: PrimaryColors.dullGreen,
+      ),
       backgroundColor: PrimaryColors.dullGreen,
       body: SingleChildScrollView(
         child: Stack(
@@ -58,9 +68,9 @@ class _LoginpageState extends State<Loginpage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const SizedBox(
-                  height: 100,
-                ),
+                // const SizedBox(
+                //   height: 100,
+                // ),
                 Center(
                   child: Image.asset(
                     'assets/images/CalowinNoBackground.png',
