@@ -7,7 +7,7 @@ import '../models/currentlocation.dart';
 
 
 class ApiService {
-  final String baseUrl = "http://192.168.18.71:8080/api"; // Adjust base URL to include '/api'
+  final String baseUrl = "http://yourlocalip:8080/api"; // Adjust base URL to include '/api'
 
   ApiService();
 
