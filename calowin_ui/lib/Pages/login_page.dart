@@ -1,5 +1,5 @@
 import 'package:calowin/Pages/mapcalc_page.dart';
-import 'package:calowin/Pages/signup_page.dart';
+import 'package:calowin/Pages/sign_up/signup_page.dart';
 import 'package:calowin/common/colors_and_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -13,6 +13,7 @@ class Loginpage extends StatefulWidget {
 
 class _LoginpageState extends State<Loginpage> {
   bool _wrongPW = false;
+  bool _invalidEmail = false;
   bool _showFP = false;
   final TextEditingController _inputPassword = TextEditingController();
   final TextEditingController _inputEmail = TextEditingController();
@@ -24,6 +25,7 @@ class _LoginpageState extends State<Loginpage> {
       setState(() {
         {
           _wrongPW = true;
+          _invalidEmail = false;
           _inputPassword.clear();
         }
       });
@@ -33,6 +35,7 @@ class _LoginpageState extends State<Loginpage> {
       _inputPassword.clear();
       setState(() {
         _wrongPW = false;
+        _invalidEmail = false;
         _inputPassword.clear();
         _inputEmail.clear();
       });
@@ -44,6 +47,7 @@ class _LoginpageState extends State<Loginpage> {
       _showFP = false;
     });
   }
+
 //hello
   void _handleSignUp() {
     Navigator.push(
@@ -133,10 +137,19 @@ class _LoginpageState extends State<Loginpage> {
                                     focusedBorder: inputBorder,
                                   )),
                             ),
+                            if (_invalidEmail)
+                              Align(
+                                alignment: Alignment.topLeft,
+                                child: Text(
+                                  "Invalid Email!",
+                                  style: GoogleFonts.roboto(
+                                      fontSize: 14, color: Colors.red),
+                                ),
+                              )
                           ],
                         ),
                         const SizedBox(
-                          height: 20,
+                          height: 15,
                         ),
                         Column(
                           children: [
@@ -153,6 +166,7 @@ class _LoginpageState extends State<Loginpage> {
                               height: 40,
                               child: TextField(
                                   controller: _inputPassword,
+                                  obscureText: true,
                                   textAlign: TextAlign.left,
                                   decoration: InputDecoration(
                                     contentPadding: const EdgeInsets.symmetric(
