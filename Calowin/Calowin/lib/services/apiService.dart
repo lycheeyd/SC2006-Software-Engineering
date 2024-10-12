@@ -1,17 +1,19 @@
-// apiservice.dart
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/location.dart';
 import '../models/travelmethod.dart';
 import '../models/currentlocation.dart';
 
+
+
 class ApiService {
-  final String baseUrl = "http://yourlocal-ip:8080"; // use your local ip
+  final String baseUrl = "http://192.168.18.71:8080/api"; // Adjust base URL to include '/api'
 
   ApiService();
 
+  // Fetch available locations
   Future<List<Location>> fetchAvailableLocations() async {
-    final response = await http.get(Uri.parse('$baseUrl/api/trips/locations'));
+    final response = await http.get(Uri.parse('$baseUrl/trips/locations'));
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
       return data.map((loc) => Location(loc['name'], loc['latitude'], loc['longitude'])).toList();
@@ -20,8 +22,9 @@ class ApiService {
     }
   }
 
+  // Fetch current location
   Future<CurrentLocation> fetchCurrentLocation() async {
-    final response = await http.get(Uri.parse('$baseUrl/api/trips/current-location'));
+    final response = await http.get(Uri.parse('$baseUrl/trips/current-location'));
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       return CurrentLocation(
@@ -34,8 +37,9 @@ class ApiService {
     }
   }
 
+  // Fetch available travel methods
   Future<List<String>> fetchTravelMethods() async {
-    final response = await http.get(Uri.parse('$baseUrl/api/trips/methods'));
+    final response = await http.get(Uri.parse('$baseUrl/trips/methods'));
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
       return List<String>.from(data);
@@ -44,9 +48,10 @@ class ApiService {
     }
   }
 
+  // Start a trip with a given destination and travel method
   Future<Map<String, dynamic>> startTrip(Location destination, String method) async {
     final response = await http.post(
-      Uri.parse('$baseUrl/api/trips/start'),
+      Uri.parse('$baseUrl/trips/start'),
       headers: {'Content-Type': 'application/json'},
       body: json.encode({
         'destination': {
@@ -64,4 +69,29 @@ class ApiService {
       throw Exception('Failed to start trip');
     }
   }
+
+  // Fetch achievement progress from the backend
+  Future<Map<String, dynamic>> getAchievementProgress() async {
+    final response = await http.get(Uri.parse(baseUrl + "/achievements/progress"));
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception("Failed to load achievements");
+    }
+  }
+
+  // Send trip metrics to the backend
+  Future<void> addTripMetrics(int carbonSaved, int caloriesBurnt) async {
+    final response = await http.post(
+Uri.parse(baseUrl + "/achievements/addTripMetrics?carbonSaved=$carbonSaved&caloriesBurnt=$caloriesBurnt")
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception("Failed to add trip metrics");
+    }
+  }
 }
+
+
+

@@ -63,7 +63,6 @@ class _HomeScreenState extends State<HomeScreen> {
         print('Metrics received: $metrics');
 
         setState(() {
-    
           resultMessage = 'Calories burned: ${metrics['caloriesBurnt']}, Carbon saved: ${metrics['carbonSaved']} kg, Distance: ${metrics['distance'].toStringAsFixed(2)} km';
           tripStarted = true; // Mark trip as started
         });
@@ -108,31 +107,40 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
- void _navigateToAchievement() {
-  if (selectedLocation != null && selectedMethod != null && userCurrentLocation != null) {
-    final metrics = resultMessage!.split(',');
-    final distance = double.parse(metrics[2].split(': ')[1].split(' ')[0]);
-    final caloriesBurnt = int.parse(metrics[0].split(': ')[1]);
-    final carbonSaved = int.parse(metrics[1].split(': ')[1].split(' ')[0]);
+  void _navigateToAchievement() async {
+    if (selectedLocation != null && selectedMethod != null && userCurrentLocation != null) {
+      final metrics = resultMessage!.split(',');
+        final distance = double.parse(metrics[2].split(': ')[1].split(' ')[0]);
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => AchievementScreen(
-          distance: distance,
-          destination: selectedLocation!.name,
-          currentLocation: userCurrentLocation!.name,
-          travelMethod: selectedMethod!,
-          caloriesBurnt: caloriesBurnt,
-          carbonSaved: carbonSaved,
-        ),
-      ),
-    ).then((_) {
-      _resetState(); // Reset state when coming back to home screen
-    });
+      final caloriesBurnt = int.parse(metrics[0].split(': ')[1]);
+      final carbonSaved = int.parse(metrics[1].split(': ')[1].split(' ')[0]);
+
+      try {
+        // Send trip metrics to the backend
+        await apiService.addTripMetrics(carbonSaved, caloriesBurnt);
+        print('Trip metrics sent successfully.');
+        
+        // Navigate to AchievementScreen and pass metrics
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => AchievementScreen(
+              caloriesBurnt: caloriesBurnt,
+              carbonSaved: carbonSaved,
+              distance: distance,
+              destination: selectedLocation!.name,
+              currentLocation: userCurrentLocation!.name,
+              tripMethod: selectedMethod!,
+            ),
+          ),
+        ).then((_) {
+          _resetState(); // Reset state when coming back to home screen
+        });
+      } catch (e) {
+        print('Error sending trip metrics: $e');
+      }
+    }
   }
-}
-
 
   void _resetState() {
     setState(() {
