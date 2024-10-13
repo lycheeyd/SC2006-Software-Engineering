@@ -61,7 +61,9 @@ class _LoginpageState extends State<Loginpage> {
         borderRadius: BorderRadius.circular(8));
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: PrimaryColors.dullGreen,
+        backgroundColor: !_showFP
+            ? PrimaryColors.dullGreen
+            : const Color.fromARGB(255, 63, 96, 63),
         foregroundColor: PrimaryColors.dullGreen,
       ),
       backgroundColor: PrimaryColors.dullGreen,
@@ -264,8 +266,12 @@ class _LoginpageState extends State<Loginpage> {
                     height: MediaQuery.of(context).size.height,
                     child: Container(
                       color: const Color.fromARGB(120, 0, 0, 0),
-                      child: Center(
-                          child: Container(
+                      child: Column(
+                        children: [
+                          const SizedBox(
+                            height: 170,
+                          ),
+                          Container(
                               decoration: BoxDecoration(
                                   color:
                                       const Color.fromARGB(255, 241, 241, 241),
@@ -381,7 +387,9 @@ class _LoginpageState extends State<Loginpage> {
                                     )
                                   ],
                                 ),
-                              ))),
+                              )),
+                        ],
+                      ),
                     ),
                   )
                 : Container(),

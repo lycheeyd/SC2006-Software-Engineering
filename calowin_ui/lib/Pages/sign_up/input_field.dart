@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:calowin/common/colors_and_fonts.dart';
 
@@ -9,16 +10,19 @@ class InputField extends StatefulWidget {
   final String? bottomHint;
   final String errorText;
   final bool hasError;
+  final TextInputType? keyboardType;
+  final List<TextInputFormatter>? inputFormatter;
 
-  const InputField({
-    super.key,
-    required this.hasError,
-    required this.errorText,
-    required this.inputController,
-    required this.title,
-    required this.inputHint,
-    this.bottomHint,
-  });
+  const InputField(
+      {super.key,
+      required this.hasError,
+      required this.errorText,
+      required this.inputController,
+      required this.title,
+      required this.inputHint,
+      this.bottomHint,
+      this.keyboardType,
+      this.inputFormatter});
 
   @override
   State<InputField> createState() => _InputFieldState();
@@ -32,10 +36,14 @@ class _InputFieldState extends State<InputField> {
   late String _errorText;
   bool _hasBottomHint = false;
   String? _bottomHint;
+  late TextInputType? _keyboardType;
+  late List<TextInputFormatter>? _inputFormatter;
 
   @override
   void initState() {
     super.initState();
+    _keyboardType = widget.keyboardType;
+    _inputFormatter = widget.inputFormatter;
     _hasError = widget.hasError;
     _errorText = widget.errorText;
     _inputEmail = widget.inputController;
@@ -71,6 +79,8 @@ class _InputFieldState extends State<InputField> {
           SizedBox(
             height: 50,
             child: TextField(
+                keyboardType: _keyboardType,
+                inputFormatters: _inputFormatter,
                 controller: _inputEmail,
                 textAlign: TextAlign.left,
                 decoration: InputDecoration(
@@ -106,10 +116,13 @@ class _InputFieldState extends State<InputField> {
               height: 2,
             ),
           if (_hasBottomHint)
-            Text(
-              textAlign: TextAlign.left,
-              _bottomHint as String,
-              style: GoogleFonts.roboto(fontSize: 11, color: Colors.white),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                textAlign: TextAlign.left,
+                _bottomHint as String,
+                style: GoogleFonts.roboto(fontSize: 11, color: Colors.white),
+              ),
             )
         ],
       ),

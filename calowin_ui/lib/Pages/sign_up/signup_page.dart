@@ -1,7 +1,9 @@
 import 'package:calowin/Pages/sign_up/input_field.dart';
+import 'package:calowin/Pages/sign_up/signup_page2.dart';
 import 'package:calowin/common/colors_and_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter/services.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -21,7 +23,7 @@ class _SignupPageState extends State<SignupPage> {
 
   void _checkEmail() {
     setState(() {
-      _invalidEmail = true; //define the conditions later
+      _invalidEmail = true; //define the conditions laterf
     });
   }
 
@@ -33,7 +35,11 @@ class _SignupPageState extends State<SignupPage> {
 
   void _handleOTP() {}
 
-  void _handleContinue() {}
+  void _handleContinue() {
+    //check conditions and communicate with backend
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => const SignupPage2()));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -105,6 +111,12 @@ class _SignupPageState extends State<SignupPage> {
                   height: 50,
                   width: 200,
                   child: TextField(
+                      keyboardType: TextInputType
+                          .number, // Set the keyboard type to numbers
+                      inputFormatters: <TextInputFormatter>[
+                        FilteringTextInputFormatter
+                            .digitsOnly // Allow only digits
+                      ],
                       controller: _inputOTP,
                       textAlign: TextAlign.left,
                       decoration: InputDecoration(
