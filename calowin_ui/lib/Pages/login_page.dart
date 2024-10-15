@@ -1,6 +1,7 @@
 import 'package:calowin/Pages/mapcalc_page.dart';
 import 'package:calowin/Pages/sign_up/signup_page.dart';
 import 'package:calowin/common/colors_and_fonts.dart';
+import 'package:calowin/control/page_navigator.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -30,8 +31,12 @@ class _LoginpageState extends State<Loginpage> {
         }
       });
     } else {
-      Navigator.push(context,
-          MaterialPageRoute(builder: (context) => const MapcalcPage()));
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => const PageNavigator(
+                    startPage: 0,
+                  )));
       _inputPassword.clear();
       setState(() {
         _wrongPW = false;

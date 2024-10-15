@@ -1,6 +1,7 @@
 import 'package:calowin/Pages/mapcalc_page.dart';
 import 'package:calowin/Pages/sign_up/input_field.dart';
 import 'package:calowin/common/colors_and_fonts.dart';
+import 'package:calowin/control/page_navigator.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/services.dart';
@@ -35,7 +36,11 @@ class _SignupPage2State extends State<SignupPage2> {
   void _handleSignup() {
     //check conditions and communicate with backend
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => const MapcalcPage()));
+        context,
+        MaterialPageRoute(
+            builder: (context) => const PageNavigator(
+                  startPage: 0,
+                )));
   }
 
   @override
