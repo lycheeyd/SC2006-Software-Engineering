@@ -1,5 +1,5 @@
 import 'package:calowin/Pages/mapcalc_page.dart';
-import 'package:calowin/Pages/sign_up/input_field.dart';
+import 'package:calowin/common/input_field.dart';
 import 'package:calowin/common/colors_and_fonts.dart';
 import 'package:calowin/control/page_navigator.dart';
 import 'package:flutter/material.dart';

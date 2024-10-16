@@ -1,4 +1,4 @@
-import 'package:calowin/Pages/sign_up/input_field.dart';
+import 'package:calowin/common/input_field.dart';
 import 'package:calowin/Pages/sign_up/signup_page2.dart';
 import 'package:calowin/common/colors_and_fonts.dart';
 import 'package:flutter/material.dart';
