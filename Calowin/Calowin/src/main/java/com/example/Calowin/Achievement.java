@@ -1,5 +1,6 @@
 package com.example.Calowin;
 
+
 public class Achievement {
     private int totalCarbonSavedExp;
     private int totalCalorieBurntExp;
@@ -11,10 +12,10 @@ public class Achievement {
     private final int GOLD_THRESHOLD = 10000;
 
     public Achievement() {
-        this.totalCarbonSavedExp = 0;
-        this.totalCalorieBurntExp = 0;
-        this.carbonSavedMedal = "No Medal";
-        this.calorieBurntMedal = "No Medal";
+        this.totalCarbonSavedExp = 0; // Default value
+        this.totalCalorieBurntExp = 0; // Default value
+        this.carbonSavedMedal = "No Medal"; // Default value
+        this.calorieBurntMedal = "No Medal"; // Default value
     }
 
     // Method to add experience from a specific trip
@@ -99,6 +100,8 @@ public class Achievement {
     public String getCalorieBurntMedal() {
         return calorieBurntMedal;
     }
+
+   
 
     
 }

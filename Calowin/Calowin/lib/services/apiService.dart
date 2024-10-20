@@ -3,11 +3,15 @@ import 'package:http/http.dart' as http;
 import '../models/location.dart';
 import '../models/travelmethod.dart';
 import '../models/currentlocation.dart';
+import '../models/achievement.dart'; // Adjust the path based on your project structure
+
 
 
 
 class ApiService {
-  final String baseUrl = "http://yourlocalip:8080/api"; // Adjust base URL to include '/api'
+   final String baseUrl = "http://172.21.146.188:8080/api"; // VM URL 
+  // final String baseUrl = "http://10.91.236.124:8080/api"; NTU URL
+  
 
   ApiService();
 
@@ -49,11 +53,13 @@ class ApiService {
   }
 
   // Start a trip with a given destination and travel method
-  Future<Map<String, dynamic>> startTrip(Location destination, String method) async {
+  Future<Map<String, dynamic>> startTrip(Location destination, String method, String user_id) async {
     final response = await http.post(
       Uri.parse('$baseUrl/trips/start'),
       headers: {'Content-Type': 'application/json'},
       body: json.encode({
+        'userId': user_id, // Include userId
+
         'destination': {
           'name': destination.name,
           'latitude': destination.latitude,
@@ -91,6 +97,8 @@ Uri.parse(baseUrl + "/achievements/addTripMetrics?carbonSaved=$carbonSaved&calor
       throw Exception("Failed to add trip metrics");
     }
   }
+
+
 }
 
 

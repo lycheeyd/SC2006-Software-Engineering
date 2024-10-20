@@ -46,6 +46,17 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<dependency>
+    <groupId>com.microsoft.sqlserver</groupId>
+    <artifactId>mssql-jdbc</artifactId>
+    <version>11.2.3.jre8</version> <!-- Adjust the version to the latest available if needed -->
+</dependency>
+		<dependency>
+    <groupId>com.microsoft.sqlserver</groupId>
+    <artifactId>mssql-jdbc</artifactId>
+    <version>12.2.0.jre11</version> <!-- Adjust the version based on your JDK -->
+</dependency>
 	</dependencies>
 
 	<build>

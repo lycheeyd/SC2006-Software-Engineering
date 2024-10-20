@@ -8,6 +8,7 @@ public class CalowinApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(CalowinApplication.class, args);
+		
 	}
 
 }

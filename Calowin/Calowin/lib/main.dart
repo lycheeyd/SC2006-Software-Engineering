@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'screens/homescreen.dart';  // Import the HomeScreen
+import 'screens/mapCalculationScreen.dart';
 
 void main() {
   runApp(MyApp());
@@ -15,7 +16,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: HomeScreen(),  // Set HomeScreen as the starting page
+      home: MapcalcPage(),  // Set HomeScreen as the starting page
     );
   }
 }

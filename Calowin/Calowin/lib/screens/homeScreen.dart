@@ -57,9 +57,12 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _startTrip() async {
+
+    String userId = "user123"; // Retrieve the actual user ID from your auth logic
+
     if (selectedLocation != null && selectedMethod != null) {
       try {
-        final metrics = await apiService.startTrip(selectedLocation!, selectedMethod!);
+        final metrics = await apiService.startTrip(selectedLocation!, selectedMethod!, userId);
         print('Metrics received: $metrics');
 
         setState(() {
@@ -114,6 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
       final caloriesBurnt = int.parse(metrics[0].split(': ')[1]);
       final carbonSaved = int.parse(metrics[1].split(': ')[1].split(' ')[0]);
+      
 
       try {
         // Send trip metrics to the backend

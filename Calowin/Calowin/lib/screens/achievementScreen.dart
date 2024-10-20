@@ -1,5 +1,7 @@
+import 'package:calowin/common/colors_and_fonts.dart';
 import 'package:flutter/material.dart';
 import '../services/apiService.dart';
+import '../common/medals.dart'; // Import the Medals class
 
 class AchievementScreen extends StatefulWidget {
   final int caloriesBurnt;
@@ -57,16 +59,15 @@ class _AchievementScreenState extends State<AchievementScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Achievements"),
-      ),
-      body: SingleChildScrollView(
-        child: Center(
+      backgroundColor: PrimaryColors.dullGreen,
+      body: Center(
+        child: SingleChildScrollView(
           child: Card(
             elevation: 4,
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center, // Center vertically
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
@@ -92,6 +93,7 @@ class _AchievementScreenState extends State<AchievementScreen> {
                     pointsToNextBronze: pointsToNextCarbonBronze,
                     pointsToNextSilver: pointsToNextCarbonSilver,
                     pointsToNextGold: pointsToNextCarbonGold,
+                    gainedExp: widget.carbonSaved, // Pass the carbon saved as gained EXP
                   ),
                   SizedBox(height: 10),
                   _buildProgressSection(
@@ -101,12 +103,12 @@ class _AchievementScreenState extends State<AchievementScreen> {
                     pointsToNextBronze: pointsToNextCalorieBronze,
                     pointsToNextSilver: pointsToNextCalorieSilver,
                     pointsToNextGold: pointsToNextCalorieGold,
+                    gainedExp: widget.caloriesBurnt, // Pass the calories burnt as gained EXP
                   ),
                   SizedBox(height: 20),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -130,9 +132,8 @@ class _AchievementScreenState extends State<AchievementScreen> {
 
   String _getCalorieThreshold() {
     // Determine the current threshold based on the user's EXP
-    
     if (totalCalorieBurntExp >= pointsToNextCalorieSilver) {
-      return pointsToNextCalorieGold.toString(); // Silver threshold
+      return pointsToNextCalorieGold.toString(); // Gold threshold
     } else if (totalCalorieBurntExp >= pointsToNextCalorieBronze) {
       return pointsToNextCalorieSilver.toString(); // Silver threshold
     } else {
@@ -142,13 +143,12 @@ class _AchievementScreenState extends State<AchievementScreen> {
 
   String _getCarbonThreshold() {
     // Determine the current threshold based on the user's EXP
-    
     if (totalCarbonSavedExp >= pointsToNextCarbonSilver) {
-      return pointsToNextCarbonGold.toString(); // Silver threshold
+      return pointsToNextCarbonGold.toString(); // Gold threshold
     } else if (totalCarbonSavedExp >= pointsToNextCarbonBronze) {
-      return pointsToNextCalorieSilver.toString(); // Silver threshold
+      return pointsToNextCarbonSilver.toString(); // Silver threshold
     } else {
-      return pointsToNextCalorieBronze.toString(); // Default to bronze threshold
+      return pointsToNextCarbonBronze.toString(); // Default to bronze threshold
     }
   }
 
@@ -159,6 +159,7 @@ class _AchievementScreenState extends State<AchievementScreen> {
     required int pointsToNextBronze,
     required int pointsToNextSilver,
     required int pointsToNextGold,
+    required int gainedExp, // New parameter for gained EXP
   }) {
     double progress = 0.0;
 
@@ -191,6 +192,16 @@ class _AchievementScreenState extends State<AchievementScreen> {
     // Clamp progress to avoid exceeding bounds
     progress = progress.clamp(0.0, 1.0);
 
+    // Determine the next medal based on the current value
+    String nextMedal = "No Medal";
+    if (value < pointsToNextBronze) {
+      nextMedal = "Bronze";
+    } else if (value < pointsToNextSilver) {
+      nextMedal = "Silver";
+    } else if (value < pointsToNextGold) {
+      nextMedal = "Gold";
+    }
+
     return Card(
       elevation: 4,
       child: Padding(
@@ -203,17 +214,38 @@ class _AchievementScreenState extends State<AchievementScreen> {
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 10),
-            LinearProgressIndicator(
-              value: progress,
-              backgroundColor: Colors.grey[300],
-              color: Colors.blue,
+            // Adjust the width of the progress bar for space
+            Row(
+              children: [
+                if (nextMedal != "No Medal") ...[
+                  _getMedalImage(nextMedal, size: 20), // Show the next medal image
+                  SizedBox(width: 8), // Add space between the medal image and progress bar
+                ],
+                Expanded(
+                  child: LinearProgressIndicator(
+                    value: progress,
+                    backgroundColor: Colors.grey[300],
+                    color: Colors.blue,
+                    minHeight: 8, // Make the progress bar slightly smaller
+                  ),
+                ),
+                SizedBox(width: 10), // Add some space between the progress bar and EXP text
+                Text(
+                  "+$gainedExp EXP", // Show the gained EXP points with a plus sign
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                ),
+              ],
             ),
             SizedBox(height: 10),
+            // Show the corresponding medal image instead of text
             Text(
-              "Current Badge: $medal",
+              "Current Badge:",
               style: TextStyle(fontSize: 18),
               textAlign: TextAlign.center,
             ),
+            SizedBox(height: 5),
+            _getMedalImage(medal), // Display the medal image
             SizedBox(height: 10),
             if (medal == "No Medal") ...[
               Text(
@@ -240,5 +272,30 @@ class _AchievementScreenState extends State<AchievementScreen> {
         ),
       ),
     );
+  }
+
+  Widget _getMedalImage(String medal, {double size = 50}) {
+    switch (medal) {
+      case "Gold":
+        return SizedBox(
+          width: size,
+          height: size,
+          child: Medals.calorieGold,
+        );
+      case "Silver":
+        return SizedBox(
+          width: size,
+          height: size,
+          child: Medals.calorieSilver,
+        );
+      case "Bronze":
+        return SizedBox(
+          width: size,
+          height: size,
+          child: Medals.calorieBronze,
+        );
+      default:
+        return Container(); // No image for "No Medal"
+    }
   }
 }
