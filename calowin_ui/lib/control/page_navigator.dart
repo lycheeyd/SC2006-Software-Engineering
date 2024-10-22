@@ -1,7 +1,8 @@
+import 'package:calowin/Pages/profile/profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:calowin/Pages/mapcalc_page.dart';
+import 'package:calowin/Pages/rank_page.dart';
 import 'package:calowin/common/colors_and_fonts.dart';
-import 'package:flutter/rendering.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class PageNavigator extends StatefulWidget {
@@ -26,7 +27,15 @@ class _PageNavigatorState extends State<PageNavigator> {
   List<String> listOfNotifications = <String>[
     "John sent a Friend Request",
     "Notification 2",
-    "Notification 3"
+    "Notification 3",
+    "Notification 4",
+    "Notification 4",
+    "Notification 4",
+    "Notification 4",
+    "Notification 4",
+    "Notification 4",
+    "Notification 4",
+    "Notification 4",
   ];
 
   bool _showNotifications =
@@ -106,60 +115,52 @@ class _PageNavigatorState extends State<PageNavigator> {
 
     return Scaffold(
       //extendBodyBehindAppBar: true,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(60),
-        child: Stack(
-          children: [
-            AppBar(
-              leadingWidth: 300,
-              toolbarHeight: 60,
-              backgroundColor: lightgreen,
-              leading: Padding(
-                padding: const EdgeInsets.only(left: 8, bottom: 5),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      height: 50,
-                      width: 50,
-                      child: Image.asset(
-                          'assets/images/CalowinNoBackground.png',
-                          fit: BoxFit.contain),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 17),
-                      child: Text(
-                        "CaloWin",
-                        style: PrimaryFonts.logoFont.copyWith(fontSize: 27),
-                      ),
-                    ),
-                  ],
+      appBar: AppBar(
+        leadingWidth: 300,
+        toolbarHeight: 60,
+        backgroundColor: lightgreen,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 8, bottom: 5),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(
+                height: 50,
+                width: 50,
+                child: Image.asset('assets/images/CalowinNoBackground.png',
+                    fit: BoxFit.contain),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 17),
+                child: Text(
+                  "CaloWin",
+                  style: PrimaryFonts.logoFont.copyWith(fontSize: 27),
                 ),
               ),
-              actions: [
-                Padding(
-                  padding: const EdgeInsets.only(
-                    right: 5,
-                  ),
-                  child: Container(
-                    height: 40,
-                    width: 40,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: _showNotifications ? Colors.black : lightgreen,
-                    ),
-                    child: IconButton(
-                      color: _showNotifications ? Colors.white : Colors.black,
-                      icon: const Icon(Icons.notifications),
-                      onPressed: _toggleNotifications,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
+            ],
+          ),
         ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(
+              right: 5,
+            ),
+            child: Container(
+              height: 40,
+              width: 40,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                color: _showNotifications ? Colors.black : lightgreen,
+              ),
+              child: IconButton(
+                color: _showNotifications ? Colors.white : Colors.black,
+                icon: const Icon(Icons.notifications),
+                onPressed: _toggleNotifications,
+              ),
+            ),
+          ),
+        ],
       ),
       body: Stack(children: [
         IndexedStack(
@@ -199,29 +200,33 @@ class _PageNavigatorState extends State<PageNavigator> {
                       ],
                     ),
                     const Divider(),
-                    ListView.builder(
-                      scrollDirection: Axis.vertical,
-                      shrinkWrap: true,
-                      itemCount: listOfNotifications.length,
-                      itemBuilder: (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 4, horizontal: 5),
-                          child: Container(
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: Colors.grey.shade300),
-                            child: ListTile(
-                              onTap: () => _handleNotificationTap(index),
-                              title: Text(
-                                listOfNotifications[index],
-                                style: GoogleFonts.poppins(
-                                    fontSize: 12, fontWeight: FontWeight.bold),
+                    SizedBox(
+                      height: 230,
+                      child: ListView.builder(
+                        scrollDirection: Axis.vertical,
+                        shrinkWrap: true,
+                        itemCount: listOfNotifications.length,
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 4, horizontal: 5),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: Colors.grey.shade300),
+                              child: ListTile(
+                                onTap: () => _handleNotificationTap(index),
+                                title: Text(
+                                  listOfNotifications[index],
+                                  style: GoogleFonts.poppins(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold),
+                                ),
                               ),
                             ),
-                          ),
-                        );
-                      },
+                          );
+                        },
+                      ),
                     )
                   ],
                 ),
@@ -258,24 +263,6 @@ class FriendPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Center(child: Text('Friend Page'));
-  }
-}
-
-class ProfilePage extends StatelessWidget {
-  const ProfilePage({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text('Profile Page'));
-  }
-}
-
-class RankPage extends StatelessWidget {
-  const RankPage({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text('Rank Page'));
   }
 }
 
