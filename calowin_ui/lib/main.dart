@@ -12,6 +12,19 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-        title: 'CaloWin', debugShowCheckedModeBanner: false, home: Loginpage());
+      title: 'CaloWin',
+      debugShowCheckedModeBanner: false,
+      home: Loginpage(),
+      // initialRoute: '/',
+      // routes: {
+      //   '/login': (context) => const Loginpage(),
+      //   '/signup': (context) => const SignupPage(),
+      //   '/home': (context) => const PageNavigator(
+      //         startPage: 0,
+      //       ),
+      //   '/profile': (context) => const ProfilePage(),
+      //   '/editprofile': (context) => const EditprofilePage()
+      //   },
+    );
   }
 }
