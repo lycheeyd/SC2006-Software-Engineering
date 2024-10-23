@@ -12,6 +12,7 @@ class InputField extends StatefulWidget {
   final bool hasError;
   final TextInputType? keyboardType;
   final List<TextInputFormatter>? inputFormatter;
+  final bool obscureText;
 
   const InputField(
       {super.key,
@@ -20,6 +21,7 @@ class InputField extends StatefulWidget {
       required this.inputController,
       required this.title,
       required this.inputHint,
+      required this.obscureText,
       this.bottomHint,
       this.keyboardType,
       this.inputFormatter});
@@ -38,6 +40,7 @@ class _InputFieldState extends State<InputField> {
   String? _bottomHint;
   late TextInputType? _keyboardType;
   late List<TextInputFormatter>? _inputFormatter;
+  late bool _obscureText;
 
   @override
   void initState() {
@@ -49,6 +52,7 @@ class _InputFieldState extends State<InputField> {
     _inputEmail = widget.inputController;
     _title = widget.title;
     _inputHint = widget.inputHint;
+    _obscureText = widget.obscureText;
     if (widget.bottomHint != null) {
       _bottomHint = widget.bottomHint;
       _hasBottomHint = true;
@@ -79,6 +83,8 @@ class _InputFieldState extends State<InputField> {
           SizedBox(
             height: 50,
             child: TextField(
+                obscureText: _obscureText,
+                textInputAction: TextInputAction.done,
                 keyboardType: _keyboardType,
                 inputFormatters: _inputFormatter,
                 controller: _inputEmail,

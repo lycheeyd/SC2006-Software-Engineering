@@ -1,3 +1,4 @@
+import 'package:calowin/Pages/profile/editprofile_page.dart';
 import 'package:calowin/common/colors_and_fonts.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:calowin/common/user_profile.dart';
@@ -27,7 +28,7 @@ class _ProfilePageState extends State<ProfilePage> {
         name: "Eric Koh",
         email: "Eric123@gmail.com",
         userID: "#044612",
-        bio: "A typical guy\ncool\nPhd in Bio Science",
+        bio: "012345678901234567890123456789",
         weight: 80,
         carbonSaved: 4000,
         calorieBurn: 2300,
@@ -39,7 +40,10 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  void _handleEditProfile() {}
+  void _handleEditProfile() {
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => const EditprofilePage()));
+  }
 
   void _handleLogOut() {}
 
@@ -126,7 +130,7 @@ class _ProfilePageState extends State<ProfilePage> {
           children: [
             fieldBuilder("Name", _profile.getName()),
             fieldBuilder("User ID", _profile.getUserID()),
-            fieldBuilder("Email", _profile.getEmail()),
+            fieldBuilder("Email", _profile.getEmail() ?? "Error Retrieving"),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
               child: SizedBox(
@@ -282,9 +286,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           width: 150,
                           height: 40,
                           child: ElevatedButton(
-                              onPressed: () {
-                                _handleLogOut();
-                              },
+                              onPressed: _handleLogOut,
                               style: ElevatedButton.styleFrom(
                                 elevation: 0,
                                 backgroundColor: Colors.red,

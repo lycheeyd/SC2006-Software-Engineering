@@ -1,4 +1,5 @@
 import 'package:calowin/common/colors_and_fonts.dart';
+import 'package:calowin/control/page_navigator.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:calowin/common/medals.dart';
@@ -47,7 +48,15 @@ class _RankPageState extends State<RankPage> {
   }
 
   void _onListItemTap(String name) {
-    //navigate to the person's profile
+    //first retrieve the user id then pass to the page navigator (logic to be considered)
+    const String userID = "#12345";
+    final pageNavigatorState =
+        context.findAncestorStateOfType<PageNavigatorState>();
+
+    if (pageNavigatorState != null) {
+      pageNavigatorState.navigateToPage(3,
+          params: {'userID': userID}); // Navigate to Profile tab
+    }
   }
 
   Widget _buildListItem(int index, String name, int points, Image? medal) {

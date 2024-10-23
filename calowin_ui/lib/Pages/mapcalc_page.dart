@@ -74,6 +74,7 @@ class _MapcalcPageState extends State<MapcalcPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: PrimaryColors.dullGreen,
       body: Column(
         children: [

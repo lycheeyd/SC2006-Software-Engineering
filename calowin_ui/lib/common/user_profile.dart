@@ -1,6 +1,6 @@
 class UserProfile {
   late final String _name;
-  late final String _email;
+  late final String? _email;
   late final String _userID;
   late String _bio;
   late int _weight;
@@ -11,7 +11,7 @@ class UserProfile {
   // Constructor
   UserProfile({
     required String name,
-    required String email,
+    String? email,
     required String userID,
     required String bio,
     required int weight,
@@ -34,7 +34,7 @@ class UserProfile {
     return _name;
   }
 
-  String getEmail() {
+  String? getEmail() {
     return _email;
   }
 

@@ -9,6 +9,7 @@ class InputDialog extends StatelessWidget {
   final VoidCallback onCancel;
   final String? confirmButtonText;
   final String hintText;
+  final Color? confirmButtonColor;
 
   const InputDialog({
     super.key,
@@ -18,6 +19,7 @@ class InputDialog extends StatelessWidget {
     required this.onCancel,
     required this.hintText,
     this.confirmButtonText,
+    this.confirmButtonColor,
   });
 
   @override
@@ -110,7 +112,7 @@ class InputDialog extends StatelessWidget {
                       },
                       style: ElevatedButton.styleFrom(
                         elevation: 0,
-                        backgroundColor: Colors.black,
+                        backgroundColor: confirmButtonColor ?? Colors.black,
                         padding: const EdgeInsets.symmetric(
                             horizontal: 10, vertical: 5),
                         shape: RoundedRectangleBorder(
