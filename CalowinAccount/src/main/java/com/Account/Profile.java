@@ -29,10 +29,11 @@ public class Profile {
     public Profile() {
     }
 
-    public Profile(String userID, String name, float weight) {
+    public Profile(String userID, String name, float weight, String bio) {
         this.userID = userID;
         this.name = name;
         this.weight = weight;
+        this.bio = bio;
     }
     
     public String getUserID() {

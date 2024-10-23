@@ -17,7 +17,7 @@ import com.DataTransferObject.SignupDTO;
 
 @RestController
 @RequestMapping("/auth")
-public class AuthController {
+public class AccountController {
 
     @Autowired
     private UserService userService;

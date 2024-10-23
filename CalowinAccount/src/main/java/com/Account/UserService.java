@@ -63,10 +63,10 @@ public class UserService {
         User user = new User(userID, email, passwordEncoder.encode(decryptedPassword));
         calowinSecureDBRepository.save(user);
 
-        Profile profile = new Profile(userID, name, weight);
+        Profile profile = new Profile(userID, name, weight, "");
         calowinDBRepository.save(profile);
 
-        return new ResponseDTO(userID, email, name, weight, "");
+        return new ResponseDTO(user.getUserID(), user.getEmail(), profile.getName(), profile.getWeight(), profile.getBio());
 
     }
 
