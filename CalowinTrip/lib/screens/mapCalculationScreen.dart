@@ -8,6 +8,8 @@ import '../models/currentlocation.dart';
 import '../services/apiService.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../models/travelmethod.dart';
+import 'package:geolocator/geolocator.dart'; // Import Geolocator
+import 'package:permission_handler/permission_handler.dart'; // Import Permission Handler
 import 'achievementScreen.dart'; // Import AchievementScreen
 
 class MapcalcPage extends StatefulWidget {
@@ -26,7 +28,7 @@ class _MapcalcPageState extends State<MapcalcPage> {
   CurrentLocation? userCurrentLocation;
   String? resultMessage;
   late GoogleMapController mapController;
-
+  
   late int _currentIndex = 99; // To unselect transport method
   late bool _tripStarted = false;
 
@@ -34,8 +36,8 @@ class _MapcalcPageState extends State<MapcalcPage> {
   void initState() {
     super.initState();
     _fetchLocations();
-    _fetchCurrentLocation();
     _fetchTravelMethods();
+    _getUserCurrentLocation(); // Fetch user's current location
   }
 
   Future<void> _fetchLocations() async {
@@ -44,15 +46,6 @@ class _MapcalcPageState extends State<MapcalcPage> {
       setState(() {});
     } catch (e) {
       print('Error fetching locations: $e');
-    }
-  }
-
-  Future<void> _fetchCurrentLocation() async {
-    try {
-      userCurrentLocation = await apiService.fetchCurrentLocation();
-      setState(() {});
-    } catch (e) {
-      print('Error fetching current location: $e');
     }
   }
 
@@ -65,9 +58,58 @@ class _MapcalcPageState extends State<MapcalcPage> {
     }
   }
 
+  // New: Fetch user's current location using Geolocator
+  Future<void> _getUserCurrentLocation() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    // Check if location services are enabled
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      print('Location services are disabled.');
+      return;
+    }
+
+    // Request location permissions
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        print('Location permissions are denied.');
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      print('Location permissions are permanently denied.');
+      return;
+    }
+
+    // Get current position
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+
+    // Set the user's current location
+    setState(() {
+      userCurrentLocation = CurrentLocation(
+        latitude: position.latitude,
+        longitude: position.longitude,
+        name: 'My Location',
+      );
+    });
+
+    // Pan the map to user's current location
+    if (mapController != null) {
+      mapController.animateCamera(
+        CameraUpdate.newLatLng(
+          LatLng(position.latitude, position.longitude),
+        ),
+      );
+    }
+  }
+
   Future<void> _startTrip() async {
-    String userId =
-        "user123"; // Retrieve the actual user ID from your auth logic
+    String userId = "user123"; // Retrieve the actual user ID from your auth logic
 
     if (selectedLocation != null && selectedMethod != null) {
       try {
@@ -233,94 +275,87 @@ class _MapcalcPageState extends State<MapcalcPage> {
             ),
           SizedBox(height: 20),
           DropdownButton<Location>(
-            hint: Text('Select a destination'),
+            hint: Text('Select your destination'),
             value: selectedLocation,
-            onChanged: _tripStarted
-                ? null
-                : (Location? newValue) {
-                    setState(() {
-                      selectedLocation = newValue;
-                    });
-                  },
-            items: locations.map((Location loc) {
-              return DropdownMenuItem<Location>(
-                value: loc,
-                child: Text(loc.name),
-              );
-            }).toList(),
+            items: locations
+                .map((location) => DropdownMenuItem(
+                      value: location,
+                      child: Text(location.name),
+                    ))
+                .toList(),
+            onChanged: (location) {
+              setState(() {
+                selectedLocation = location;
+              });
+            },
           ),
           SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _transportIconBuilder(Icons.directions_walk, "Walk", 0),
-              _transportIconBuilder(Icons.pedal_bike, "Bicycle", 1),
-              _transportIconBuilder(Icons.directions_bus, "Bus", 2),
-              _transportIconBuilder(Icons.directions_car, "Car", 3),
-            ],
-          ),
-          const SizedBox(height: 15),
-          Container(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.width + 30,
-            color: Colors.white,
+          Expanded(
             child: GoogleMap(
-              onMapCreated: (GoogleMapController controller) {
+              onMapCreated: (controller) {
                 mapController = controller;
-                if (userCurrentLocation != null) {
-                  mapController.animateCamera(
-                    CameraUpdate.newLatLng(
-                      LatLng(userCurrentLocation!.latitude,
-                          userCurrentLocation!.longitude),
-                    ),
-                  );
-                }
               },
               initialCameraPosition: CameraPosition(
-                target: LatLng(0, 0), // Default position; adjust as necessary
-                zoom: 12,
+                target: LatLng(
+                  userCurrentLocation?.latitude ?? 0,
+                  userCurrentLocation?.longitude ?? 0,
+                ),
+                zoom: 15,
               ),
-              markers: selectedLocation != null
-                  ? {
-                      Marker(
-                        markerId: MarkerId('destination'),
-                        position: LatLng(
-                          selectedLocation!.latitude,
-                          selectedLocation!.longitude,
-                        ),
-                      ),
-                    }
-                  : {},
-            ),
-          ),
-          Expanded(
-            child: SizedBox(
-              child: !_tripStarted // Check which buttons to display
-                  ? Center(
-                      child: SizedBox(
-                        width: 200,
-                        child: ElevatedButton(
-                          onPressed: _startTrip,
-                          child: const Text('Start Trip'),
-                        ),
-                      ),
-                    )
-                  : Center(
-                      child: SizedBox(
-                        width: 200,
-                        child: ElevatedButton(
-                          onPressed: _endTrip,
-                          child: const Text('End Trip'),
-                        ),
-                      ),
+              markers: {
+                if (selectedLocation != null)
+                  Marker(
+                    markerId: MarkerId(selectedLocation!.name),
+                    position: LatLng(
+                      selectedLocation!.latitude,
+                      selectedLocation!.longitude,
                     ),
+                    infoWindow: InfoWindow(
+                      title: selectedLocation!.name,
+                    ),
+                  ),
+              },
             ),
           ),
-          if (resultMessage != null) ...[
-            Text(resultMessage!, style: TextStyle(fontSize: 16)),
-            SizedBox(height: 20),
-          ],
+          if (resultMessage != null)
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Text(resultMessage!,
+                  style: TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.bold)),
+            ),
+          if (!_tripStarted)
+            ElevatedButton(
+              onPressed: _startTrip,
+              child: Text('Start Trip'),
+            ),
+          if (_tripStarted)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: _endTrip,
+                  child: Text('End Trip'),
+                ),
+                SizedBox(width: 20),
+                ElevatedButton(
+                  onPressed: _resetState,
+                  child: Text('Delete Trip'),
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                ),
+              ],
+            ),
         ],
+      ),
+      bottomNavigationBar: BottomAppBar(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _transportIconBuilder(Icons.directions_walk, 'Walk', 0),
+            _transportIconBuilder(Icons.directions_car, 'Car', 1),
+            _transportIconBuilder(Icons.directions_bus, 'Bus', 2),
+          ],
+        ),
       ),
     );
   }

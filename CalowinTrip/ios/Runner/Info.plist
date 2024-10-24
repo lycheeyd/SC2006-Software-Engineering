@@ -13,7 +13,7 @@
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>We need access to your location to show it on the map.</string>
 	<key>GMSApiKey</key>
-	<string>AIzaSyAWC5I05G8QNtoVAXk_0hbrZkJh2EgQtpU</string>
+	<string>---</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
