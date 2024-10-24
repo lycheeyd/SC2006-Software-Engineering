@@ -39,6 +39,12 @@ public class AccountController extends HttpReqController{
         return restTemplate.postForEntity(url, request, String.class);
     }
 
+    @PostMapping("/send-OTP")
+    public ResponseEntity<String> login(@RequestBody String email) {
+        String url = "http://localhost:8081/account/send-OTP";
+        return restTemplate.postForEntity(url, email, String.class);
+    }
+
     @PostMapping("/change-password")
     public ResponseEntity<String> changePassword(@RequestBody ChangePasswordDTO request) {
         // Forward change password request to AccountModule
