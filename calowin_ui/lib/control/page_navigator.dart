@@ -2,9 +2,10 @@ import 'package:calowin/Pages/friends/addfriends_page.dart';
 import 'package:calowin/Pages/friends/friends_page.dart';
 import 'package:calowin/Pages/otheruser_page.dart';
 import 'package:calowin/Pages/profile/profile_page.dart';
-import 'package:calowin/Pages/wellness_page.dart';
+import 'package:calowin/Pages/wellnesszone_page.dart';
 import 'package:flutter/material.dart';
 import 'package:calowin/Pages/mapcalc_page.dart';
+import 'package:calowin/Pages/wellness_page.dart';
 import 'package:calowin/Pages/rank_page.dart';
 import 'package:calowin/common/colors_and_fonts.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -28,7 +29,7 @@ class PageNavigatorState extends State<PageNavigator> {
     (params) => const RankPage(),
     (params) => const ProfilePage(),
     (params) => const FriendsPage(),
-    (params) => const WellnessPage(),
+    (params) => const WellnessZonePage(),
     //below are all not available in navigation bar
     (params) => OtheruserPage(
           userID: params?['userID'], //passing the user's id to redirect

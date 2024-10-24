@@ -131,13 +131,10 @@ class _MapcalcPageState extends State<MapcalcPage> {
             height: 15,
           ),
           Container(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.width + 30,
-            color: Colors.white,
-            child: const Center(
-              child: Text("Insert Map Here"),
-            ),
-          ),
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.width + 30,
+              color: Colors.white,
+              child: const Center(child: Text("Insert Map here"))),
           Expanded(
             child: SizedBox(
               child: !_tripStarted //check which buttons to display
