@@ -1,5 +1,8 @@
+import 'package:calowin/Pages/friends/addfriends_page.dart';
+import 'package:calowin/Pages/friends/friends_page.dart';
 import 'package:calowin/Pages/otheruser_page.dart';
 import 'package:calowin/Pages/profile/profile_page.dart';
+import 'package:calowin/Pages/wellness_page.dart';
 import 'package:flutter/material.dart';
 import 'package:calowin/Pages/mapcalc_page.dart';
 import 'package:calowin/Pages/rank_page.dart';
@@ -24,10 +27,13 @@ class PageNavigatorState extends State<PageNavigator> {
     (params) => const MapcalcPage(),
     (params) => const RankPage(),
     (params) => const ProfilePage(),
+    (params) => const FriendsPage(),
+    (params) => const WellnessPage(),
+    //below are all not available in navigation bar
     (params) => OtheruserPage(
           userID: params?['userID'], //passing the user's id to redirect
         ),
-    (params) => const WellnessPage(),
+    (params) => const AddfriendsPage(),
   ];
 
   List<String> listOfNotifications = <String>[
@@ -52,6 +58,7 @@ class PageNavigatorState extends State<PageNavigator> {
       _currentIndex = index;
       _currentParams = params; // Save parameters if needed
     });
+    print("Navigating to page $_currentIndex");
   }
 
   void _toggleNotifications() {
@@ -68,7 +75,7 @@ class PageNavigatorState extends State<PageNavigator> {
 
   void _handleNotificationTap(int index) {
     setState(() {
-      _currentIndex = 3;
+      navigateToPage(5, params: {"userID": "888888"});
       _toggleNotifications();
       //index should be passed to the profile page to be able to open the profile page of the person
       //alternately can just open the friend request page
@@ -93,14 +100,16 @@ class PageNavigatorState extends State<PageNavigator> {
               height: 35,
               width: 80,
               decoration: BoxDecoration(
-                color: _currentIndex == index
+                color: (_currentIndex < 5 ? _currentIndex : 3) == index
                     ? PrimaryColors.darkGreen
                     : lightgreen,
                 borderRadius: BorderRadius.circular(20), // Rounded rectangle
               ),
               child: Icon(
                 icon,
-                color: _currentIndex == index ? Colors.white : Colors.black,
+                color: (_currentIndex < 5 ? _currentIndex : 3) == index
+                    ? Colors.white
+                    : Colors.black,
               ),
             ),
             const SizedBox(height: 4),
@@ -267,16 +276,5 @@ class PageNavigatorState extends State<PageNavigator> {
         ),
       ),
     );
-  }
-}
-
-//temporary placeholders for the pages
-
-class WellnessPage extends StatelessWidget {
-  const WellnessPage({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text('Wellness Page'));
   }
 }

@@ -53,8 +53,9 @@ class _RankPageState extends State<RankPage> {
     final pageNavigatorState =
         context.findAncestorStateOfType<PageNavigatorState>();
 
+    //change here
     if (pageNavigatorState != null) {
-      pageNavigatorState.navigateToPage(3,
+      pageNavigatorState.navigateToPage(5,
           params: {'userID': userID}); // Navigate to Profile tab
     }
   }

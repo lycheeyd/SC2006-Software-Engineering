@@ -1,5 +1,6 @@
 import 'package:calowin/common/colors_and_fonts.dart';
 import 'package:calowin/common/dualbutton_dialog.dart';
+import 'package:calowin/control/page_navigator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:calowin/common/user_profile.dart';
 import 'package:calowin/control/words2widget_converter.dart';
@@ -30,7 +31,7 @@ class _OtheruserPageState extends State<OtheruserPage> {
   @override
   void initState() {
     super.initState();
-    _userStatus = UserStatus.friendrequest;
+    _userStatus = UserStatus.friend;
     _userID = widget.userID;
     getUserProfile(_userID);
   }
@@ -40,6 +41,7 @@ class _OtheruserPageState extends State<OtheruserPage> {
   void didUpdateWidget(OtheruserPage oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.userID != oldWidget.userID) {
+      _userStatus = UserStatus.friend;
       _userID = widget.userID; // Update the userID
       getUserProfile(_userID);
       // Fetch the new profile
@@ -65,7 +67,7 @@ class _OtheruserPageState extends State<OtheruserPage> {
       } else {
         print("User found");
         _userFound = true;
-        _userStatus = UserStatus.friendrequest;
+        _userStatus = UserStatus.friend;
         _profile = UserProfile(
             name: "Friend 1",
             email: "Friend@gmail.com",
@@ -84,6 +86,15 @@ class _OtheruserPageState extends State<OtheruserPage> {
         }
       }
     });
+  }
+
+  void _handleBack() {
+    final pageNavigatorState =
+        context.findAncestorStateOfType<PageNavigatorState>();
+    //change here
+    if (pageNavigatorState != null) {
+      pageNavigatorState.navigateToPage(3); // Navigate to AddFriendsPage
+    }
   }
 
   void _handleRequestFriend() {
@@ -207,8 +218,8 @@ class _OtheruserPageState extends State<OtheruserPage> {
                           content:
                               "You will not see him on your leaderboard anymore",
                           onConfirm: () {
+                            Navigator.of(context).pop();
                             _handleRemoveFriend();
-                            Navigator.of(context).pop;
                           },
                           onCancel: Navigator.of(context).pop)),
                   style: ElevatedButton.styleFrom(
@@ -342,6 +353,13 @@ class _OtheruserPageState extends State<OtheruserPage> {
 
     return Scaffold(
       backgroundColor: PrimaryColors.dullGreen,
+      appBar: AppBar(
+        backgroundColor: PrimaryColors.dullGreen,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: _handleBack,
+        ),
+      ),
       body: _userFound
           ? Padding(
               padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
@@ -388,7 +406,7 @@ class _OtheruserPageState extends State<OtheruserPage> {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
                     child: SizedBox(
-                      height: 170,
+                      height: 130,
                       width: 400,
                       child: Column(
                         children: [
@@ -402,7 +420,7 @@ class _OtheruserPageState extends State<OtheruserPage> {
                             ),
                           ),
                           Container(
-                            height: 130,
+                            height: 90,
                             decoration: BoxDecoration(
                                 color: const Color.fromARGB(255, 153, 240, 152),
                                 borderRadius: BorderRadius.circular(10)),
@@ -413,8 +431,6 @@ class _OtheruserPageState extends State<OtheruserPage> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    fieldInContainerBuilder("Weight",
-                                        _profile!.getWeight().toString(), "kg"),
                                     fieldInContainerBuilder(
                                         "Total Carbon Saved",
                                         _profile!.getCarbonSaved().toString(),
@@ -455,7 +471,7 @@ class _OtheruserPageState extends State<OtheruserPage> {
                                 borderRadius: BorderRadius.circular(10)),
                             child: Padding(
                                 padding: const EdgeInsets.symmetric(
-                                    vertical: 2, horizontal: 2),
+                                    vertical: 2, horizontal: 17),
                                 child: ListView.builder(
                                   scrollDirection: Axis.horizontal,
                                   shrinkWrap: true,
