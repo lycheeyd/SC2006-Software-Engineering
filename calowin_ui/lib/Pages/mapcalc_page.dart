@@ -14,6 +14,8 @@ class MapcalcPage extends StatefulWidget {
 class _MapcalcPageState extends State<MapcalcPage> {
   late int _currentIndex = 99; //to unselect transport method
   late bool _tripStarted = false;
+  static const LatLng A = LatLng(37.4221, -122.0841);
+  static const LatLng B = LatLng(37.3346, -122.0090);
 
   void _handleSearch(String address) {}
 
@@ -135,8 +137,21 @@ class _MapcalcPageState extends State<MapcalcPage> {
             height: MediaQuery.of(context).size.width + 30,
             color: Colors.white,
             child: const Center(
-              child: Text("Insert Map Here"),
+              child: GoogleMap(
+              initialCameraPosition: CameraPosition(
+              target: _googlePlex,  // Ensure _googlePlex is defined with a LatLng value
+              zoom: 13,
             ),
+            markers: {
+            Marker(
+              markerId: MarkerId("currentLocation"),  // Unique marker ID
+              position: A,  // Marker placed at _googlePlex
+              icon: BitmapDescriptor.defaultMarker),
+            Marker(
+              markerId: MarkerId("sourceLocation"),  // Unique marker ID
+              position: B,  // Marker placed at _googlePlex
+              icon: BitmapDescriptor.defaultMarker)
+            },
           ),
           Expanded(
             child: SizedBox(
