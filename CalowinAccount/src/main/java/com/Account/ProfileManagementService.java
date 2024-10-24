@@ -25,11 +25,11 @@ public class ProfileManagementService {
     private CalowinDBRepository calowinDBRepository;
 
     // Signup method
-    public ResponseDTO edit(String email, String encryptedPassword, String encryptedConfirmPassword, String name, float weight) throws Exception {
+    //public ResponseDTO edit(String email, String encryptedPassword, String encryptedConfirmPassword, String name, float weight) throws Exception {
 
-        return new ResponseDTO(user.getUserID(), user.getEmail(), profile.getName(), profile.getWeight(), profile.getBio());
+        //return new ResponseDTO(user.getUserID(), user.getEmail(), profile.getName(), profile.getWeight(), profile.getBio());
 
-    }
+    //}
 
 
 }
