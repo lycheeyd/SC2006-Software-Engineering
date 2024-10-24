@@ -1,4 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.perission.ACCESS_COARSE_LOCATION/">
+
     <application
         android:label="calowin"
         android:name="${applicationName}"
@@ -30,6 +34,12 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+
+            <!-- Add your Google Maps API key -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyAmYNlUJ1_e6cO6L6rd2iLvM4X9-hLEtF4"/>
+
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

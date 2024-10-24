@@ -6,6 +6,7 @@ import 'package:calowin/common/colors_and_fonts.dart';
 import '../models/location.dart';
 import '../models/currentlocation.dart';
 import '../services/apiService.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../models/travelmethod.dart';
 import 'achievementScreen.dart'; // Import AchievementScreen
 
@@ -24,7 +25,8 @@ class _MapcalcPageState extends State<MapcalcPage> {
   String? selectedMethod;
   CurrentLocation? userCurrentLocation;
   String? resultMessage;
-  
+  late GoogleMapController mapController;
+
   late int _currentIndex = 99; // To unselect transport method
   late bool _tripStarted = false;
 
@@ -64,15 +66,18 @@ class _MapcalcPageState extends State<MapcalcPage> {
   }
 
   Future<void> _startTrip() async {
-    String userId = "user123"; // Retrieve the actual user ID from your auth logic
+    String userId =
+        "user123"; // Retrieve the actual user ID from your auth logic
 
     if (selectedLocation != null && selectedMethod != null) {
       try {
-        final metrics = await apiService.startTrip(selectedLocation!, selectedMethod!, userId);
+        final metrics = await apiService.startTrip(
+            selectedLocation!, selectedMethod!, userId);
         print('Metrics received: $metrics');
 
         setState(() {
-          resultMessage = 'Calories burned: ${metrics['caloriesBurnt']}, Carbon saved: ${metrics['carbonSaved']} kg, Distance: ${metrics['distance'].toStringAsFixed(2)} km';
+          resultMessage =
+              'Calories burned: ${metrics['caloriesBurnt']}, Carbon saved: ${metrics['carbonSaved']} kg, Distance: ${metrics['distance'].toStringAsFixed(2)} km';
           _tripStarted = true; // Mark trip as started
         });
       } catch (e) {
@@ -117,17 +122,19 @@ class _MapcalcPageState extends State<MapcalcPage> {
   }
 
   void _navigateToAchievement() async {
-    if (selectedLocation != null && selectedMethod != null && userCurrentLocation != null) {
+    if (selectedLocation != null &&
+        selectedMethod != null &&
+        userCurrentLocation != null) {
       final metrics = resultMessage!.split(',');
       final distance = double.parse(metrics[2].split(': ')[1].split(' ')[0]);
       final caloriesBurnt = int.parse(metrics[0].split(': ')[1]);
       final carbonSaved = int.parse(metrics[1].split(': ')[1].split(' ')[0]);
-      
+
       try {
         // Send trip metrics to the backend
         await apiService.addTripMetrics(carbonSaved, caloriesBurnt);
         print('Trip metrics sent successfully.');
-        
+
         // Navigate to AchievementScreen and pass metrics
         Navigator.push(
           context,
@@ -151,19 +158,20 @@ class _MapcalcPageState extends State<MapcalcPage> {
   }
 
   void _resetState() {
-  setState(() {
-    _tripStarted = false; // Reset trip state
-    selectedLocation = null; // Reset location
-    selectedMethod = null; // Reset method
-    _currentIndex = 99; // Reset transport method selection
-    resultMessage = null; // Clear result message
-  });
-}
+    setState(() {
+      _tripStarted = false; // Reset trip state
+      selectedLocation = null; // Reset location
+      selectedMethod = null; // Reset method
+      _currentIndex = 99; // Reset transport method selection
+      resultMessage = null; // Clear result message
+    });
+  }
 
   void _onItemTapped(int index) {
     setState(() {
       _currentIndex = index;
-      selectedMethod = travelMethods[index]; // Set selected method based on tapped index
+      selectedMethod =
+          travelMethods[index]; // Set selected method based on tapped index
     });
   }
 
@@ -227,11 +235,13 @@ class _MapcalcPageState extends State<MapcalcPage> {
           DropdownButton<Location>(
             hint: Text('Select a destination'),
             value: selectedLocation,
-            onChanged: _tripStarted ? null : (Location? newValue) {
-              setState(() {
-                selectedLocation = newValue;
-              });
-            },
+            onChanged: _tripStarted
+                ? null
+                : (Location? newValue) {
+                    setState(() {
+                      selectedLocation = newValue;
+                    });
+                  },
             items: locations.map((Location loc) {
               return DropdownMenuItem<Location>(
                 value: loc,
@@ -254,8 +264,33 @@ class _MapcalcPageState extends State<MapcalcPage> {
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.width + 30,
             color: Colors.white,
-            child: const Center(
-              child: Text("Insert Map Here"),
+            child: GoogleMap(
+              onMapCreated: (GoogleMapController controller) {
+                mapController = controller;
+                if (userCurrentLocation != null) {
+                  mapController.animateCamera(
+                    CameraUpdate.newLatLng(
+                      LatLng(userCurrentLocation!.latitude,
+                          userCurrentLocation!.longitude),
+                    ),
+                  );
+                }
+              },
+              initialCameraPosition: CameraPosition(
+                target: LatLng(0, 0), // Default position; adjust as necessary
+                zoom: 12,
+              ),
+              markers: selectedLocation != null
+                  ? {
+                      Marker(
+                        markerId: MarkerId('destination'),
+                        position: LatLng(
+                          selectedLocation!.latitude,
+                          selectedLocation!.longitude,
+                        ),
+                      ),
+                    }
+                  : {},
             ),
           ),
           Expanded(
@@ -263,72 +298,28 @@ class _MapcalcPageState extends State<MapcalcPage> {
               child: !_tripStarted // Check which buttons to display
                   ? Center(
                       child: SizedBox(
-                        width: 150,
-                        height: 40,
+                        width: 200,
                         child: ElevatedButton(
                           onPressed: _startTrip,
-                          style: ElevatedButton.styleFrom(
-                            elevation: 0,
-                            backgroundColor: const Color.fromARGB(255, 48, 93, 48),
-                            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 3),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10), // Rounded corners
-                            ),
-                          ),
-                          child: Text(
-                            "Start",
-                            style: GoogleFonts.roboto(fontSize: 16, color: Colors.white),
-                          ),
+                          child: const Text('Start Trip'),
                         ),
                       ),
                     )
-                  : Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        SizedBox(
-                          width: 150,
-                          height: 40,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              _resetState();
-                            },
-                            style: ElevatedButton.styleFrom(
-                              elevation: 0,
-                              backgroundColor: Colors.red,
-                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 3),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            child: Text(
-                              "Delete Trip",
-                              style: GoogleFonts.roboto(fontSize: 16, color: Colors.white),
-                            ),
-                          ),
+                  : Center(
+                      child: SizedBox(
+                        width: 200,
+                        child: ElevatedButton(
+                          onPressed: _endTrip,
+                          child: const Text('End Trip'),
                         ),
-                        SizedBox(
-                          width: 150,
-                          height: 40,
-                          child: ElevatedButton(
-                            onPressed: _endTrip,
-                            style: ElevatedButton.styleFrom(
-                              elevation: 0,
-                              backgroundColor: Colors.green,
-                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 3),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            child: Text(
-                              "End Trip",
-                              style: GoogleFonts.roboto(fontSize: 16, color: Colors.white),
-                            ),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
             ),
           ),
+          if (resultMessage != null) ...[
+            Text(resultMessage!, style: TextStyle(fontSize: 16)),
+            SizedBox(height: 20),
+          ],
         ],
       ),
     );

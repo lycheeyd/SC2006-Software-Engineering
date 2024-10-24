@@ -5,13 +5,10 @@ import '../models/travelmethod.dart';
 import '../models/currentlocation.dart';
 import '../models/achievement.dart'; // Adjust the path based on your project structure
 
-
-
-
 class ApiService {
-   final String baseUrl = "http://172.21.146.188:8080/api"; // VM URL 
+  //final String baseUrl = "http://172.21.146.188:8080/api"; // VM URL
+  final String baseUrl = "http://192.168.18.71:8080/"; // VM URL
   // final String baseUrl = "http://10.91.236.124:8080/api"; NTU URL
-  
 
   ApiService();
 
@@ -20,7 +17,10 @@ class ApiService {
     final response = await http.get(Uri.parse('$baseUrl/trips/locations'));
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
-      return data.map((loc) => Location(loc['name'], loc['latitude'], loc['longitude'])).toList();
+      return data
+          .map(
+              (loc) => Location(loc['name'], loc['latitude'], loc['longitude']))
+          .toList();
     } else {
       throw Exception('Failed to load locations');
     }
@@ -28,7 +28,8 @@ class ApiService {
 
   // Fetch current location
   Future<CurrentLocation> fetchCurrentLocation() async {
-    final response = await http.get(Uri.parse('$baseUrl/trips/current-location'));
+    final response =
+        await http.get(Uri.parse('$baseUrl/trips/current-location'));
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       return CurrentLocation(
@@ -53,7 +54,8 @@ class ApiService {
   }
 
   // Start a trip with a given destination and travel method
-  Future<Map<String, dynamic>> startTrip(Location destination, String method, String user_id) async {
+  Future<Map<String, dynamic>> startTrip(
+      Location destination, String method, String user_id) async {
     final response = await http.post(
       Uri.parse('$baseUrl/trips/start'),
       headers: {'Content-Type': 'application/json'},
@@ -78,7 +80,8 @@ class ApiService {
 
   // Fetch achievement progress from the backend
   Future<Map<String, dynamic>> getAchievementProgress() async {
-    final response = await http.get(Uri.parse(baseUrl + "/achievements/progress"));
+    final response =
+        await http.get(Uri.parse(baseUrl + "/achievements/progress"));
 
     if (response.statusCode == 200) {
       return json.decode(response.body);
@@ -89,17 +92,11 @@ class ApiService {
 
   // Send trip metrics to the backend
   Future<void> addTripMetrics(int carbonSaved, int caloriesBurnt) async {
-    final response = await http.post(
-Uri.parse(baseUrl + "/achievements/addTripMetrics?carbonSaved=$carbonSaved&caloriesBurnt=$caloriesBurnt")
-    );
+    final response = await http.post(Uri.parse(baseUrl +
+        "/achievements/addTripMetrics?carbonSaved=$carbonSaved&caloriesBurnt=$caloriesBurnt"));
 
     if (response.statusCode != 200) {
       throw Exception("Failed to add trip metrics");
     }
   }
-
-
 }
-
-
-

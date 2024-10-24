@@ -1,9 +1,9 @@
 #!/bin/sh
 # This is a generated file; do not edit or check into version control.
-export "FLUTTER_ROOT=/Users/raphelsim/FlutterDev/flutter"
-export "FLUTTER_APPLICATION_PATH=/Users/raphelsim/Documents/GitHub/SC2006-Software-Engineering/Calowin/Calowin"
+export "FLUTTER_ROOT=C:\Users\junji\flutter_windows_3.24.3-stable\flutter"
+export "FLUTTER_APPLICATION_PATH=C:\Users\junji\Downloads\CalowinTrip"
 export "COCOAPODS_PARALLEL_CODE_SIGN=true"
-export "FLUTTER_TARGET=lib/main.dart"
+export "FLUTTER_TARGET=lib\main.dart"
 export "FLUTTER_BUILD_DIR=build"
 export "FLUTTER_BUILD_NAME=1.0.0"
 export "FLUTTER_BUILD_NUMBER=1"
