@@ -1,4 +1,4 @@
-package com.DataTransferObject.AuthDTO;
+package com.DataTransferObject;
 
 public class DeleteAccountDTO {
 

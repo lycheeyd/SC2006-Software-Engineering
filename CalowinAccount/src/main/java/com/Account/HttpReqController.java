@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.DataTransferObject.ChangePasswordDTO;
+import com.DataTransferObject.DeleteAccountDTO;
+import com.DataTransferObject.EditProfileDTO;
 import com.DataTransferObject.ForgotPasswordDTO;
 import com.DataTransferObject.LoginDTO;
 import com.DataTransferObject.ResponseDTO;
