@@ -8,9 +8,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.DataTransferObject.ResponseDTO;
-import com.Database.CalowinDBRepository;
-import com.Database.CalowinSecureDBRepository;
-import com.Database.OTPRepository;
+import com.Database.CalowinDB.CalowinDBRepository;
+import com.Database.CalowinSecureDB.CalowinSecureDBRepository;
+import com.Database.CalowinSecureDB.OTPRepository;
 
 import org.apache.commons.lang3.RandomStringUtils;
 

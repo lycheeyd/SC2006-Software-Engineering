@@ -2,17 +2,10 @@ package com.Account;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.annotation.Transactional;
 
-import com.DataTransferObject.ResponseDTO;
-import com.Database.CalowinDBRepository;
-import com.Database.CalowinSecureDBRepository;
-
-import org.apache.commons.lang3.RandomStringUtils;
-
+import com.Database.CalowinDB.CalowinDBRepository;
 
 @Service
 public class ProfileManagementService {

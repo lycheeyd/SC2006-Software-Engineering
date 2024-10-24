@@ -7,7 +7,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import com.Database.OTPRepository;
+import com.Database.CalowinSecureDB.OTPRepository;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
