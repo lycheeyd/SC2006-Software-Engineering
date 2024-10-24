@@ -29,6 +29,9 @@ public class HttpReqController {
     @Autowired
     private ProfileManagementService profileManagementService;
 
+    @Autowired
+    private OTPService otpService;
+
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody SignupDTO signupDTO) {
         // Signup logic (save user details to DB)
@@ -73,22 +76,38 @@ public class HttpReqController {
         
     }
 
-    @PostMapping("/get-OTP")
-    public ResponseEntity<String> getOTP(String userID) {
+    @PostMapping("/send-OTP")
+    public ResponseEntity<String> sendOTP(String email) {
         try {
-            // NEED EMAIL SERVICE. INVOKE OTP GENERATION AND SENDING
+            // Generates the OTP
+            String otpCode = otpService.generateAndSaveOTP(email);
+
+            // NEED EMAIL SERVICE TO SEND OTP
             // implement next time after email service is setup
             return ResponseEntity.ok("OTP sent to email associate with the account");
+        
         } catch (Exception e) {
            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error sending OTP: " + e.getMessage());
         }
+
     }
 
     @PostMapping("/change-password")
     public ResponseEntity<?> changePassword(@RequestBody ChangePasswordDTO changePasswordDTO) {
         // Change password logic (update password in DB)
+        try {
+            passwordManagementService.changePassword(changePasswordDTO.getUserID(), changePasswordDTO.getOldPassword(), changePasswordDTO.getNewPassword(), changePasswordDTO.getConfirm_newPassword());
+            
+            return ResponseEntity.ok("Password changed successfully");
+
+        } catch (RuntimeException e) {
+            // Return unauthorized error for invalid credentials
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        } catch (Exception e) {
+            // Handle other exceptions
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + e.getMessage());
+        }
         
-        return ResponseEntity.ok("Password changed successfully");
     }
 
     @PostMapping("/forget-password")
