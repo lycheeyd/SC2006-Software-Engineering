@@ -27,42 +27,42 @@ public class AccountController extends HttpReqController{
 
     @PostMapping("/signup")
     public ResponseEntity<String> signup(@RequestBody SignupDTO request) {
-        // Forward signup request to AuthModule
+        // Forward signup request to AccountModule
         String url = "http://localhost:8081/account/signup"; // URL of Auth Java application
         return restTemplate.postForEntity(url, request, String.class);
     }
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody LoginDTO request) {
-        // Forward login request to AuthModule
+        // Forward login request to AccountModule
         String url = "http://localhost:8081/account/login";
         return restTemplate.postForEntity(url, request, String.class);
     }
 
     @PostMapping("/change-password")
     public ResponseEntity<String> changePassword(@RequestBody ChangePasswordDTO request) {
-        // Forward change password request to AuthModule
+        // Forward change password request to AccountModule
         String url = "http://localhost:8081/account/change-password";
         return restTemplate.postForEntity(url, request, String.class);
     }
 
     @PostMapping("/forget-password")
     public ResponseEntity<String> forgetPassword(@RequestBody ForgotPasswordDTO request) {
-        // Forward forget password request to AuthModule
+        // Forward forget password request to AccountModule
         String url = "http://localhost:8081/account/forget-password";
         return restTemplate.postForEntity(url, request, String.class);
     }
 
-    @PostMapping("/edit-account")
-    public ResponseEntity<String> editAccount(@RequestBody EditAccountDTO request) {
-        // Forward forget password request to AuthModule
-        String url = "http://localhost:8081/account/edit-account";
+    @PostMapping("/edit-profile")
+    public ResponseEntity<String> editProfile(@RequestBody EditProfileDTO request) {
+        // Forward forget password request to AccountModule
+        String url = "http://localhost:8081/account/edit-profile";
         return restTemplate.postForEntity(url, request, String.class);
     }
 
     @PostMapping("/delete-account")
     public ResponseEntity<String> deleteAccount(@RequestBody DeleteAccountDTO request) {
-        // Forward forget password request to AuthModule
+        // Forward forget password request to AccountModule
         String url = "http://localhost:8081/account/delete-account";
         return restTemplate.postForEntity(url, request, String.class);
     }

@@ -1,5 +1,5 @@
 package com.DataTransferObject.AuthDTO;
 
-public class EditAccountDTO {
+public class EditProfileDTO {
 
 }
