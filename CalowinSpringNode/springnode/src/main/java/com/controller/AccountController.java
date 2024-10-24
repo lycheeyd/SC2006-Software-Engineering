@@ -9,7 +9,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.DataTransferObject.AuthDTO.ChangePasswordDTO;
 import com.DataTransferObject.AuthDTO.DeleteAccountDTO;
-import com.DataTransferObject.AuthDTO.EditAccountDTO;
+import com.DataTransferObject.AuthDTO.EditProfileDTO;
 import com.DataTransferObject.AuthDTO.ForgotPasswordDTO;
 import com.DataTransferObject.AuthDTO.LoginDTO;
 import com.DataTransferObject.AuthDTO.SignupDTO;
