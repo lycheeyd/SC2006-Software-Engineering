@@ -20,20 +20,20 @@ import jakarta.persistence.EntityManagerFactory;
 public class CalowinSecureDBConfig {
 
     @Primary
-    @Bean(name = "CalowinSecureDBEntityManagerFactory")
-    public LocalContainerEntityManagerFactoryBean CalowinSecureDBEntityManagerFactory(
-            EntityManagerFactoryBuilder builder, @Qualifier("CalowinSecureDBDataSource") DataSource dataSource) {
+    @Bean(name = "calowinSecureDBEntityManagerFactory")
+    public LocalContainerEntityManagerFactoryBean calowinSecureDBEntityManagerFactory(
+            EntityManagerFactoryBuilder builder, @Qualifier("calowinSecureDBDataSource") DataSource dataSource) {
         return builder
                 .dataSource(dataSource)
                 .packages("com.Account") // Entity package for CalowinSecure
-                .persistenceUnit("User")
+                .persistenceUnit("calowinSecureDB")
                 .build();
     }
 
     @Primary
-    @Bean(name = "CalowinSecureDBTransactionManager")
-    public PlatformTransactionManager CalowinSecureDBTransactionManager(
-            @Qualifier("CalowinSecureDBEntityManagerFactory") EntityManagerFactory entityManagerFactory) {
+    @Bean(name = "calowinSecureDBTransactionManager")
+    public PlatformTransactionManager calowinSecureDBTransactionManager(
+            @Qualifier("calowinSecureDBEntityManagerFactory") EntityManagerFactory entityManagerFactory) {
         return new JpaTransactionManager(entityManagerFactory);
     }
 }

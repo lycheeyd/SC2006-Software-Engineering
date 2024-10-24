@@ -10,7 +10,7 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "UserInfo")
 
-public class Profile {
+public class ProfileEntity {
 
     @Id
     @Column(name = "user_id", length = 8, nullable = false, unique = true)
@@ -26,10 +26,10 @@ public class Profile {
     private String bio;
 
     // Default constructor is required by JPA
-    public Profile() {
+    public ProfileEntity() {
     }
 
-    public Profile(String userID, String name, float weight, String bio) {
+    public ProfileEntity(String userID, String name, float weight, String bio) {
         this.userID = userID;
         this.name = name;
         this.weight = weight;

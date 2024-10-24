@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.config.Profiles;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,17 +17,23 @@ import com.DataTransferObject.ResponseDTO;
 import com.DataTransferObject.SignupDTO;
 
 @RestController
-@RequestMapping("/auth")
-public class AccountController {
+@RequestMapping("/account")
+public class HttpReqController {
 
     @Autowired
-    private UserService userService;
+    private AccountManagementService accountManagementService;
+
+    @Autowired
+    private PasswordManagementService passwordManagementService;
+
+    @Autowired
+    private ProfileManagementService profileManagementService;
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody SignupDTO signupDTO) {
         // Signup logic (save user details to DB)
         try {
-            ResponseDTO responseDTO = userService.signup(signupDTO.getEmail(), signupDTO.getPassword(), signupDTO.getConfirm_password(), signupDTO.getName(), signupDTO.getWeight());
+            ResponseDTO responseDTO = accountManagementService.signup(signupDTO.getEmail(), signupDTO.getPassword(), signupDTO.getConfirm_password(), signupDTO.getName(), signupDTO.getWeight());
     
             // Prepare response after successful signup
             Map<String, Object> response = new HashMap<>();
@@ -47,7 +54,7 @@ public class AccountController {
     public ResponseEntity<?> login(@RequestBody LoginDTO loginDTO) {
         // Login logic (check username/password)
         try {
-            ResponseDTO responseDTO = userService.login(loginDTO.getEmail(), loginDTO.getPassword());
+            ResponseDTO responseDTO = accountManagementService.login(loginDTO.getEmail(), loginDTO.getPassword());
 
             // Prepare response after successful login
             Map<String, Object> response = new HashMap<>();
@@ -66,6 +73,17 @@ public class AccountController {
         
     }
 
+    @PostMapping("/get-OTP")
+    public ResponseEntity<String> getOTP(String userID) {
+        try {
+            // NEED EMAIL SERVICE. INVOKE OTP GENERATION AND SENDING
+            // implement next time after email service is setup
+            return ResponseEntity.ok("OTP sent to email associate with the account");
+        } catch (Exception e) {
+           return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error sending OTP: " + e.getMessage());
+        }
+    }
+
     @PostMapping("/change-password")
     public ResponseEntity<?> changePassword(@RequestBody ChangePasswordDTO changePasswordDTO) {
         // Change password logic (update password in DB)
@@ -76,7 +94,20 @@ public class AccountController {
     @PostMapping("/forget-password")
     public ResponseEntity<String> forgetPassword(@RequestBody ForgotPasswordDTO forgotPasswordDTO) {
         // Forget password logic (send reset link)
+        // implement next time after email service is setup
         return ResponseEntity.ok("Password reset link sent");
+    }
+
+    @PostMapping("/edit-profile")
+    public ResponseEntity<String> editProfile(@RequestBody EditProfileDTO request) {
+        // Edit account logic
+        return ResponseEntity.ok("");
+    }
+
+    @PostMapping("/delete-account")
+    public ResponseEntity<String> deleteAccount(@RequestBody DeleteAccountDTO request) {
+        // Delete account logic
+        return ResponseEntity.ok("");
     }
 
 }

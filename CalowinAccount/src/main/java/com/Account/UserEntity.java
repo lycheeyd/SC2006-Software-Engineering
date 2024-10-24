@@ -10,7 +10,7 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "SecureUserInfo")
 
-public class User {
+public class UserEntity {
 
     @Id
     @Column(name = "user_id", length = 8, nullable = false, unique = true)
@@ -24,10 +24,10 @@ public class User {
     private String password;
 
     // Default constructor is required by JPA
-    public User() {
+    public UserEntity() {
     }
 
-    public User(String userID, String email, String password) {
+    public UserEntity(String userID, String email, String password) {
         this.userID = userID;
         this.email = email;
         this.password = password;

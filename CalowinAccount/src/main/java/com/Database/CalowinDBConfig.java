@@ -15,19 +15,19 @@ import jakarta.persistence.EntityManagerFactory;
 @Configuration
 public class CalowinDBConfig {
 
-    @Bean(name = "CalowinDBEntityManagerFactory")
-    public LocalContainerEntityManagerFactoryBean CalowinDBEntityManagerFactory(
-            EntityManagerFactoryBuilder builder, @Qualifier("CalowinDBDataSource") DataSource dataSource) {
+    @Bean(name = "calowinDBEntityManagerFactory")
+    public LocalContainerEntityManagerFactoryBean calowinDBEntityManagerFactory(
+            EntityManagerFactoryBuilder builder, @Qualifier("calowinDBDataSource") DataSource dataSource) {
         return builder
                 .dataSource(dataSource)
                 .packages("com.Account") // Entity package for CalowinDB
-                .persistenceUnit("Profile")
+                .persistenceUnit("calowinDB")
                 .build();
     }
 
-    @Bean(name = "CalowinDBTransactionManager")
-    public PlatformTransactionManager CalowinDBTransactionManager(
-            @Qualifier("CalowinDBEntityManagerFactory") EntityManagerFactory entityManagerFactory) {
+    @Bean(name = "calowinDBTransactionManager")
+    public PlatformTransactionManager calowinDBTransactionManager(
+            @Qualifier("calowinDBEntityManagerFactory") EntityManagerFactory entityManagerFactory) {
         return new JpaTransactionManager(entityManagerFactory);
     }
 }

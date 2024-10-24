@@ -4,9 +4,9 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.Account.Profile;
+import com.Account.ProfileEntity;
 
-public interface CalowinDBRepository extends JpaRepository<Profile, String> {
-    Optional<Profile> findByUserID(String userID);
+public interface CalowinDBRepository extends JpaRepository<ProfileEntity, String> {
+    Optional<ProfileEntity> findByUserID(String userID);
     boolean existsByUserID(String userID);
 }

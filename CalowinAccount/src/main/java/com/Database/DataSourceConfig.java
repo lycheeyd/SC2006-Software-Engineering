@@ -12,15 +12,15 @@ import org.springframework.context.annotation.Primary;
 public class DataSourceConfig {
 
     @Primary
-    @Bean(name = "CalowinSecureDBDataSource")
+    @Bean(name = "calowinSecureDBDataSource")
     @ConfigurationProperties(prefix = "spring.datasource.calowinsecuredb")
-    public DataSource userDbDataSource() {
+    public DataSource calowinSecureDBDataSource() {
         return DataSourceBuilder.create().build();
     }
 
-    @Bean(name = "CalowinDBDataSource")
+    @Bean(name = "calowinDBDataSource")
     @ConfigurationProperties(prefix = "spring.datasource.calowindb")
-    public DataSource userDetailsDbDataSource() {
+    public DataSource calowinDBDataSource() {
         return DataSourceBuilder.create().build();
     }
 }
