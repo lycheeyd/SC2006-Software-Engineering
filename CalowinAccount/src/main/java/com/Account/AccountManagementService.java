@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.Account.SecurityUtilities.Decryptor;
+import com.Account.SecurityUtilities.PasswordValidator;
 import com.DataTransferObject.ResponseDTO;
 import com.Database.CalowinDB.CalowinDBRepository;
 import com.Database.CalowinSecureDB.CalowinSecureDBRepository;
@@ -57,7 +59,7 @@ public class AccountManagementService {
         String decryptedConfirmPassword = Decryptor.decrypt(encryptedConfirmPassword, SECRET_KEY);
 
         // Check if password meet requirements
-        PasswordManagementService.isPasswordValid(decryptedPassword, decryptedConfirmPassword);
+        PasswordValidator.isPasswordValid(decryptedPassword, decryptedConfirmPassword);
 
         // Generate userID
         String userID = generateUniqueUserId();
