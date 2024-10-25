@@ -17,8 +17,9 @@ public class ProfileManagementService {
     @Autowired
     private CalowinDBRepository calowinDBRepository;
 
-    // Signup method
-    //public ResponseDTO edit(String email, String encryptedPassword, String encryptedConfirmPassword, String name, float weight) throws Exception {
+    // Edit account method
+    //public ResponseDTO edit(String userID, String name, float weight, String bio) throws Exception {
+        // UserEntity user = 
 
         //return new ResponseDTO(user.getUserID(), user.getEmail(), profile.getName(), profile.getWeight(), profile.getBio());
 
