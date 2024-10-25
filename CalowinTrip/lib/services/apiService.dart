@@ -7,10 +7,20 @@ import '../models/achievement.dart'; // Adjust the path based on your project st
 
 class ApiService {
   //final String baseUrl = "http://172.21.146.188:8080/api"; // VM URL
-  final String baseUrl = "http://192.168.18.71:8080/"; // VM URL
-  // final String baseUrl = "http://10.91.236.124:8080/api"; NTU URL
-
+  final String baseUrl = "http://10.91.236.36:8080"; 
   ApiService();
+
+  // Fetch API key by key name
+Future<String> fetchApiKey(String keyName) async {
+  final response = await http.get(Uri.parse('$baseUrl/api/keys/$keyName'));
+
+  if (response.statusCode == 200) {
+    // Return the API key from the response
+    return response.body; // The body contains the API key as a string
+  } else {
+    throw Exception('Failed to load API key: ${response.body}');
+  }
+}
 
   // Fetch available locations
   Future<List<Location>> fetchAvailableLocations() async {

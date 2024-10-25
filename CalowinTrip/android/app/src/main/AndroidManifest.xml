@@ -2,6 +2,8 @@
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.perission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+
 
     <application
         android:label="calowin"
@@ -35,10 +37,9 @@
             android:name="flutterEmbedding"
             android:value="2" />
 
-            <!-- Add your Google Maps API key -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="---"/>
+            android:value="YOUR_API_KEY_HERE"/>  <!-- Replace with your API key -->
 
     </application>
     <!-- Required to query activities that can process text, see:

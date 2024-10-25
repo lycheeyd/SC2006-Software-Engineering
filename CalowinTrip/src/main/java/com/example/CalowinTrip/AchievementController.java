@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/api/achievements")
+@RequestMapping("/achievements")
 public class AchievementController {
 
     private final Achievement achievement;

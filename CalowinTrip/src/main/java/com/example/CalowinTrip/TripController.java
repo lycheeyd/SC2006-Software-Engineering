@@ -20,10 +20,8 @@ import java.time.LocalDateTime;
 import java.sql.Timestamp;
 
 @RestController
-@RequestMapping("/api/trips")
+@RequestMapping("/trips")
 public class TripController {
-
-
 
     public static Timestamp getCurrentSqlTimestamp() {
         LocalDateTime now = LocalDateTime.now();
