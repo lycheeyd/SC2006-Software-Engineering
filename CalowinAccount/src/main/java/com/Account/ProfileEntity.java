@@ -35,6 +35,12 @@ public class ProfileEntity {
         this.weight = weight;
         this.bio = bio;
     }
+
+    public void updateProfile(String name, float weight, String bio) {
+        this.name = name;
+        this.weight = weight;
+        this.bio = bio;
+    }
     
     public String getUserID() {
         return this.userID;

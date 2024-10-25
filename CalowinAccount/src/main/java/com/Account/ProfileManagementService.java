@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import com.DataTransferObject.ViewProfileResponseDTO;
 import com.Database.CalowinDB.CalowinDBRepository;
 
 @Service
@@ -18,12 +19,29 @@ public class ProfileManagementService {
     private CalowinDBRepository calowinDBRepository;
 
     // Edit account method
-    //public ResponseDTO edit(String userID, String name, float weight, String bio) throws Exception {
-        // UserEntity user = 
+    public ProfileEntity editProfile(String userID, String name, float weight, String bio) throws Exception {
+        ProfileEntity profile = calowinDBRepository.findByUserID(userID)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+                
+        profile.updateProfile(name, weight, bio);
 
-        //return new ResponseDTO(user.getUserID(), user.getEmail(), profile.getName(), profile.getWeight(), profile.getBio());
+        calowinDBRepository.save(profile);
 
-    //}
+        return profile;
+
+    }
+
+    // View account method
+    public ViewProfileResponseDTO viewProfile(String userID) {
+        ProfileEntity profile = calowinDBRepository.findByUserID(userID)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        // getMap from ziyan on friend status
+        UserStatusEnum userStatus = UserStatusEnum.FRIEND; // EXAMPLE
+
+        return new ViewProfileResponseDTO(profile.getUserID(), profile.getName(), profile.getBio(), userStatus);
+
+    }
 
 
 }

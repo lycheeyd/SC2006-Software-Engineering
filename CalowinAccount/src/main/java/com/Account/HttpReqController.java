@@ -14,8 +14,10 @@ import com.DataTransferObject.DeleteAccountDTO;
 import com.DataTransferObject.EditProfileDTO;
 import com.DataTransferObject.ForgotPasswordDTO;
 import com.DataTransferObject.LoginDTO;
-import com.DataTransferObject.ResponseDTO;
+import com.DataTransferObject.LoginResponseDTO;
 import com.DataTransferObject.SignupDTO;
+import com.DataTransferObject.ViewProfileDTO;
+import com.DataTransferObject.ViewProfileResponseDTO;
 
 @RestController
 @RequestMapping("/account")
@@ -37,7 +39,7 @@ public class HttpReqController {
     public ResponseEntity<?> signup(@RequestBody SignupDTO signupDTO) {
         // Signup logic (save user details to DB)
         try {
-            ResponseDTO responseDTO = accountManagementService.signup(signupDTO.getEmail(), signupDTO.getPassword(), signupDTO.getConfirm_password(), signupDTO.getName(), signupDTO.getWeight());
+            LoginResponseDTO responseDTO = accountManagementService.signup(signupDTO.getEmail(), signupDTO.getPassword(), signupDTO.getConfirm_password(), signupDTO.getName(), signupDTO.getWeight());
     
             // Prepare response after successful signup
             Map<String, Object> response = new HashMap<>();
@@ -58,7 +60,7 @@ public class HttpReqController {
     public ResponseEntity<?> login(@RequestBody LoginDTO loginDTO) {
         // Login logic (check username/password)
         try {
-            ResponseDTO responseDTO = accountManagementService.login(loginDTO.getEmail(), loginDTO.getPassword());
+            LoginResponseDTO responseDTO = accountManagementService.login(loginDTO.getEmail(), loginDTO.getPassword());
 
             // Prepare response after successful login
             Map<String, Object> response = new HashMap<>();
@@ -119,15 +121,51 @@ public class HttpReqController {
     }
 
     @PostMapping("/edit-profile")
-    public ResponseEntity<String> editProfile(@RequestBody EditProfileDTO request) {
+    public ResponseEntity<?> editProfile(@RequestBody EditProfileDTO editProfileDTO) {
         // Edit account logic
-        return ResponseEntity.ok("");
+        try {
+            ProfileEntity profile = profileManagementService.editProfile(editProfileDTO.getUserID(), editProfileDTO.getName(), editProfileDTO.getWeight(), editProfileDTO.getBio());
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Profile updated successfully");
+            response.put("UserObject", profile);      
+
+            return ResponseEntity.ok(response);
+
+        } catch (RuntimeException e) {
+            // Return unauthorized error for invalid credentials
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        } catch (Exception e) {
+            // Handle other exceptions
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + e.getMessage());
+        }
     }
 
     @PostMapping("/delete-account")
     public ResponseEntity<String> deleteAccount(@RequestBody DeleteAccountDTO request) {
         // Delete account logic
         return ResponseEntity.ok("");
+    }
+
+    @PostMapping("/view-profile")
+    public ResponseEntity<?> viewProfile(@RequestBody String userID) {
+        // View account logic
+        try {
+            ViewProfileResponseDTO profile = profileManagementService.viewProfile(userID);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Profile retrieved successfully");
+            response.put("UserObject", profile);
+
+            return ResponseEntity.ok(response);
+
+        } catch (RuntimeException e) {
+            // Return unauthorized error for invalid credentials
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        } catch (Exception e) {
+            // Handle other exceptions
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + e.getMessage());
+        }
     }
 
 }

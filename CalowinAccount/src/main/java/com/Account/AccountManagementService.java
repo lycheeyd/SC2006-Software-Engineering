@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.Account.SecurityUtilities.Decryptor;
 import com.Account.SecurityUtilities.PasswordValidator;
-import com.DataTransferObject.ResponseDTO;
+import com.DataTransferObject.LoginResponseDTO;
 import com.Database.CalowinDB.CalowinDBRepository;
 import com.Database.CalowinSecureDB.CalowinSecureDBRepository;
 import com.Database.CalowinSecureDB.OTPRepository;
@@ -44,7 +44,7 @@ public class AccountManagementService {
 
     // Signup method
     @Transactional(transactionManager = "calowinSecureDBTransactionManager")
-    public ResponseDTO signup(String email, String encryptedPassword, String encryptedConfirmPassword, String name, float weight) throws Exception {
+    public LoginResponseDTO signup(String email, String encryptedPassword, String encryptedConfirmPassword, String name, float weight) throws Exception {
         // Authenticate OTP
         //if (!otpService.verifyOTP(email, otpCode) {
         //    throw new RuntimeException("Incorrect OTP");
@@ -73,12 +73,12 @@ public class AccountManagementService {
         calowinDBRepository.save(profile);
 
         // Prepare and returns user data to frontend
-        return new ResponseDTO(user.getUserID(), user.getEmail(), profile.getName(), profile.getWeight(), profile.getBio());
+        return new LoginResponseDTO(user.getUserID(), user.getEmail(), profile.getName(), profile.getWeight(), profile.getBio());
 
     }
 
     // Login method
-    public ResponseDTO login(String email, String encryptedPassword) throws Exception {
+    public LoginResponseDTO login(String email, String encryptedPassword) throws Exception {
         String decryptedPassword = Decryptor.decrypt(encryptedPassword, SECRET_KEY);
 
         UserEntity user = calowinSecureDBRepository.findByEmail(email)
@@ -91,7 +91,7 @@ public class AccountManagementService {
         ProfileEntity profile = calowinDBRepository.findByUserID(user.getUserID())
         .orElseThrow(() -> new RuntimeException("Failed to retrieve userdata"));;
 
-        return new ResponseDTO(user.getUserID(), user.getEmail(), profile.getName(), profile.getWeight(), profile.getBio());
+        return new LoginResponseDTO(user.getUserID(), user.getEmail(), profile.getName(), profile.getWeight(), profile.getBio());
     
     }
 

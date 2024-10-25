@@ -1,6 +1,6 @@
 package com.DataTransferObject;
 
-public class ResponseDTO {
+public class LoginResponseDTO {
     
     private String userID;
     private String email;
@@ -8,7 +8,7 @@ public class ResponseDTO {
     private float weight;
     private String bio;
 
-    public ResponseDTO(String userID, String email, String name, float weight, String bio) {
+    public LoginResponseDTO(String userID, String email, String name, float weight, String bio) {
         this.userID = userID;
         this.email = email;
         this.name = name;
