@@ -7,8 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.Account.SecurityUtilities.Decryptor;
-import com.Account.SecurityUtilities.PasswordValidator;
 import com.DataTransferObject.LoginResponseDTO;
 import com.Database.CalowinDB.CalowinDBRepository;
 import com.Database.CalowinSecureDB.CalowinSecureDBRepository;
@@ -38,6 +36,9 @@ public class AccountManagementService {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
+    private PasswordSecurityService passwordSecurityService;
+
+    @Autowired
     private OTPService otpService;
 
     private static final String SECRET_KEY = "ASK RAPHEL FOR KEY"; // Should be a 16/32-byte key
@@ -55,11 +56,11 @@ public class AccountManagementService {
             throw new RuntimeException("User already exists");
         }
 
-        String decryptedPassword = Decryptor.decrypt(encryptedPassword, SECRET_KEY);
-        String decryptedConfirmPassword = Decryptor.decrypt(encryptedConfirmPassword, SECRET_KEY);
+        String decryptedPassword = passwordSecurityService.decrypt(encryptedPassword, SECRET_KEY);
+        String decryptedConfirmPassword = passwordSecurityService.decrypt(encryptedConfirmPassword, SECRET_KEY);
 
         // Check if password meet requirements
-        PasswordValidator.isPasswordValid(decryptedPassword, decryptedConfirmPassword);
+        passwordSecurityService.isPasswordValid(decryptedPassword, decryptedConfirmPassword);
 
         // Generate userID
         String userID = generateUniqueUserId();
@@ -79,7 +80,7 @@ public class AccountManagementService {
 
     // Login method
     public LoginResponseDTO login(String email, String encryptedPassword) throws Exception {
-        String decryptedPassword = Decryptor.decrypt(encryptedPassword, SECRET_KEY);
+        String decryptedPassword = passwordSecurityService.decrypt(encryptedPassword, SECRET_KEY);
 
         UserEntity user = calowinSecureDBRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Invalid email or password"));

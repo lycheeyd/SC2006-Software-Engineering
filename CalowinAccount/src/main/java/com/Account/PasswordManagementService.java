@@ -6,8 +6,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import com.Account.SecurityUtilities.Decryptor;
-import com.Account.SecurityUtilities.PasswordValidator;
 import com.Database.CalowinSecureDB.CalowinSecureDBRepository;
 
 import org.apache.commons.lang3.RandomStringUtils;
@@ -23,6 +21,8 @@ public class PasswordManagementService {
     @Autowired
     private CalowinSecureDBRepository calowinSecureDBRepository;
 
+    @Autowired
+    private PasswordSecurityService passwordSecurityService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -35,12 +35,12 @@ public class PasswordManagementService {
         UserEntity user = calowinSecureDBRepository.findByUserID(userid)
                 .orElseThrow(() -> new RuntimeException("Invalid user"));
 
-        String decryptedNewPassword = Decryptor.decrypt(newPassword, SECRET_KEY);
-        String decryptedConfirmNewPassword = Decryptor.decrypt(confirmNewPassword, SECRET_KEY);
-        String decryptedOldPassword = Decryptor.decrypt(oldPassword, SECRET_KEY);
+        String decryptedNewPassword = passwordSecurityService.decrypt(newPassword, SECRET_KEY);
+        String decryptedConfirmNewPassword = passwordSecurityService.decrypt(confirmNewPassword, SECRET_KEY);
+        String decryptedOldPassword = passwordSecurityService.decrypt(oldPassword, SECRET_KEY);
 
         // Check if new password meet requirements
-        PasswordValidator.isPasswordValid(decryptedNewPassword, decryptedConfirmNewPassword);
+        passwordSecurityService.isPasswordValid(decryptedNewPassword, decryptedConfirmNewPassword);
 
         // Authenticate old password
         if (!passwordEncoder.matches(decryptedOldPassword, user.getPassword())) {
@@ -56,7 +56,7 @@ public class PasswordManagementService {
     // Forgot password method
     public void forgotPassword(String email) throws Exception {
         // Forgot password logic
-        String newPassword = RandomStringUtils.randomAlphanumeric(12);
+        String newPassword = passwordSecurityService.generateRandomPassword();
         // send new password to email
         // implement next time after email service is setup
     }
