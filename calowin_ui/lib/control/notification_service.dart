@@ -2,17 +2,17 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class NotificationService {
-  final String baseUrl = 'http://localhost:8080'; // Replace with your backend URL
+  final String baseUrl = "http://localhost:8081"; // Update with actual base URL
 
   Future<List<String>> fetchFriendRequests(String userId) async {
-    final url = Uri.parse('$baseUrl/notifications/friend-requests/$userId');
-    final response = await http.get(url);
+    final response = await http.get(Uri.parse('$baseUrl/notifications/friend-requests/$userId'));
 
     if (response.statusCode == 200) {
+      // Parse the JSON response
       List<dynamic> data = jsonDecode(response.body);
-      return data.map((request) => "${request['senderUsername']} sent a Friend Request").toList();
+      return data.map((item) => item.toString()).toList();
     } else {
-      throw Exception('Failed to load friend requests');
+      throw Exception("Failed to load notifications");
     }
   }
 }

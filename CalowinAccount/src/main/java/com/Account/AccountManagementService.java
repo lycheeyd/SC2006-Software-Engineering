@@ -46,7 +46,7 @@ public class AccountManagementService {
     private FriendRelationshipRepository friendRelationshipRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserRepository UserRepository;
 
     private static final String SECRET_KEY = "ASK RAPHEL FOR KEY"; // Replace with actual key
 

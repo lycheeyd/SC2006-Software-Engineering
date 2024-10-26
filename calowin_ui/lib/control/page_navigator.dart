@@ -56,7 +56,7 @@ class PageNavigatorState extends State<PageNavigator> {
   Future<void> _loadNotifications() async {
     try {
       // Replace '123' with actual user ID
-      String userId = "123";
+      String userId = "00000001";
       List<String> notifications = await notificationService.fetchFriendRequests(userId);
       setState(() {
         listOfNotifications = notifications;
@@ -93,7 +93,7 @@ class PageNavigatorState extends State<PageNavigator> {
 
   void _handleNotificationTap(int index) {
     setState(() {
-      navigateToPage(5, params: {"userID": "888888"});
+      navigateToPage(5, params: {"userID": "00000001"});
       _toggleNotifications();
       //index should be passed to the profile page to be able to open the profile page of the person
       //alternately can just open the friend request page
