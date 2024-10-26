@@ -9,6 +9,7 @@ import 'package:calowin/Pages/wellness_page.dart';
 import 'package:calowin/Pages/rank_page.dart';
 import 'package:calowin/common/colors_and_fonts.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:calowin/control/notification_service.dart';
 
 class PageNavigator extends StatefulWidget {
   const PageNavigator({super.key});
@@ -23,7 +24,9 @@ class PageNavigatorState extends State<PageNavigator> {
 
   //this is to set parameters to pass to the pages
   Map<String, dynamic>? _currentParams;
-
+  bool _showNotifications = false;
+  List<String> listOfNotifications = [];
+  final NotificationService notificationService = NotificationService();
   final List<Widget Function(Map<String, dynamic>?)> _pages = [
     (params) => const MapcalcPage(),
     (params) => const RankPage(),
@@ -37,7 +40,7 @@ class PageNavigatorState extends State<PageNavigator> {
     (params) => const AddfriendsPage(),
   ];
 
-  List<String> listOfNotifications = <String>[
+  /*List<String> listOfNotifications = <String>[
     "John sent a Friend Request",
     "Notification 2",
     "Notification 3",
@@ -49,10 +52,21 @@ class PageNavigatorState extends State<PageNavigator> {
     "Notification 4",
     "Notification 4",
     "Notification 4",
-  ];
+  ];*/
+  Future<void> _loadNotifications() async {
+    try {
+      // Replace '123' with actual user ID
+      String userId = "123";
+      List<String> notifications = await notificationService.fetchFriendRequests(userId);
+      setState(() {
+        listOfNotifications = notifications;
+      });
+    } catch (e) {
+      print("Error loading notifications: $e");
+    }
+  }
 
-  bool _showNotifications =
-      false; // State to track if notifications are visible
+  
 
   void navigateToPage(int index, {Map<String, dynamic>? params}) {
     setState(() {
@@ -66,6 +80,9 @@ class PageNavigatorState extends State<PageNavigator> {
     setState(() {
       _showNotifications = !_showNotifications;
     });
+    if (_showNotifications) {
+      _loadNotifications(); // Load notifications when opened
+    }
   }
 
   void _onItemTapped(int index) {

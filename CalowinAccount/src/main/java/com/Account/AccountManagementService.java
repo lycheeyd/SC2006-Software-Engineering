@@ -11,11 +11,13 @@ import com.Account.SecurityUtilities.Decryptor;
 import com.Account.SecurityUtilities.PasswordValidator;
 import com.DataTransferObject.LoginResponseDTO;
 import com.Database.CalowinDB.CalowinDBRepository;
+import com.Database.CalowinDB.FriendRelationshipRepository;
 import com.Database.CalowinSecureDB.CalowinSecureDBRepository;
-import com.Database.CalowinSecureDB.OTPRepository;
+import com.Database.CalowinDB.UserRepository;
 
 import org.apache.commons.lang3.RandomStringUtils;
 
+import java.util.List;
 
 @Service
 public class AccountManagementService {
@@ -40,17 +42,19 @@ public class AccountManagementService {
     @Autowired
     private OTPService otpService;
 
-    private static final String SECRET_KEY = "ASK RAPHEL FOR KEY"; // Should be a 16/32-byte key
+    @Autowired
+    private FriendRelationshipRepository friendRelationshipRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    private static final String SECRET_KEY = "ASK RAPHEL FOR KEY"; // Replace with actual key
 
     // Signup method
     @Transactional(transactionManager = "calowinSecureDBTransactionManager")
     public LoginResponseDTO signup(String email, String encryptedPassword, String encryptedConfirmPassword, String name, float weight) throws Exception {
-        // Authenticate OTP
-        //if (!otpService.verifyOTP(email, otpCode) {
-        //    throw new RuntimeException("Incorrect OTP");
-        //}
         
-        // Check if user exist
+        // Check if user exists
         if (calowinSecureDBRepository.findByEmail(email).isPresent()) {
             throw new RuntimeException("User already exists");
         }
@@ -58,23 +62,22 @@ public class AccountManagementService {
         String decryptedPassword = Decryptor.decrypt(encryptedPassword, SECRET_KEY);
         String decryptedConfirmPassword = Decryptor.decrypt(encryptedConfirmPassword, SECRET_KEY);
 
-        // Check if password meet requirements
+        // Validate password requirements
         PasswordValidator.isPasswordValid(decryptedPassword, decryptedConfirmPassword);
 
-        // Generate userID
+        // Generate unique userID
         String userID = generateUniqueUserId();
 
         // Create and store user credentials in database (CALOWIN_SECURE)
         UserEntity user = new UserEntity(userID, email, passwordEncoder.encode(decryptedPassword));
         calowinSecureDBRepository.save(user);
 
-        // Create and store user info in database (CALOWIN)
+        // Create and store user profile in database (CALOWIN)
         ProfileEntity profile = new ProfileEntity(userID, name, weight, "");
         calowinDBRepository.save(profile);
 
-        // Prepare and returns user data to frontend
+        // Prepare and return user data to frontend
         return new LoginResponseDTO(user.getUserID(), user.getEmail(), profile.getName(), profile.getWeight(), profile.getBio());
-
     }
 
     // Login method
@@ -89,39 +92,30 @@ public class AccountManagementService {
         }
 
         ProfileEntity profile = calowinDBRepository.findByUserID(user.getUserID())
-        .orElseThrow(() -> new RuntimeException("Failed to retrieve userdata"));;
+                .orElseThrow(() -> new RuntimeException("Failed to retrieve user data"));
 
         return new LoginResponseDTO(user.getUserID(), user.getEmail(), profile.getName(), profile.getWeight(), profile.getBio());
-    
     }
 
     // Delete account method
-    @Transactional(transactionManager = "CalowinSecureDBTransactionManager")
+    @Transactional(transactionManager = "calowinSecureDBTransactionManager")
     public void deleteAccount(String userID, int OTP) throws Exception {
-        // Authenticate OTP
-        //if (!otpService.verifyOTP(email, otpCode) {
-        //    throw new RuntimeException("Incorrect OTP");
-        //}
-
-        // delete account logic
-        // implement next time after email service is setup
-        
+        // Logic for deleting the account can be implemented here once email service is set up
     }
 
     // Method to generate a unique 8-character userID
     private String generateUniqueUserId() {
         String userID;
         boolean exists;
-    
+
         // Loop until a unique userID is generated
         do {
-            // Generate random 8-character alphanumeric string (both letters and numbers)
-            userID = RandomStringUtils.randomAlphanumeric(8).toUpperCase();;
-            // Check if the generated userID already exists in the database
+            userID = RandomStringUtils.randomAlphanumeric(8).toUpperCase();
             exists = calowinSecureDBRepository.existsByUserID(userID);
         } while (exists);
-    
+
         return userID;
     }
 
+    
 }

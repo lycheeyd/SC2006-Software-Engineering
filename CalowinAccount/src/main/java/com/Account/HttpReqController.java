@@ -16,7 +16,7 @@ import com.DataTransferObject.ForgotPasswordDTO;
 import com.DataTransferObject.LoginDTO;
 import com.DataTransferObject.LoginResponseDTO;
 import com.DataTransferObject.SignupDTO;
-import com.DataTransferObject.ViewProfileDTO;
+//import com.DataTransferObject.ViewProfileDTO;
 import com.DataTransferObject.ViewProfileResponseDTO;
 
 @RestController
