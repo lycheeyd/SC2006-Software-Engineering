@@ -45,7 +45,7 @@ public class HttpReqController {
             response.put("message", "Signup successful");
             response.put("UserObject", responseDTO);
     
-            return ResponseEntity.ok(response);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
     
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Signup failed: " + e.getMessage());
@@ -146,8 +146,8 @@ public class HttpReqController {
         return ResponseEntity.ok("");
     }
 
-    @PostMapping("/view-profile")
-    public ResponseEntity<?> viewProfile(@RequestBody String userID) {
+    @GetMapping("/view-profile/{userID}")
+    public ResponseEntity<?> viewProfile(@PathVariable String userID) {
         // View account logic
         try {
             ViewProfileResponseDTO profile = profileManagementService.viewProfile(userID);

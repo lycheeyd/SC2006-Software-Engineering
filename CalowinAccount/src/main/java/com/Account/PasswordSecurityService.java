@@ -31,6 +31,7 @@ public class PasswordSecurityService {
         return new String(original);
     }
 
+    // Utility function to validate the password
     public void isPasswordValid(String password, String confirmPassword) throws Exception {
         // At least 8 characters, 1 digit, 1 uppercase, 1 lowercase, and 1 special character
         String passwordPattern = "^(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])(?=.*[@#$%^&+=!])(?=.{8,}).*$";

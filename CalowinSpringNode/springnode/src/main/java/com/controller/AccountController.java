@@ -14,7 +14,6 @@ import com.DataTransferObject.AuthDTO.ForgotPasswordDTO;
 import com.DataTransferObject.AuthDTO.LoginDTO;
 import com.DataTransferObject.AuthDTO.SignupDTO;
 
-
 @RestController
 @RequestMapping("/central/account")
 public class AccountController extends HttpReqController{

@@ -18,6 +18,9 @@ public class ProfileManagementService {
     @Autowired
     private CalowinDBRepository calowinDBRepository;
 
+    @Autowired
+    private ExternalServiceClient externalServiceController;
+
     // Edit account method
     public ProfileEntity editProfile(String userID, String name, float weight, String bio) throws Exception {
         ProfileEntity profile = calowinDBRepository.findByUserID(userID)
@@ -36,12 +39,11 @@ public class ProfileManagementService {
         ProfileEntity profile = calowinDBRepository.findByUserID(userID)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         
-        // getMap from ziyan on friend status
-        UserStatusEnum userStatus = UserStatusEnum.FRIEND; // EXAMPLE
+        // Get friend status from external service
+        FriendStatusEnum friendStatus = externalServiceController.getFriendStatus(userID);
 
-        return new ViewProfileResponseDTO(profile.getUserID(), profile.getName(), profile.getBio(), userStatus);
+        return new ViewProfileResponseDTO(profile.getUserID(), profile.getName(), profile.getBio(), friendStatus);
 
     }
-
 
 }

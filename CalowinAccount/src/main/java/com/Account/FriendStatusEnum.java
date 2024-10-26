@@ -1,6 +1,6 @@
 package com.Account;
 
-public enum UserStatusEnum {
+public enum FriendStatusEnum {
     FRIEND, 
     REQUESTSENT, 
     STRANGER, 
