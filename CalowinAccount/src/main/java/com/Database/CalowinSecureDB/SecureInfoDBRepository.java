@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.Account.UserEntity;
+import com.Account.Entities.UserEntity;
 
 @Repository
 @Primary

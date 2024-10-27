@@ -1,4 +1,4 @@
-package com.Account;
+package com;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -7,6 +7,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 
+import com.Account.Entities.EmailServiceProperties;
+import com.Account.Services.EmailService;
 import com.Database.CalowinDB.CalowinDBProperties;
 import com.Database.CalowinSecureDB.CalowinSecureDBProperties;
 

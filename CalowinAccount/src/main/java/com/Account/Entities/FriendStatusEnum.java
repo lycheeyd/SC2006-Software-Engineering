@@ -1,4 +1,4 @@
-package com.Account;
+package com.Account.Entities;
 
 public enum FriendStatusEnum {
     FRIEND, 

@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 
-import com.Account.EmailServiceProperties;
+import com.Account.Entities.EmailServiceProperties;
 import com.Database.CalowinDB.CalowinDBProperties;
 import com.Database.CalowinSecureDB.CalowinSecureDBProperties;
 

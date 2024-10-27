@@ -1,4 +1,4 @@
-package com.Account;
+package com.Account.Entities;
 
 import java.util.HashMap;
 

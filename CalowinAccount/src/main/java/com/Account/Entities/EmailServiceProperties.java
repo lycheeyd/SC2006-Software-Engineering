@@ -1,4 +1,4 @@
-package com.Account;
+package com.Account.Entities;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;

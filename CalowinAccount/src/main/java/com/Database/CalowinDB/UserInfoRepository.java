@@ -5,7 +5,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.Account.ProfileEntity;
+import com.Account.Entities.ProfileEntity;
 
 @Repository
 public interface UserInfoRepository extends JpaRepository<ProfileEntity, String> {

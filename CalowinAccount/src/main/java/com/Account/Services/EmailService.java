@@ -1,7 +1,9 @@
-package com.Account;
+package com.Account.Services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.Account.Entities.EmailServiceProperties;
 
 import javax.mail.*;
 import javax.mail.internet.*;

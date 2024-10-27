@@ -1,6 +1,6 @@
 package com.DataTransferObject;
 
-import com.Account.FriendStatusEnum;
+import com.Account.Entities.FriendStatusEnum;
 
 public class ViewProfileResponseDTO {
     

@@ -1,4 +1,4 @@
-package com.Account;
+package com.Account.Managers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -7,6 +7,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.Account.Entities.ProfileEntity;
+import com.Account.Entities.UserEntity;
+import com.Account.Services.OTPService;
+import com.Account.Services.PasswordSecurityService;
 import com.DataTransferObject.LoginResponseDTO;
 import com.Database.CalowinDB.UserInfoRepository;
 import com.Database.CalowinSecureDB.SecureInfoDBRepository;
