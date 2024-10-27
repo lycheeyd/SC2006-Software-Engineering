@@ -6,10 +6,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import com.Database.CalowinSecureDB.CalowinSecureDBRepository;
-
-import org.apache.commons.lang3.RandomStringUtils;
-
+import com.Database.CalowinSecureDB.SecureInfoDBRepository;
 
 @Service
 public class PasswordManagementService {
@@ -19,7 +16,7 @@ public class PasswordManagementService {
     private PlatformTransactionManager calowinSecureDBTransactionManager;
 
     @Autowired
-    private CalowinSecureDBRepository calowinSecureDBRepository;
+    private SecureInfoDBRepository calowinSecureDBRepository;
 
     @Autowired
     private PasswordSecurityService passwordSecurityService;

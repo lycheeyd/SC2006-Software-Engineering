@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import com.Account.ProfileEntity;
 
 @Repository
-public interface CalowinDBRepository extends JpaRepository<ProfileEntity, String> {
+public interface UserInfoRepository extends JpaRepository<ProfileEntity, String> {
     Optional<ProfileEntity> findByUserID(String userID);
     boolean existsByUserID(String userID);
 }

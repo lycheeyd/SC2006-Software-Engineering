@@ -8,9 +8,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.DataTransferObject.LoginResponseDTO;
-import com.Database.CalowinDB.CalowinDBRepository;
-import com.Database.CalowinSecureDB.CalowinSecureDBRepository;
-import com.Database.CalowinSecureDB.OTPRepository;
+import com.Database.CalowinDB.UserInfoRepository;
+import com.Database.CalowinSecureDB.SecureInfoDBRepository;
 
 import org.apache.commons.lang3.RandomStringUtils;
 
@@ -27,10 +26,10 @@ public class AccountManagementService {
     private PlatformTransactionManager calowinDBTransactionManager;
 
     @Autowired
-    private CalowinSecureDBRepository calowinSecureDBRepository;
+    private SecureInfoDBRepository calowinSecureDBRepository;
 
     @Autowired
-    private CalowinDBRepository calowinDBRepository;
+    private UserInfoRepository calowinDBRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -56,17 +55,17 @@ public class AccountManagementService {
             throw new RuntimeException("User already exists");
         }
 
-        String decryptedPassword = passwordSecurityService.decrypt(encryptedPassword, SECRET_KEY);
-        String decryptedConfirmPassword = passwordSecurityService.decrypt(encryptedConfirmPassword, SECRET_KEY);
+        //String decryptedPassword = passwordSecurityService.decrypt(encryptedPassword, SECRET_KEY);
+        //String decryptedConfirmPassword = passwordSecurityService.decrypt(encryptedConfirmPassword, SECRET_KEY);
 
         // Check if password meet requirements
-        passwordSecurityService.isPasswordValid(decryptedPassword, decryptedConfirmPassword);
-
+        //passwordSecurityService.isPasswordValid(decryptedPassword, decryptedConfirmPassword);
+        passwordSecurityService.isPasswordValid(encryptedPassword, encryptedConfirmPassword);
         // Generate userID
         String userID = generateUniqueUserId();
 
         // Create and store user credentials in database (CALOWIN_SECURE)
-        UserEntity user = new UserEntity(userID, email, passwordEncoder.encode(decryptedPassword));
+        UserEntity user = new UserEntity(userID, email, passwordEncoder.encode(encryptedConfirmPassword));
         calowinSecureDBRepository.save(user);
 
         // Create and store user info in database (CALOWIN)

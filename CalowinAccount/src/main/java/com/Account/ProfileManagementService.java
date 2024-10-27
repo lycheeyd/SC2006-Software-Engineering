@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import com.DataTransferObject.ViewProfileResponseDTO;
-import com.Database.CalowinDB.CalowinDBRepository;
+import com.Database.CalowinDB.UserInfoRepository;
 
 @Service
 public class ProfileManagementService {
@@ -16,7 +16,7 @@ public class ProfileManagementService {
     private PlatformTransactionManager calowinDBTransactionManager;
     
     @Autowired
-    private CalowinDBRepository calowinDBRepository;
+    private UserInfoRepository calowinDBRepository;
 
     @Autowired
     private ExternalServiceClient externalServiceController;
