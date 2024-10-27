@@ -12,20 +12,12 @@ public class ExternalServiceClient {
     @Autowired
     private RestTemplate restTemplate;
 
-    private String friendModuleUrl;
-
-    public ExternalServiceClient() {
-    }
-
-    @Autowired
-    public ExternalServiceClient(@Value("${friend.module.url}") String friendModuleUrl) {
-        this.friendModuleUrl = friendModuleUrl;
-    }
+    @Value("${friend.module.urlPrefix}")
+    private String urlPrefix;
 
     public FriendStatusEnum getFriendStatus(String userID) {
         try {
-            String url = friendModuleUrl + "/friend/get-friendstatus/" + userID;
-            System.out.println(url);
+            String url = urlPrefix + "/friend/get-friendstatus/" + userID;
             return restTemplate.getForObject(url, FriendStatusEnum.class);
         } catch (RestClientException e) {
             // Handle the error or log it

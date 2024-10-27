@@ -43,24 +43,24 @@ public class AccountManagementService {
     private static final String SECRET_KEY = "ASK RAPHEL FOR KEY"; // Should be a 16/32-byte key
 
     // Signup method
-    @Transactional(transactionManager = "calowinSecureDBTransactionManager")
-    public LoginResponseDTO signup(String email, String encryptedPassword, String encryptedConfirmPassword, String name, float weight) throws Exception {
+    @Transactional //(transactionManager = "calowinSecureDBTransactionManager")
+    public LoginResponseDTO signup(String email, String encryptedPassword, String encryptedConfirmPassword, String name, float weight, String otpCode) throws Exception {
         // Authenticate OTP
-        //if (!otpService.verifyOTP(email, otpCode) {
-        //    throw new RuntimeException("Incorrect OTP");
-        //}
+        if (!otpService.verifyOTP(email, otpCode)) {
+            throw new RuntimeException("Incorrect OTP");
+        }
         
         // Check if user exist
         if (calowinSecureDBRepository.findByEmail(email).isPresent()) {
             throw new RuntimeException("User already exists");
         }
 
-        //String decryptedPassword = passwordSecurityService.decrypt(encryptedPassword, SECRET_KEY);
-        //String decryptedConfirmPassword = passwordSecurityService.decrypt(encryptedConfirmPassword, SECRET_KEY);
+        String decryptedPassword = passwordSecurityService.decrypt(encryptedPassword, SECRET_KEY);
+        String decryptedConfirmPassword = passwordSecurityService.decrypt(encryptedConfirmPassword, SECRET_KEY);
 
         // Check if password meet requirements
-        //passwordSecurityService.isPasswordValid(decryptedPassword, decryptedConfirmPassword);
-        passwordSecurityService.isPasswordValid(encryptedPassword, encryptedConfirmPassword);
+        passwordSecurityService.isPasswordValid(decryptedPassword, decryptedConfirmPassword);
+        //passwordSecurityService.isPasswordValid(encryptedPassword, encryptedConfirmPassword);
         // Generate userID
         String userID = generateUniqueUserId();
 
@@ -96,7 +96,7 @@ public class AccountManagementService {
     }
 
     // Delete account method
-    @Transactional(transactionManager = "CalowinSecureDBTransactionManager")
+    @Transactional //(transactionManager = "CalowinSecureDBTransactionManager")
     public void deleteAccount(String userID, int OTP) throws Exception {
         // Authenticate OTP
         //if (!otpService.verifyOTP(email, otpCode) {

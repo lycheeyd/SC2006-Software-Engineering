@@ -38,7 +38,7 @@ public class HttpReqController {
     public ResponseEntity<?> signup(@RequestBody SignupDTO signupDTO) {
         // Signup logic (save user details to DB)
         try {
-            LoginResponseDTO responseDTO = accountManagementService.signup(signupDTO.getEmail(), signupDTO.getPassword(), signupDTO.getConfirm_password(), signupDTO.getName(), signupDTO.getWeight());
+            LoginResponseDTO responseDTO = accountManagementService.signup(signupDTO.getEmail(), signupDTO.getPassword(), signupDTO.getConfirm_password(), signupDTO.getName(), signupDTO.getWeight(), signupDTO.getOtpCode());
     
             // Prepare response after successful signup
             Map<String, Object> response = new HashMap<>();
