@@ -8,13 +8,16 @@ import org.springframework.stereotype.Repository;
 import com.Account.FriendRelationship;
 
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public interface FriendRelationshipRepository extends JpaRepository<FriendRelationship, String> {
 
     // Custom SQL query to fetch pending friend requests for a specific user
     @Query(value = "SELECT * FROM FriendRelationship WHERE Friend_Unique_ID = :userId AND status = 'REQUESTSENT'", nativeQuery = true)
-    List<FriendRelationship> findPendingFriendRequests(@Param("userId") String userId);
+    List<Map<String, Object>> executeRawQuery(@Param("userId") String userId);
+    //List<FriendRelationship> findPendingFriendRequests(@Param("userId") String userId);
+    //List<FriendRelationship> findAllRecords();
 }
 
 

@@ -6,33 +6,20 @@ import org.springframework.web.bind.annotation.*;
 import com.DataTransferObject.FriendRequestDTO;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/friends")
+@RequestMapping("/notifications")
 public class NotificationController {
 
     @Autowired
     private FriendRelationshipService friendRelationshipService;
 
-    @GetMapping("/requests/{userId}")
-    public List<FriendRelationship> getFriendRequests(@PathVariable String userId) {
-        return friendRelationshipService.getPendingFriendRequests(userId);
-    }
-
-    /*@PostMapping("/accept")
-    public String acceptFriendRequest(@RequestParam String uniqueId, @RequestParam String friendUniqueId) {
-        friendRelationshipService.acceptFriendRequest(uniqueId, friendUniqueId);
-        return "Friend request accepted";
-    }*/
-
     @GetMapping("/friend-requests/{userId}")
-    public List<FriendRequestDTO> getIncomingFriendRequests(@PathVariable String userId) {
-        return friendRelationshipService.getPendingFriendRequests(userId).stream()
-                .map(request -> new FriendRequestDTO(
-                        request.getFriendUniqueId(), // Assuming this is the sender's ID
-                        "SenderNamePlaceholder"))
-                .collect(Collectors.toList());
+    public List<Map<String, Object>> getIncomingFriendRequests(@PathVariable String userId) {
+        // Directly return the list of pending friend requests from the service
+        return friendRelationshipService.getAllPendingRequestsForUser(userId);
     }
 }
 

@@ -10,6 +10,10 @@ import 'package:calowin/Pages/rank_page.dart';
 import 'package:calowin/common/colors_and_fonts.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:calowin/control/notification_service.dart';
+import 'package:logger/logger.dart';
+
+final logger = Logger();
+
 
 class PageNavigator extends StatefulWidget {
   const PageNavigator({super.key});
@@ -26,7 +30,7 @@ class PageNavigatorState extends State<PageNavigator> {
   Map<String, dynamic>? _currentParams;
   bool _showNotifications = false;
   List<String> listOfNotifications = [];
-  final NotificationService notificationService = NotificationService();
+  //final NotificationService notificationService = NotificationService();
   final List<Widget Function(Map<String, dynamic>?)> _pages = [
     (params) => const MapcalcPage(),
     (params) => const RankPage(),
@@ -54,17 +58,18 @@ class PageNavigatorState extends State<PageNavigator> {
     "Notification 4",
   ];*/
   Future<void> _loadNotifications() async {
-    try {
-      // Replace '123' with actual user ID
-      String userId = "00000001";
-      List<String> notifications = await notificationService.fetchFriendRequests(userId);
-      setState(() {
-        listOfNotifications = notifications;
-      });
-    } catch (e) {
-      print("Error loading notifications: $e");
-    }
+  try {
+    String userId = "00000001";
+    NotificationService notificationService = NotificationService(); // Create an instance
+    List<String> notifications = await notificationService.fetchFriendRequests(userId);
+    setState(() {
+      listOfNotifications = notifications;
+    });
+  } catch (e, stackTrace) {
+    logger.e("Error loading notifications", e, stackTrace);
   }
+}
+
 
   
 

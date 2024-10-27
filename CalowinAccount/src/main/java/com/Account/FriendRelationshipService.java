@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import com.Database.CalowinDB.FriendRelationshipRepository;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class FriendRelationshipService {
@@ -13,9 +14,10 @@ public class FriendRelationshipService {
     @Autowired
     private FriendRelationshipRepository friendRelationshipRepository;
 
-    public List<FriendRelationship> getPendingFriendRequests(String userId) {
-        return friendRelationshipRepository.findByFriendUniqueIdAndStatus(userId, "REQUESTSENT");
+    public List<Map<String, Object>> getAllPendingRequestsForUser(String userId) {
+        // Directly call the repository method with userId as the parameter
+        return friendRelationshipRepository.executeRawQuery(userId);
     }
-    
 }
+
 

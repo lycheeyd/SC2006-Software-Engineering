@@ -13,7 +13,7 @@ import com.DataTransferObject.LoginResponseDTO;
 import com.Database.CalowinDB.CalowinDBRepository;
 import com.Database.CalowinDB.FriendRelationshipRepository;
 import com.Database.CalowinSecureDB.CalowinSecureDBRepository;
-import com.Database.CalowinDB.UserRepository;
+//import com.Database.CalowinDB.UserRepository;
 
 import org.apache.commons.lang3.RandomStringUtils;
 
@@ -45,8 +45,7 @@ public class AccountManagementService {
     @Autowired
     private FriendRelationshipRepository friendRelationshipRepository;
 
-    @Autowired
-    private UserRepository UserRepository;
+   
 
     private static final String SECRET_KEY = "ASK RAPHEL FOR KEY"; // Replace with actual key
 
