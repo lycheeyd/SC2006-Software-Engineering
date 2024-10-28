@@ -1,5 +1,3 @@
-import 'package:calowin/screens/successScreen.dart';
-import 'package:calowin/common/dualbutton_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:calowin/common/colors_and_fonts.dart';
@@ -7,7 +5,6 @@ import '../models/location.dart';
 import '../models/currentlocation.dart';
 import '../services/apiService.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import '../models/travelmethod.dart';
 import 'achievementScreen.dart'; // Import AchievementScreen
 
 class MapcalcPage extends StatefulWidget {

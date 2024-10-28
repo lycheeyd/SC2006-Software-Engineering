@@ -35,8 +35,17 @@ class _SignupPage2State extends State<SignupPage2> {
 
   void _handleSignup() {
     //check conditions and communicate with backend
-    Navigator.push(context,
-        MaterialPageRoute(builder: (context) => const PageNavigator()));
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const PageNavigator(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return child; // No custom transition
+        },
+        // This will disable the swipe back gesture
+        settings: const RouteSettings(arguments: 'disableSwipe'),
+      ),
+    );
   }
 
   @override

@@ -31,8 +31,18 @@ class _LoginpageState extends State<Loginpage> {
         }
       });
     } else {
-      Navigator.pushReplacement(context,
-          MaterialPageRoute(builder: (context) => const PageNavigator()));
+      Navigator.of(context).push(
+        PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) =>
+              const PageNavigator(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return child; // No custom transition
+          },
+          // This will disable the swipe back gesture
+          settings: const RouteSettings(arguments: 'disableSwipe'),
+        ),
+      );
+
       _inputPassword.clear();
       setState(() {
         _wrongPW = false;
@@ -44,7 +54,30 @@ class _LoginpageState extends State<Loginpage> {
   }
 
   void _handleForgetPW(String email) {
-    print(email);
+    _handleOTPWindow();
+  }
+
+  void _handlePwdSending(String inputText) {
+    //verifying otp and send email
+  }
+
+  void _handleOTPWindow() {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return InputDialog(
+              hintText: "OTP",
+              title: "An OTP has been sent to your email",
+              content:
+                  "A temporary password would be sent to your email after the OTP is verified",
+              onConfirm: (inputText) {
+                Navigator.of(context).pop();
+                return _handlePwdSending(inputText);
+              },
+              onCancel: () {
+                Navigator.of(context).pop();
+              });
+        });
   }
 
 //hello

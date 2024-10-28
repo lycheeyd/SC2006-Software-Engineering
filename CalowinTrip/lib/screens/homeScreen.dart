@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../models/location.dart';
 import '../models/currentlocation.dart';
 import '../services/apiService.dart';
-import '../models/travelmethod.dart';
 import 'achievementScreen.dart'; // Import AchievementScreen
 
 class HomeScreen extends StatefulWidget {
