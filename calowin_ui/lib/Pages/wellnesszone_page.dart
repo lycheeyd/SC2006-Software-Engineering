@@ -1,5 +1,7 @@
 import 'package:calowin/common/colors_and_fonts.dart';
 import 'package:calowin/control/page_navigator.dart';
+import 'package:calowin/control/park_retriever.dart';
+import 'package:calowin/control/weather_retriever.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -11,20 +13,133 @@ class WellnessZonePage extends StatefulWidget {
 }
 
 class _WellnessZonePageState extends State<WellnessZonePage> {
+  //to be retrieved
+  double userLat = 1.385170;
+  double userLon = 103.79615;
+
   int _currentIndex = -1;
+  final double _sliderMin = 1;
+  final double _sliderMax = 20;
+  late Icon _weatherIcon;
+  late String _weatherForecast;
+  double _sliderValue = 5;
+  ParkRetriever _parkRetriever = ParkRetriever();
+  WeatherRetriever _weatherRetriever = WeatherRetriever();
 
-  final List<Map<String, dynamic>> _wellnessZones = [
-    {"name": "East Coast Park", "distance": 5},
-    {"name": "West Coast Park", "distance": 3},
-    {"name": "Lake Side Garden", "distance": 4},
-    {"name": "Sentosa", "distance": 2},
-    {"name": "Gardens By The Bay", "distance": 7}
-  ];
+  // final List<Map<String, dynamic>> _wellnessZones = [
+  //   {"name": "East Coast Park", "distance": 5},
+  //   {"name": "West Coast Park", "distance": 3},
+  //   {"name": "Lake Side Garden", "distance": 4},
+  //   {"name": "Sentosa", "distance": 2},
+  //   {"name": "Gardens By The Bay", "distance": 7}
+  // ];
 
-  void _onListItemTap(int index) {
+  List<Park> _wellnessZones = [];
+  List<Park> _filteredZones = [];
+
+  void _retrieveWellnessZones() async {
+    //_wellnessZones = await retriever.retrievePark(userLat, userLon);
+    //testing list for filtering
+    setState(() {
+      _wellnessZones = [
+        Park(
+          name: "Changi Airport",
+          distance: 5.3,
+          closestPoint: {"Lat": 1.348740, "Lon": 103.984940},
+        )
+      ];
+    });
+
+    _filterWellnessZones(_sliderValue);
+  }
+
+  void _filterWellnessZones(double radius) {
+    setState(() {
+      _filteredZones = _wellnessZones.where((zone) {
+        return zone.distance <=
+            _sliderValue; // Show only zones within the radius
+      }).toList();
+      _filteredZones.sort((a, b) => a.distance.compareTo(b.distance));
+      _sliderValue = radius;
+    });
+  }
+
+  // Get const icon based on weather forecast
+  void setWeatherIcon() {
+    Icon icon;
+    switch (_weatherForecast) {
+      case 'Fair':
+      case 'Fair (Day)':
+      case 'Fair (Night)':
+      case 'Fair and Warm':
+        icon = const Icon(Icons.wb_sunny, color: Colors.yellow);
+
+      case 'Partly Cloudy':
+      case 'Partly Cloudy (Day)':
+      case 'Partly Cloudy (Night)':
+        icon = const Icon(Icons.cloud, color: Colors.blueGrey);
+
+      case 'Cloudy':
+        icon = const Icon(Icons.cloud_queue, color: Colors.grey);
+
+      case 'Hazy':
+      case 'Slightly Hazy':
+        icon = const Icon(Icons.filter_drama, color: Colors.orange);
+
+      case 'Windy':
+        icon = const Icon(Icons.air, color: Colors.blue);
+
+      case 'Mist':
+      case 'Fog':
+        icon = const Icon(Icons.blur_on, color: Colors.grey);
+
+      case 'Light Rain':
+      case 'Moderate Rain':
+      case 'Heavy Rain':
+        icon = const Icon(Icons.grain, color: Colors.blueAccent);
+
+      case 'Passing Showers':
+      case 'Light Showers':
+      case 'Showers':
+      case 'Heavy Showers':
+        icon = const Icon(Icons.grain, color: Colors.blue);
+
+      case 'Thundery Showers':
+      case 'Heavy Thundery Showers':
+      case 'Heavy Thundery Showers with Gusty Winds':
+        icon = const Icon(Icons.flash_on, color: Colors.purple);
+
+      default:
+        icon = const Icon(Icons.help_outline, color: Colors.grey);
+    }
+
+    setState(() {
+      _weatherIcon = icon;
+    });
+  }
+
+  void _setWeather(double lat, double lon) async {
+    _weatherRetriever.setLocation(lat, lon);
+    String forecast = await _weatherRetriever.retrieveWeather();
+    setState(() {
+      _weatherForecast = forecast;
+      setWeatherIcon();
+    });
+    print(_weatherForecast);
+  }
+
+  void _onListItemTap(int index, double? lat, double? lon) {
     setState(() {
       _currentIndex = index;
     });
+    if (lat == null || lon == null) {
+      setState(() {
+        _weatherForecast = "Weather Not Available";
+        _weatherIcon = const Icon(Icons.error_outline_rounded);
+      });
+    } else {
+      _setWeather(lat, lon);
+    }
   }
 
   void _handleGO() {
@@ -36,9 +151,7 @@ class _WellnessZonePageState extends State<WellnessZonePage> {
     }
   }
 
-  void _getWellnessZones() {}
-
-  Widget _buildListItem(int index, Map<String, dynamic> zone) {
+  Widget _buildListItem(int index, Park zone) {
     Color tileColor = const Color.fromARGB(10, 0, 0, 0);
     Color selectedColor = const Color.fromARGB(255, 232, 231, 253);
     return Padding(
@@ -51,24 +164,24 @@ class _WellnessZonePageState extends State<WellnessZonePage> {
           borderRadius: BorderRadius.circular(10),
           border: const Border(
             bottom: BorderSide(
-              color: Colors.grey, // Change this to your desired border color
-              width: 2, // Set the desired width of the bottom border
+              color: Colors.grey,
+              width: 2,
             ),
           ),
         ),
         child: ListTile(
           title: Text(
-            zone["name"],
+            zone.name,
             style:
                 GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 15),
           ),
           trailing: SizedBox(
-            width: 120,
+            width: 130,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Text(
-                  "${zone["distance"].toString()} km",
+                  "${zone.distance.toString()} km",
                   style: GoogleFonts.poppins(
                       fontSize: 14, fontWeight: FontWeight.w600),
                 ),
@@ -98,10 +211,17 @@ class _WellnessZonePageState extends State<WellnessZonePage> {
               ],
             ),
           ),
-          onTap: () => _onListItemTap(index),
+          onTap: () => _onListItemTap(
+              index, zone.closestPoint['Lat'], zone.closestPoint['Lon']),
         ),
       ),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _retrieveWellnessZones();
   }
 
   @override
@@ -110,22 +230,115 @@ class _WellnessZonePageState extends State<WellnessZonePage> {
       backgroundColor: PrimaryColors.dullGreen,
       body: Column(
         children: [
-          Container(
-            color: Colors.white,
+          SizedBox(
             height: 400,
             width: 400,
-            child: const Center(child: Text("<Insert Map Here>")),
+            child: Stack(
+              children: [
+                Container(
+                  color: const Color.fromARGB(255, 138, 218, 255),
+                  height: 400,
+                  width: 400,
+                  child: const Center(child: Text("<Insert Map Here>")),
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 15, horizontal: 5),
+                  child: Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Container(
+                      decoration: BoxDecoration(
+                          color: const Color.fromARGB(50, 0, 0, 0),
+                          borderRadius: BorderRadius.circular(10)),
+                      height: 45,
+                      width: 300,
+                      child: Column(
+                        children: [
+                          const Padding(
+                            padding:
+                                EdgeInsets.only(left: 20, top: 3, bottom: 0),
+                            child: Align(
+                                alignment: Alignment.topLeft,
+                                child: Text(
+                                  "Search Radius",
+                                  style: TextStyle(color: Colors.white),
+                                )),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                height: 18,
+                                width: 240,
+                                child: SliderTheme(
+                                  data: SliderTheme.of(context).copyWith(
+                                    thumbShape: const RoundSliderThumbShape(
+                                        pressedElevation: 0,
+                                        enabledThumbRadius:
+                                            7.0), // Change thumb size here
+                                    overlayShape: const RoundSliderOverlayShape(
+                                        overlayRadius:
+                                            8.0), // Change overlay size
+                                  ),
+                                  child: Slider(
+                                    activeColor: Colors.black,
+                                    overlayColor: const WidgetStatePropertyAll(
+                                        Colors.black),
+                                    value: _sliderValue,
+                                    min: _sliderMin,
+                                    max: _sliderMax,
+                                    divisions: 200,
+                                    onChanged: (double value) {
+                                      _filterWellnessZones(value);
+                                    },
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(
+                                width: 7,
+                              ),
+                              Align(
+                                  alignment: Alignment.bottomRight,
+                                  child: Text(_sliderValue.toStringAsFixed(1),
+                                      style: const TextStyle(
+                                          color: Colors.white))),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
           Container(
             color: PrimaryColors.grey,
-            height: 30,
+            height: 40,
             width: 400,
-            child: const Center(
-                child: Text(
-              "Wellness Zones",
-              style:
-                  TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-            )),
+            child: Stack(
+              children: [
+                // Use Expanded to take all the available space for the text
+                const Center(
+                  child: Text(
+                    "Wellness Zones",
+                    style: TextStyle(
+                        color: Colors.black, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: IconButton(
+                    iconSize: 20,
+                    onPressed: _retrieveWellnessZones,
+                    icon: const Icon(
+                      Icons.refresh,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
           Expanded(
             child: Container(
@@ -133,9 +346,9 @@ class _WellnessZonePageState extends State<WellnessZonePage> {
               child: ListView.builder(
                 scrollDirection: Axis.vertical,
                 shrinkWrap: true,
-                itemCount: _wellnessZones.length,
+                itemCount: _filteredZones.length,
                 itemBuilder: (context, index) {
-                  Map<String, dynamic> currentItem = _wellnessZones[index];
+                  Park currentItem = _filteredZones[index];
                   return _buildListItem(index, currentItem);
                 },
               ),

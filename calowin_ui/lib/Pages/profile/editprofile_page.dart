@@ -17,8 +17,8 @@ class EditprofilePage extends StatefulWidget {
 
 class _EditprofilePageState extends State<EditprofilePage> {
   //logic to be implemented
-  bool _invalidName = false;
-  bool _invalidWeight = false;
+  final bool _invalidName = false;
+  final bool _invalidWeight = false;
 
   //preset the inputs here
   final TextEditingController _nameController = TextEditingController();

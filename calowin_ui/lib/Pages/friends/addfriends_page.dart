@@ -12,7 +12,7 @@ class AddfriendsPage extends StatefulWidget {
 
 class _AddfriendsPageState extends State<AddfriendsPage> {
   List<String> _searchList = [];
-  List<String> _friendRequests = ['Mia', 'Khalifa', 'Cody'];
+  final List<String> _friendRequests = ['Mia', 'Khalifa', 'Cody'];
 
   void _handleBack() {
     final pageNavigatorState =

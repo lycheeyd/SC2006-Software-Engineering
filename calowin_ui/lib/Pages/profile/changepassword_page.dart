@@ -12,13 +12,13 @@ class ChangepasswordPage extends StatefulWidget {
 }
 
 class _ChangepasswordPageState extends State<ChangepasswordPage> {
-  bool _wrongPW = false;
-  bool _wrongNewPW = false;
-  bool _newPWNotSame = false;
+  final bool _wrongPW = false;
+  final bool _wrongNewPW = false;
+  final bool _newPWNotSame = false;
 
-  TextEditingController _currentPWController = TextEditingController();
-  TextEditingController _newPWController = TextEditingController();
-  TextEditingController _confirmPWController = TextEditingController();
+  final TextEditingController _currentPWController = TextEditingController();
+  final TextEditingController _newPWController = TextEditingController();
+  final TextEditingController _confirmPWController = TextEditingController();
 
   void _handleChangePassword() {
     // Handle change password logic

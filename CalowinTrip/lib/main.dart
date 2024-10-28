@@ -1,7 +1,7 @@
 // lib/main.dart
 
 import 'package:flutter/material.dart';
-import 'screens/homescreen.dart';  // Import the HomeScreen
+// Import the HomeScreen
 import 'screens/mapCalculationScreen.dart';
 
 void main() {

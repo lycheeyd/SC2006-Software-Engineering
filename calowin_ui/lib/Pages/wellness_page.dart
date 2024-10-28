@@ -1,7 +1,4 @@
-import 'package:calowin/Pages/success_page.dart';
-import 'package:calowin/common/dualbutton_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:calowin/common/colors_and_fonts.dart';
 
 class WellnessPage extends StatefulWidget {
@@ -24,22 +21,22 @@ class _WellnessPageState extends State<WellnessPage> {
     setState(() {
       selectedItemIndex = index;
     });
-    // selectedItemIndex = index;
-    // print("Item selected");
   }
 
   // List of wellness zones
   final List<Map<String, dynamic>> wellnessZones = [
-    {"name": "West Coast Park", 
-     "description": "A chill place", 
-     "distance": 2,
-     "forecast": "heavy Rain"
-     },
-    {"name": "Student Recreational Center", 
-     "description": "For exercise", 
-     "distance": 10,
-     "forecast": "Sunny"
-     },
+    {
+      "name": "West Coast Park",
+      "description": "A chill place",
+      "distance": 2,
+      "forecast": "heavy Rain"
+    },
+    {
+      "name": "Student Recreational Center",
+      "description": "For exercise",
+      "distance": 10,
+      "forecast": "Sunny"
+    },
   ];
 
   // void _onMapCreated(GoogleMapController controller) {
@@ -49,24 +46,25 @@ class _WellnessPageState extends State<WellnessPage> {
   @override
   Widget build(BuildContext context) {
     final filteredZones = wellnessZones.where((zone) {
-      return zone['distance'] <= _currentRadius; // Show only zones within the radius
+      return zone['distance'] <=
+          _currentRadius; // Show only zones within the radius
     }).toList();
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: PrimaryColors.dullGreen,
-      
       body: Column(
         children: [
           // Weather widget
-           // Weather Forecast
+          // Weather Forecast
           Positioned(
             top: 20,
             left: 10,
             right: 10,
-            child: selectedItemIndex != -1 ?// Only show if West Coast Park is selected
-                  Container(
-                    padding: EdgeInsets.all(10),
+            child: selectedItemIndex != -1
+                ? // Only show if West Coast Park is selected
+                Container(
+                    padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color: Colors.black.withOpacity(0.5),
                       borderRadius: BorderRadius.circular(10),
@@ -77,9 +75,9 @@ class _WellnessPageState extends State<WellnessPage> {
                         const SizedBox(width: 10),
                         Text(
                           'Next 2 hr forecast: ${wellnessZones[selectedItemIndex]['forecast']}',
-                          style: const TextStyle(color: Colors.white, fontSize: 16),
+                          style: const TextStyle(
+                              color: Colors.white, fontSize: 16),
                         ),
-                        
                       ],
                     ),
                   )
@@ -103,10 +101,10 @@ class _WellnessPageState extends State<WellnessPage> {
             right: 10,
             child: Container(
               color: Colors.grey[200]?.withOpacity(0.8),
-              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               child: Row(
                 children: [
-                  Text('Search Radius'),
+                  const Text('Search Radius'),
                   Expanded(
                     child: Slider(
                       value: _currentRadius,
@@ -126,7 +124,6 @@ class _WellnessPageState extends State<WellnessPage> {
               ),
             ),
           ),
-              
 
           // Wellness Zones List
           Expanded(
@@ -137,11 +134,12 @@ class _WellnessPageState extends State<WellnessPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: EdgeInsets.all(8.0),
                     // backgroundColor: PrimaryColors.dullGreen,
                     child: Text(
                       'Wellness Zones',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                     ),
                   ),
                   Expanded(
@@ -155,16 +153,14 @@ class _WellnessPageState extends State<WellnessPage> {
                             children: [
                               Text("${filteredZones[index]['distance']} km"),
                               ElevatedButton(
-                                onPressed: () => {
-                                  _handleItemPressed(index)
-                                },
+                                onPressed: () => {_handleItemPressed(index)},
                                 style: ElevatedButton.styleFrom(
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                   // primary: Colors.purple, // Adjust the button color
                                 ),
-                                child: Text('Go'),
+                                child: const Text('Go'),
                               ),
                             ],
                           ),
@@ -176,7 +172,6 @@ class _WellnessPageState extends State<WellnessPage> {
               ),
             ),
           ),
-
         ],
       ),
     );

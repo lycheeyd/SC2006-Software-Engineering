@@ -22,7 +22,7 @@ class _OtheruserPageState extends State<OtheruserPage> {
   //define retrieve logic here
   late String? _userID;
   late UserProfile? _profile;
-  late List<Image?> _badges = [];
+  late final List<Image?> _badges = [];
   late UserStatus _userStatus;
   late bool _userFound;
 
@@ -52,7 +52,6 @@ class _OtheruserPageState extends State<OtheruserPage> {
   void getUserProfile(String? id) {
     setState(() {
       if (id == null) {
-        print("User not found");
         _userFound = false;
         // A placeholder profile to prevent errors
         _profile = UserProfile(
@@ -65,7 +64,6 @@ class _OtheruserPageState extends State<OtheruserPage> {
             calorieBurn: 2300,
             badges: ["CalorieGold", "EcoBronze"]);
       } else {
-        print("User found");
         _userFound = true;
         _userStatus = UserStatus.friend;
         _profile = UserProfile(
@@ -356,7 +354,7 @@ class _OtheruserPageState extends State<OtheruserPage> {
       appBar: AppBar(
         backgroundColor: PrimaryColors.dullGreen,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: _handleBack,
         ),
       ),

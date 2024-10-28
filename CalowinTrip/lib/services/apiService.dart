@@ -1,9 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/location.dart';
-import '../models/travelmethod.dart';
 import '../models/currentlocation.dart';
-import '../models/achievement.dart'; // Adjust the path based on your project structure
+// Adjust the path based on your project structure
 
 class ApiService {
   //final String baseUrl = "http://172.21.146.188:8080/api"; // VM URL
