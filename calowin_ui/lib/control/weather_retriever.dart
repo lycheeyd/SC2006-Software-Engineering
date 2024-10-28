@@ -1,98 +1,102 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'dart:math';
 import 'package:intl/intl.dart';
 
 class WeatherRetriever {
-  double latitude;
-  double longitude;
+  late double latitude;
+  late double longitude;
 
-  WeatherRetriever({required this.latitude, required this.longitude});
   String formattedDate =
       DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(DateTime.now());
   // Retrieve weather forecast from API
   Future<String> retrieveWeather() async {
     final url = Uri.parse(
-        'https://api-open.data.gov.sg/v2/real-time/api/two-hr-forecast?$formattedDate'); // Replace with actual API endpoint
+        'https://api.data.gov.sg/v1/environment/2-hour-weather-forecast?$formattedDate');
 
     try {
-      final response = await http.post(url, body: {
-        'latitude': latitude.toString(),
-        'longitude': longitude.toString(),
-      });
+      final response = await http.get(url);
 
       if (response.statusCode == 200) {
-        final jsonResponse = jsonDecode(response.body);
+        final data = jsonDecode(response.body);
+        final areaMetadata = data['area_metadata'];
+        final forecasts = data['items'][0]['forecasts'];
 
-        if (jsonResponse['code'] == 1) {
-          // Extract forecast information from response
-          final forecast =
-              jsonResponse['data']['items'][0]['forecasts'][0]['forecast'];
-          return forecast;
+        // Find the closest area
+        final nearestArea = _findNearestArea(latitude, longitude, areaMetadata);
+
+        // Retrieve the forecast for the nearest area
+        Map<String, dynamic>? nearestForecast;
+        for (var forecast in forecasts) {
+          if (forecast['area'] == nearestArea['name']) {
+            nearestForecast = forecast;
+            break;
+          }
+        }
+
+        print(nearestArea['name']);
+
+        if (nearestForecast != null) {
+          return nearestForecast['forecast'];
         } else {
-          return 'Error: ${jsonResponse['errorMsg']}';
+          return 'Forecast not available';
         }
       } else if (response.statusCode == 404) {
-        return 'Forecast Not Available';
+        return 'Forecast not available';
       } else {
-        return 'Error: Unable to retrieve weather data';
+        return 'Failed to fetch weather data';
       }
     } catch (e) {
-      return 'Error: $e';
+      return 'Error occurred here: $e';
     }
+  }
+
+  // Method to calculate the nearest area using the Haversine formula
+  Map<String, dynamic> _findNearestArea(
+      double userLat, double userLon, List<dynamic> areaMetadata) {
+    late Map<String, dynamic> nearestArea;
+    double shortestDistance = double.infinity;
+
+    for (var area in areaMetadata) {
+      final areaLat = area['label_location']['latitude'];
+      final areaLon = area['label_location']['longitude'];
+      final distance = _calculateDistance(userLat, userLon, areaLat, areaLon);
+
+      if (distance < shortestDistance) {
+        shortestDistance = distance;
+        nearestArea = area;
+      }
+    }
+
+    return nearestArea;
+  }
+
+  // Haversine formula to calculate distance between two coordinates
+  double _calculateDistance(
+      double lat1, double lon1, double lat2, double lon2) {
+    const earthRadius = 6371; // Radius of the Earth in kilometers
+    final dLat = _degreesToRadians(lat2 - lat1);
+    final dLon = _degreesToRadians(lon2 - lon1);
+
+    final a = sin(dLat / 2) * sin(dLat / 2) +
+        cos(_degreesToRadians(lat1)) *
+            cos(_degreesToRadians(lat2)) *
+            sin(dLon / 2) *
+            sin(dLon / 2);
+
+    final c = 2 * atan2(sqrt(a), sqrt(1 - a));
+
+    return earthRadius * c;
+  }
+
+  // Convert degrees to radians
+  double _degreesToRadians(double degrees) {
+    return degrees * pi / 180;
   }
 
   void setLocation(double latitude, double longitude) {
     this.latitude = latitude;
     this.longitude = longitude;
-  }
-
-  // Get const icon based on weather forecast
-  Icon getWeatherIcon(String forecast) {
-    switch (forecast) {
-      case 'Fair':
-      case 'Fair (Day)':
-      case 'Fair (Night)':
-      case 'Fair and Warm':
-        return const Icon(Icons.wb_sunny, color: Colors.yellow);
-
-      case 'Partly Cloudy':
-      case 'Partly Cloudy (Day)':
-      case 'Partly Cloudy (Night)':
-        return const Icon(Icons.cloud, color: Colors.blueGrey);
-
-      case 'Cloudy':
-        return const Icon(Icons.cloud_queue, color: Colors.grey);
-
-      case 'Hazy':
-      case 'Slightly Hazy':
-        return const Icon(Icons.filter_drama, color: Colors.orange);
-
-      case 'Windy':
-        return const Icon(Icons.air, color: Colors.blue);
-
-      case 'Mist':
-      case 'Fog':
-        return const Icon(Icons.blur_on, color: Colors.grey);
-
-      case 'Light Rain':
-      case 'Moderate Rain':
-      case 'Heavy Rain':
-        return const Icon(Icons.grain, color: Colors.blueAccent);
-
-      case 'Passing Showers':
-      case 'Light Showers':
-      case 'Showers':
-      case 'Heavy Showers':
-        return const Icon(Icons.grain, color: Colors.blue);
-
-      case 'Thundery Showers':
-      case 'Heavy Thundery Showers':
-      case 'Heavy Thundery Showers with Gusty Winds':
-        return const Icon(Icons.flash_on, color: Colors.purple);
-
-      default:
-        return const Icon(Icons.help_outline, color: Colors.grey);
-    }
   }
 }

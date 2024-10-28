@@ -1,6 +1,7 @@
 import 'package:calowin/common/colors_and_fonts.dart';
 import 'package:calowin/control/page_navigator.dart';
 import 'package:calowin/control/park_retriever.dart';
+import 'package:calowin/control/weather_retriever.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -12,15 +13,18 @@ class WellnessZonePage extends StatefulWidget {
 }
 
 class _WellnessZonePageState extends State<WellnessZonePage> {
-  int _currentIndex = -1;
-  final double _sliderMin = 1;
-  final double _sliderMax = 20;
-  double _sliderValue = 5;
-  ParkRetriever retriever = ParkRetriever();
-
   //to be retrieved
   double userLat = 1.385170;
   double userLon = 103.79615;
+
+  int _currentIndex = -1;
+  final double _sliderMin = 1;
+  final double _sliderMax = 20;
+  late Icon _weatherIcon;
+  late String _weatherForecast;
+  double _sliderValue = 5;
+  ParkRetriever _parkRetriever = ParkRetriever();
+  WeatherRetriever _weatherRetriever = WeatherRetriever();
 
   // final List<Map<String, dynamic>> _wellnessZones = [
   //   {"name": "East Coast Park", "distance": 5},
@@ -39,65 +43,10 @@ class _WellnessZonePageState extends State<WellnessZonePage> {
     setState(() {
       _wellnessZones = [
         Park(
-          name: "Central Park",
+          name: "Changi Airport",
           distance: 5.3,
-          closestPoint: {"Lat": 1.3000, "Lon": 103.8000},
-        ),
-        Park(
-          name: "Greenwood Park",
-          distance: 12.7,
-          closestPoint: {"Lat": 1.3050, "Lon": 103.8100},
-        ),
-        Park(
-          name: "Sunshine Gardens",
-          distance: 9.8,
-          closestPoint: {"Lat": 1.3200, "Lon": 103.8200},
-        ),
-        Park(
-          name: "Maple Leaf Park",
-          distance: 3.1,
-          closestPoint: {"Lat": 1.3350, "Lon": 103.8250},
-        ),
-        Park(
-          name: "Riverside Park",
-          distance: 15.4,
-          closestPoint: {"Lat": 1.3450, "Lon": 103.8350},
-        ),
-        Park(
-          name: "Hillside Park",
-          distance: 7.2,
-          closestPoint: {"Lat": 1.3550, "Lon": 103.8450},
-        ),
-        Park(
-          name: "Forest Grove",
-          distance: 19.0,
-          closestPoint: {"Lat": 1.3600, "Lon": 103.8550},
-        ),
-        Park(
-          name: "Lakeside Park",
-          distance: 2.6,
-          closestPoint: {"Lat": 1.3700, "Lon": 103.8650},
-        ),
-        Park(
-          name: "Willow Creek Park",
-          distance: 14.1,
-          closestPoint: {"Lat": 1.3800, "Lon": 103.8750},
-        ),
-        Park(
-          name: "Evergreen Park",
-          distance: 8.3,
-          closestPoint: {"Lat": 1.3900, "Lon": 103.8850},
-        ),
-        Park(
-          name: "Pine Ridge Park",
-          distance: 6.7,
-          closestPoint: {"Lat": 1.4000, "Lon": 103.8950},
-        ),
-        Park(
-          name: "Oakwood Park",
-          distance: 17.5,
-          closestPoint: {"Lat": 1.4100, "Lon": 103.9050},
-        ),
+          closestPoint: {"Lat": 1.348740, "Lon": 103.984940},
+        )
       ];
     });
 
@@ -115,10 +64,82 @@ class _WellnessZonePageState extends State<WellnessZonePage> {
     });
   }
 
-  void _onListItemTap(int index) {
+  // Get const icon based on weather forecast
+  void setWeatherIcon() {
+    Icon icon;
+    switch (_weatherForecast) {
+      case 'Fair':
+      case 'Fair (Day)':
+      case 'Fair (Night)':
+      case 'Fair and Warm':
+        icon = const Icon(Icons.wb_sunny, color: Colors.yellow);
+
+      case 'Partly Cloudy':
+      case 'Partly Cloudy (Day)':
+      case 'Partly Cloudy (Night)':
+        icon = const Icon(Icons.cloud, color: Colors.blueGrey);
+
+      case 'Cloudy':
+        icon = const Icon(Icons.cloud_queue, color: Colors.grey);
+
+      case 'Hazy':
+      case 'Slightly Hazy':
+        icon = const Icon(Icons.filter_drama, color: Colors.orange);
+
+      case 'Windy':
+        icon = const Icon(Icons.air, color: Colors.blue);
+
+      case 'Mist':
+      case 'Fog':
+        icon = const Icon(Icons.blur_on, color: Colors.grey);
+
+      case 'Light Rain':
+      case 'Moderate Rain':
+      case 'Heavy Rain':
+        icon = const Icon(Icons.grain, color: Colors.blueAccent);
+
+      case 'Passing Showers':
+      case 'Light Showers':
+      case 'Showers':
+      case 'Heavy Showers':
+        icon = const Icon(Icons.grain, color: Colors.blue);
+
+      case 'Thundery Showers':
+      case 'Heavy Thundery Showers':
+      case 'Heavy Thundery Showers with Gusty Winds':
+        icon = const Icon(Icons.flash_on, color: Colors.purple);
+
+      default:
+        icon = const Icon(Icons.help_outline, color: Colors.grey);
+    }
+
+    setState(() {
+      _weatherIcon = icon;
+    });
+  }
+
+  void _setWeather(double lat, double lon) async {
+    _weatherRetriever.setLocation(lat, lon);
+    String forecast = await _weatherRetriever.retrieveWeather();
+    setState(() {
+      _weatherForecast = forecast;
+      setWeatherIcon();
+    });
+    print(_weatherForecast);
+  }
+
+  void _onListItemTap(int index, double? lat, double? lon) {
     setState(() {
       _currentIndex = index;
     });
+    if (lat == null || lon == null) {
+      setState(() {
+        _weatherForecast = "Weather Not Available";
+        _weatherIcon = const Icon(Icons.error_outline_rounded);
+      });
+    } else {
+      _setWeather(lat, lon);
+    }
   }
 
   void _handleGO() {
@@ -190,7 +211,8 @@ class _WellnessZonePageState extends State<WellnessZonePage> {
               ],
             ),
           ),
-          onTap: () => _onListItemTap(index),
+          onTap: () => _onListItemTap(
+              index, zone.closestPoint['Lat'], zone.closestPoint['Lon']),
         ),
       ),
     );
