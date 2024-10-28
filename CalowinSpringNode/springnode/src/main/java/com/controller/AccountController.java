@@ -1,5 +1,7 @@
 package com.controller;
 
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,14 +33,14 @@ public class AccountController extends HttpReqController{
     public ResponseEntity<?> signup(@RequestBody SignupDTO DTO) {
         // Forward signup request to AccountModule
         String url = "http://localhost:8081/account/signup"; // URL of Account Java application
-        return restTemplate.postForEntity(url, DTO, String.class);
+        return restTemplate.postForEntity(url, DTO, Map.class);
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginDTO DTO) {
         // Forward login request to AccountModule
         String url = "http://localhost:8081/account/login";
-        return restTemplate.postForEntity(url, DTO, String.class);
+        return restTemplate.postForEntity(url, DTO, Map.class);
     }
 
     @PostMapping("/send-OTP")
@@ -65,7 +67,7 @@ public class AccountController extends HttpReqController{
     public ResponseEntity<?> editProfile(@RequestBody EditProfileDTO DTO) {
         // Forward edit profile request to AccountModule
         String url = "http://localhost:8081/account/edit-profile";
-        return restTemplate.postForEntity(url, DTO, String.class);
+        return restTemplate.postForEntity(url, DTO, Map.class);
     }
 
     @PostMapping("/delete-account")
@@ -79,7 +81,7 @@ public class AccountController extends HttpReqController{
     public ResponseEntity<?> viewProfile(@PathVariable String userID) {
         // Forward view profile request to AccountModule
         String url = "http://localhost:8081/account/view-profile/" + userID;
-        return restTemplate.getForEntity(url, String.class);
+        return restTemplate.getForEntity(url, Map.class);
     }
     
 }
