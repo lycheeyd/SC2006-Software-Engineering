@@ -23,7 +23,7 @@ class Park {
 
 class ParkRetriever {
   final String _baseUrl =
-      'http://springnodeurl/central/wellness/parks'; // Replace with your backend URL
+      'http://172.21.146.188:8080/central/wellness/parks'; // Replace with your backend URL
 
   // Function to retrieve parks based on user's coordinates
   Future<List<Park>> retrievePark(double userLat, double userLon) async {
