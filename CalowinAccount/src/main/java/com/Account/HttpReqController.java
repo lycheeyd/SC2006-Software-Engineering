@@ -20,6 +20,7 @@ import com.DataTransferObject.EditProfileDTO;
 import com.DataTransferObject.ForgotPasswordDTO;
 import com.DataTransferObject.LoginDTO;
 import com.DataTransferObject.LoginResponseDTO;
+import com.DataTransferObject.SendOtpDTO;
 import com.DataTransferObject.SignupDTO;
 import com.DataTransferObject.ViewProfileResponseDTO;
 
@@ -83,14 +84,12 @@ public class HttpReqController {
         
     }
 
-    @PostMapping("/send-OTP")
-    public ResponseEntity<String> sendOTP(String email) {
+    @PostMapping("/send-otp")
+    public ResponseEntity<?> sendOTP(@RequestParam SendOtpDTO sendOtpDTO) {
         try {
-            // Generates the OTP
-            String otpCode = otpService.generateAndSaveOTP(email);
-
-            // NEED EMAIL SERVICE TO SEND OTP
-            // implement next time after email service is setup
+            // Send the OTP
+            otpService.sendOtpCode(sendOtpDTO.getEmail(), sendOtpDTO.getType());;
+            
             return ResponseEntity.ok("OTP sent to email associate with the account");
         
         } catch (Exception e) {
@@ -114,14 +113,23 @@ public class HttpReqController {
             // Handle other exceptions
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + e.getMessage());
         }
-        
+
     }
 
     @PostMapping("/forget-password")
-    public ResponseEntity<String> forgetPassword(@RequestBody ForgotPasswordDTO forgotPasswordDTO) {
-        // Forget password logic (send reset link)
-        // implement next time after email service is setup
-        return ResponseEntity.ok("Password reset link sent");
+    public ResponseEntity<?> forgetPassword(@RequestBody ForgotPasswordDTO forgotPasswordDTO) {
+        // Forget password logic
+        try {
+            passwordManagementService.forgotPassword(forgotPasswordDTO.getEmail(), forgotPasswordDTO.getOtCode());
+
+            return ResponseEntity.ok("New password is sent to your email");
+
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error sending new password: " + e.getMessage());
+        }
+
     }
 
     @PostMapping("/edit-profile")
@@ -143,12 +151,23 @@ public class HttpReqController {
             // Handle other exceptions
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + e.getMessage());
         }
+
     }
 
     @PostMapping("/delete-account")
-    public ResponseEntity<String> deleteAccount(@RequestBody DeleteAccountDTO request) {
+    public ResponseEntity<?> deleteAccount(@RequestBody DeleteAccountDTO deleteAccountDTO) {
         // Delete account logic
-        return ResponseEntity.ok("");
+        try {
+            accountManagementService.deleteAccount(deleteAccountDTO.getUserID(), deleteAccountDTO.getEmail(), deleteAccountDTO.getOtpCode());
+        
+            return ResponseEntity.ok("Account deleted");
+
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting account: " + e.getMessage());
+        }
+
     }
 
     @GetMapping("/view-profile/{userID}")
@@ -165,7 +184,7 @@ public class HttpReqController {
 
         } catch (RuntimeException e) {
             // Return unauthorized error for invalid credentials
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {
             // Handle other exceptions
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + e.getMessage());

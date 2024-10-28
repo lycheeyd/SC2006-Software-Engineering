@@ -1,4 +1,4 @@
-package com.DataTransferObject;
+package com.DataTransferObject.AccountDTO;
 
 public class EditProfileDTO {
     private String userID;

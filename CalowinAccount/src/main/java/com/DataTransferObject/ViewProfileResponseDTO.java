@@ -1,15 +1,15 @@
 package com.DataTransferObject;
 
-import com.Account.Entities.FriendStatusEnum;
+import com.Account.Entities.FriendStatus;
 
 public class ViewProfileResponseDTO {
     
     private String userID;
     private String name;
     private String bio;
-    private FriendStatusEnum friendStatus;
+    private FriendStatus friendStatus;
 
-    public ViewProfileResponseDTO(String userID, String name, String bio, FriendStatusEnum friendStatus) {
+    public ViewProfileResponseDTO(String userID, String name, String bio, FriendStatus friendStatus) {
         this.userID = userID;
         this.name = name;
         this.bio = bio;
@@ -40,11 +40,11 @@ public class ViewProfileResponseDTO {
         this.bio = bio;
     }
 
-    public FriendStatusEnum getFriendStatus() {
+    public FriendStatus getFriendStatus() {
         return this.friendStatus;
     }
 
-    public void setFriendStatus(FriendStatusEnum friendStatus) {
+    public void setFriendStatus(FriendStatus friendStatus) {
         this.friendStatus = friendStatus;
     }
 

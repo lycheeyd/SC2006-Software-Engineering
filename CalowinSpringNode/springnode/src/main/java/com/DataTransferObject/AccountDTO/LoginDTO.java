@@ -1,4 +1,4 @@
-package com.DataTransferObject.AuthDTO;
+package com.DataTransferObject.AccountDTO;
 
 public class LoginDTO {
     private String email;
