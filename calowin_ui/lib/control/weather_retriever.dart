@@ -1,17 +1,19 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 class WeatherRetriever {
   double latitude;
   double longitude;
 
   WeatherRetriever({required this.latitude, required this.longitude});
-
+  String formattedDate =
+      DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(DateTime.now());
   // Retrieve weather forecast from API
   Future<String> retrieveWeather() async {
     final url = Uri.parse(
-        'https://api.example.com/weather'); // Replace with actual API endpoint
+        'https://api-open.data.gov.sg/v2/real-time/api/two-hr-forecast?$formattedDate'); // Replace with actual API endpoint
 
     try {
       final response = await http.post(url, body: {
