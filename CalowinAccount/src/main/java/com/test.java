@@ -8,7 +8,9 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.ApplicationContext;
 
 import com.Account.Entities.EmailServiceProperties;
+import com.Account.Entities.EmailType;
 import com.Account.Services.EmailService;
+import com.Account.Services.OTPService;
 import com.Database.CalowinDB.CalowinDBProperties;
 import com.Database.CalowinSecureDB.CalowinSecureDBProperties;
 
@@ -21,6 +23,7 @@ public class test {
         ApplicationContext context = SpringApplication.run(test.class, args);
 
         // Get the EmailService bean from the application context
+        OTPService otpService = context.getBean(OTPService.class);
         EmailService emailService = context.getBean(EmailService.class);
 
         // Test sending an email
@@ -29,9 +32,17 @@ public class test {
         String messageBody = "This is a test email from the EmailService.";
 
         // Call the sendEmail method to send the test email
-        emailService.sendEmail(recipient, subject, messageBody);
-
-        System.out.println("Test email sent.");
+        try {
+            otpService.sendOtpCode(recipient, EmailType.DEFAULT);
+            otpService.sendOtpCode(recipient, EmailType.SIGN_UP);
+            otpService.sendOtpCode(recipient, EmailType.FORGOT_PASSWORD);
+            otpService.sendOtpCode(recipient, EmailType.DELETE_ACCOUNT);
+            otpService.sendOtpCode(recipient, EmailType.SEND_NEW_PASSWORD);
+            System.out.println("SUCCESSSS");
+        } catch (Exception e) {
+            System.out.println("ERRORRRRRRRRRRRRRR");
+            System.out.println(e);
+        }
     }
 
 }

@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import com.Account.ExternalServiceClient;
-import com.Account.Entities.FriendStatusEnum;
+import com.Account.Entities.FriendStatus;
 import com.Account.Entities.ProfileEntity;
 import com.DataTransferObject.ViewProfileResponseDTO;
 import com.Database.CalowinDB.UserInfoRepository;
@@ -43,7 +43,7 @@ public class ProfileManagementService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
         
         // Get friend status from external service
-        FriendStatusEnum friendStatus = externalServiceController.getFriendStatus(userID);
+        FriendStatus friendStatus = externalServiceController.getFriendStatus(userID);
 
         return new ViewProfileResponseDTO(profile.getUserID(), profile.getName(), profile.getBio(), friendStatus);
 

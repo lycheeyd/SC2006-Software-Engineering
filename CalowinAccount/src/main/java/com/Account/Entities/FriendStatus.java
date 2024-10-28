@@ -1,6 +1,6 @@
 package com.Account.Entities;
 
-public enum FriendStatusEnum {
+public enum FriendStatus {
     FRIEND, 
     REQUESTSENT, 
     STRANGER, 

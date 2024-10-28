@@ -29,7 +29,7 @@ public class CalowinDBConfig {
             EntityManagerFactoryBuilder builder, @Qualifier("calowinDBDataSource") DataSource dataSource) {
         return builder
                 .dataSource(dataSource)
-                .packages("com.Account") // Entity package for CalowinDB
+                .packages("com.Account.Entities") // Entity package for CalowinDB
                 .persistenceUnit("calowinDB")
                 .build();
     }

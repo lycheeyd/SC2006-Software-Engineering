@@ -15,7 +15,7 @@ public class EmailService {
     @Autowired
     private EmailServiceProperties emailServiceProperties;
 
-    public void sendEmail(String recipient, String subject, String messageBody) {
+    public void sendEmail(String recipient, String subject, String messageBody) throws Exception {
         // SMTP server configuration
         Properties properties = new Properties();
         properties.put("mail.smtp.auth", "true");
@@ -47,7 +47,7 @@ public class EmailService {
 
         } catch (MessagingException e) {
             e.printStackTrace();
-            throw new RuntimeException("Failed to send email", e);
+            throw new RuntimeException(e);
         }
     }
 

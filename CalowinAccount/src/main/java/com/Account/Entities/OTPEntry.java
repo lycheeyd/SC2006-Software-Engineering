@@ -12,12 +12,13 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "OTP")
 
-public class OTPEntity {
+public class OTPEntry {
 
     @Id
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
+    @JsonIgnore
     @Column(name = "otp_code", length = 6, nullable = false)
     private String otpCode;
 
@@ -25,10 +26,10 @@ public class OTPEntity {
     private LocalDateTime expiresAt;
 
     // Default constructor is required by JPA
-    public OTPEntity() {
+    public OTPEntry() {
     }
 
-    public OTPEntity(String email, String otpCode, LocalDateTime expiresAt) {
+    public OTPEntry(String email, String otpCode, LocalDateTime expiresAt) {
         this.email = email;
         this.otpCode = otpCode;
         this.expiresAt = expiresAt;

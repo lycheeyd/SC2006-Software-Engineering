@@ -2,29 +2,29 @@ package com.Account.Services;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.Account.Entities.OTPEntity;
+import com.Account.Entities.OTPEntry;
+import com.Account.Entities.EmailType;
 import com.Database.CalowinSecureDB.OTPRepository;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
+@Transactional("calowinSecureDBTransactionManager")
 public class OTPService {
-
-@Autowired
-    @Qualifier("calowinSecureDBTransactionManager")
-    private PlatformTransactionManager calowinSecureDBTransactionManager;
 
     @Autowired
     private OTPRepository otpRepository;
 
+    @Autowired
+    private EmailService emailService;
+
     // Generate and store OTP with 1-day expiry
-    public String generateAndSaveOTP(String email) {
+    private String generateAndSaveOTP(String email) {
         // Generate 6-digit OTP
         String otpCode = RandomStringUtils.randomNumeric(6);
 
@@ -38,18 +38,27 @@ public class OTPService {
         }
 
         // Save new OTP to database (CALOWIN_SECURE)
-        OTPEntity otpEntity = new OTPEntity(email, otpCode, expiresAt);
+        OTPEntry otpEntity = new OTPEntry(email, otpCode, expiresAt);
         otpRepository.save(otpEntity);
 
         return otpCode;
     }
 
+    // Send otpCode to user
+    public void sendOtpCode(String email, EmailType type) throws Exception {
+        // Generate OTP
+        String otpCode = generateAndSaveOTP(email);
+
+        // Send OTP
+        emailService.sendEmail(email, type.getSubject(), type.getMessageBody(otpCode));
+    }
+
     // Verify if the OTP is valid (not expired and matches)
     public boolean verifyOTP(String email, String otpCode) {
-        Optional<OTPEntity> otpEntityOptional = otpRepository.findByEmail(email);
+        Optional<OTPEntry> otpEntityOptional = otpRepository.findByEmail(email);
 
         if (otpEntityOptional.isPresent()) {
-            OTPEntity otpEntity = otpEntityOptional.get();
+            OTPEntry otpEntity = otpEntityOptional.get();
 
             // Check if the OTP has expired
             if (otpEntity.getExpiresAt().isBefore(LocalDateTime.now())) {
@@ -59,7 +68,11 @@ public class OTPService {
             }
 
             // Check if OTP matches
-            return otpEntity.getOtpCode().equals(otpCode);
+            if (otpEntity.getOtpCode().equals(otpCode)) {
+                // Delete OTP entry after verification
+                otpRepository.deleteByEmail(email);
+                return true;
+            }
         }
 
         // No OTP found for the user

@@ -47,11 +47,11 @@ public class AccountManagementService {
     private static final String SECRET_KEY = "ASK RAPHEL FOR KEY"; // Should be a 16/32-byte key
 
     // Signup method
-    @Transactional //(transactionManager = "calowinSecureDBTransactionManager")
+    @Transactional // (transactionManager = "calowinSecureDBTransactionManager")
     public LoginResponseDTO signup(String email, String encryptedPassword, String encryptedConfirmPassword, String name, float weight, String otpCode) throws Exception {
         // Authenticate OTP
         if (!otpService.verifyOTP(email, otpCode)) {
-            throw new RuntimeException("Incorrect OTP");
+            throw new RuntimeException("Invalid OTP");
         }
         
         // Check if user exist
@@ -64,7 +64,7 @@ public class AccountManagementService {
 
         // Check if password meet requirements
         passwordSecurityService.isPasswordValid(decryptedPassword, decryptedConfirmPassword);
-        //passwordSecurityService.isPasswordValid(encryptedPassword, encryptedConfirmPassword);
+        
         // Generate userID
         String userID = generateUniqueUserId();
 
@@ -100,15 +100,19 @@ public class AccountManagementService {
     }
 
     // Delete account method
-    @Transactional //(transactionManager = "CalowinSecureDBTransactionManager")
-    public void deleteAccount(String userID, int OTP) throws Exception {
+    @Transactional // (transactionManager = "CalowinSecureDBTransactionManager")
+    public void deleteAccount(String userID, String email, String otpCode) throws Exception {
         // Authenticate OTP
-        //if (!otpService.verifyOTP(email, otpCode) {
-        //    throw new RuntimeException("Incorrect OTP");
-        //}
+        if (!otpService.verifyOTP(email, otpCode)) {
+            throw new RuntimeException("Invalid OTP");
+        }
 
-        // delete account logic
-        // implement next time after email service is setup
+        // Delete from CalowinSecureDB
+        calowinSecureDBRepository.deleteByUserID(userID); //UserEntity
+
+        // Delete from CalowinDB
+        calowinDBRepository.deleteByUserID(userID); //ProfileEntity
+        // ADD MORE FOR EACH TABLE
         
     }
 

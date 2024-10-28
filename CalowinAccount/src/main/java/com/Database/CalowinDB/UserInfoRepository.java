@@ -11,4 +11,5 @@ import com.Account.Entities.ProfileEntity;
 public interface UserInfoRepository extends JpaRepository<ProfileEntity, String> {
     Optional<ProfileEntity> findByUserID(String userID);
     boolean existsByUserID(String userID);
+    void deleteByUserID(String userID);
 }

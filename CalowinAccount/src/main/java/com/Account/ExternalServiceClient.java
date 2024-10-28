@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import com.Account.Entities.FriendStatusEnum;
+import com.Account.Entities.FriendStatus;
 
 @Service
 public class ExternalServiceClient {
@@ -17,10 +17,10 @@ public class ExternalServiceClient {
     @Value("${friend.module.urlPrefix}")
     private String urlPrefix;
 
-    public FriendStatusEnum getFriendStatus(String userID) {
+    public FriendStatus getFriendStatus(String userID) {
         try {
             String url = urlPrefix + "/friend/get-friendstatus/" + userID;
-            return restTemplate.getForObject(url, FriendStatusEnum.class);
+            return restTemplate.getForObject(url, FriendStatus.class);
         } catch (RestClientException e) {
             // Handle the error or log it
             throw new RuntimeException("Failed to retrieve friend status", e);
