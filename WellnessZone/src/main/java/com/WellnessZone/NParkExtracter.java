@@ -14,7 +14,7 @@ public class NParkExtracter {
     private List<NPark> parks = new ArrayList<>();
     private NParkDataDownloader downloader = new NParkDataDownloader("d_77d7ec97be83d44f61b85454f844382f");
 
-    public NParkExtracter(double userLat, double userLong) {
+    public NParkExtracter(double userLat, double userLong) throws Exception {
         userCoordinate.put("Lat", userLat);
         userCoordinate.put("Lon", userLong);
         downloader.initiateDownload();
