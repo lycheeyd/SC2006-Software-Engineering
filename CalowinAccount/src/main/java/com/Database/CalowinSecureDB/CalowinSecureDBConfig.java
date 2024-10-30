@@ -31,7 +31,7 @@ public class CalowinSecureDBConfig {
             EntityManagerFactoryBuilder builder, @Qualifier("calowinSecureDBDataSource") DataSource dataSource) {
         return builder
                 .dataSource(dataSource)
-                .packages("com.Account") // Entity package for CalowinSecure
+                .packages("com.Account.Entities") // Entity package for CalowinSecure
                 .persistenceUnit("calowinSecureDB")
                 .build();
     }

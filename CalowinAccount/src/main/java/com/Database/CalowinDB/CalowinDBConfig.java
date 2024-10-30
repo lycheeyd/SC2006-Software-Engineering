@@ -10,10 +10,12 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import jakarta.persistence.EntityManagerFactory;
 
 @Configuration
+@EnableTransactionManagement
 @EnableJpaRepositories(
     basePackages = "com.Database.CalowinDB",  // Repository package for this database
     entityManagerFactoryRef = "calowinDBEntityManagerFactory",
@@ -27,7 +29,7 @@ public class CalowinDBConfig {
             EntityManagerFactoryBuilder builder, @Qualifier("calowinDBDataSource") DataSource dataSource) {
         return builder
                 .dataSource(dataSource)
-                .packages("com.Account") // Entity package for CalowinDB
+                .packages("com.Account.Entities") // Entity package for CalowinDB
                 .persistenceUnit("calowinDB")
                 .build();
     }

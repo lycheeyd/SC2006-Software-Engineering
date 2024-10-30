@@ -5,10 +5,10 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.Account.OTPEntity;
+import com.Account.Entities.OTPEntry;
 
 @Repository
-public interface OTPRepository extends JpaRepository<OTPEntity, String> {
-    Optional<OTPEntity> findByEmail(String email);
+public interface OTPRepository extends JpaRepository<OTPEntry, String> {
+    Optional<OTPEntry> findByEmail(String email);
     void deleteByEmail(String email);  // Delete existing OTP for a user
 }

@@ -6,6 +6,7 @@ public class SignupDTO {
     private String password;
     private String confirm_password;
     private float weight;
+    private String otpCode;
 
     public String getEmail() {
         return this.email;
@@ -45,6 +46,14 @@ public class SignupDTO {
 
     public void setWeight(float weight) {
         this.weight = weight;
+    }
+
+    public String getOtpCode() {
+        return this.otpCode;
+    }
+
+    public void setOtpCode(String otpCode) {
+        this.otpCode = otpCode;
     }
 
 }
