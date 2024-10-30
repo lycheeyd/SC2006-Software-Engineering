@@ -28,6 +28,7 @@ class ParkRetriever {
   // Function to retrieve parks based on user's coordinates
   Future<List<Park>> retrievePark(double userLat, double userLon) async {
     final url = Uri.parse('$_baseUrl?lat=$userLat&lon=$userLon');
+    //print(url);
     //final url = Uri.parse('$_baseUrl/$userLat/$userLon');
     try {
       final response = await http.get(url);
