@@ -11,8 +11,7 @@ import java.util.Map;
 public class HttpReqController {
 
     @GetMapping("/parks")
-    public List<Map<String, Object>> getNearbyParks(@RequestParam("lat") double userLat,
-            @RequestParam("lon") double userLon) {
+    public List<Map<String, Object>> getNearbyParks(@RequestParam("lat") double userLat, @RequestParam("lon") double userLon) {
         // Initialize the NParkExtracter with user coordinates
         NParkExtracter parkExtracter = new NParkExtracter(userLat, userLon);
 
