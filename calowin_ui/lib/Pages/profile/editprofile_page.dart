@@ -93,7 +93,7 @@ class _EditprofilePageState extends State<EditprofilePage> {
                     ),
                     Container(
                       height: 100,
-                      width: 400,
+                      width: 350,
                       decoration: BoxDecoration(
                           color: const Color.fromARGB(255, 233, 243, 233),
                           borderRadius: BorderRadius.circular(10)),

@@ -21,8 +21,7 @@ public class WellnessZoneController {
     }
 
     @GetMapping("/parks")
-    public List<Map<String, Object>> findNearbyParks(@RequestParam("lat") double userLat,
-            @RequestParam("lon") double userLon) {
+    public List<Map<String, Object>> findNearbyParks(@RequestParam("lat") double userLat, @RequestParam("lon") double userLon) {
         // Construct the URL to call the HttpReqController endpoint
         String url = "http://localhost:8085/api/parks?lat=" + userLat + "&lon=" + userLon;
 

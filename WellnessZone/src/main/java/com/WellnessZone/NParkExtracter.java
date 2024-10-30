@@ -14,16 +14,21 @@ public class NParkExtracter {
     private List<NPark> parks = new ArrayList<>();
     private NParkDataDownloader downloader = new NParkDataDownloader("d_77d7ec97be83d44f61b85454f844382f");
 
-    public NParkExtracter(double userLat, double userLong) {
+    public NParkExtracter(double userLat, double userLong) throws Exception {
         userCoordinate.put("Lat", userLat);
         userCoordinate.put("Lon", userLong);
         downloader.initiateDownload();
         String responseData = downloader.getResponseData();
+        String errorMessage = downloader.getErrorMessage();
         // System.out.println("Response Data: " + responseData);
-        System.out.println("Error Message: " + downloader.getErrorMessage());
+        if (errorMessage != null && !errorMessage.isEmpty()) {
+            throw new Exception("Data download error: " + errorMessage);
+        }
 
         if (responseData != null && !responseData.isEmpty()) {
             extractParks(responseData);
+        } else {
+            throw new Exception("No response data received from downloader.");
         }
     }
 

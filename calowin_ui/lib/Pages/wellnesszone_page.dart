@@ -4,6 +4,8 @@ import 'package:calowin/control/park_retriever.dart';
 import 'package:calowin/control/weather_retriever.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'dart:async';
 
 class WellnessZonePage extends StatefulWidget {
   const WellnessZonePage({super.key});
@@ -14,40 +16,52 @@ class WellnessZonePage extends StatefulWidget {
 
 class _WellnessZonePageState extends State<WellnessZonePage> {
   //to be retrieved
-  double userLat = 1.385170;
-  double userLon = 103.79615;
+  final double _userLat = 1.385170;
+  final double _userLon = 103.79615;
 
+  //private variables
   int _currentIndex = -1;
   final double _sliderMin = 1;
   final double _sliderMax = 20;
   late Icon _weatherIcon;
   late String _weatherForecast;
   double _sliderValue = 5;
-  ParkRetriever _parkRetriever = ParkRetriever();
-  WeatherRetriever _weatherRetriever = WeatherRetriever();
-
-  // final List<Map<String, dynamic>> _wellnessZones = [
-  //   {"name": "East Coast Park", "distance": 5},
-  //   {"name": "West Coast Park", "distance": 3},
-  //   {"name": "Lake Side Garden", "distance": 4},
-  //   {"name": "Sentosa", "distance": 2},
-  //   {"name": "Gardens By The Bay", "distance": 7}
-  // ];
+  final ParkRetriever _parkRetriever = ParkRetriever();
+  final WeatherRetriever _weatherRetriever = WeatherRetriever();
+  bool _showWeather = false;
+  late String _selectedPark;
+  bool _loading = true;
 
   List<Park> _wellnessZones = [];
   List<Park> _filteredZones = [];
 
   void _retrieveWellnessZones() async {
-    //_wellnessZones = await retriever.retrievePark(userLat, userLon);
-    //testing list for filtering
+    //enable loading screen
     setState(() {
-      _wellnessZones = [
-        Park(
-          name: "Changi Airport",
-          distance: 5.3,
-          closestPoint: {"Lat": 1.348740, "Lon": 103.984940},
-        )
-      ];
+      _wellnessZones = [];
+      _filteredZones = [];
+      _loading = true;
+    });
+
+    //await Future.delayed(const Duration(seconds: 5));
+    _wellnessZones = await _parkRetriever.retrievePark(_userLat, _userLon);
+
+    //disable loading screen after finished loading
+    setState(() {
+      if (_wellnessZones.isEmpty) {
+        _loading = true;
+      } else {
+        _loading = false;
+      }
+      _wellnessZones = _wellnessZones;
+      //testing list for filtering
+      // _wellnessZones = [
+      //   Park(
+      //     name: "Changi Airport",
+      //     distance: 5.3,
+      //     closestPoint: {"Lat": 1.348740, "Lon": 103.984940},
+      //   )
+      // ];
     });
 
     _filterWellnessZones(_sliderValue);
@@ -125,12 +139,20 @@ class _WellnessZonePageState extends State<WellnessZonePage> {
       _weatherForecast = forecast;
       setWeatherIcon();
     });
-    print(_weatherForecast);
+    //print(_weatherForecast);
   }
 
-  void _onListItemTap(int index, double? lat, double? lon) {
+  void _onListItemTap(
+      int index, double? lat, double? lon, String selectedPark) {
     setState(() {
-      _currentIndex = index;
+      if (_currentIndex == index) {
+        _showWeather = false;
+        _currentIndex = -1;
+      } else {
+        _currentIndex = index;
+        _showWeather = true;
+        _selectedPark = selectedPark;
+      }
     });
     if (lat == null || lon == null) {
       setState(() {
@@ -181,7 +203,7 @@ class _WellnessZonePageState extends State<WellnessZonePage> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Text(
-                  "${zone.distance.toString()} km",
+                  "${zone.distance.toStringAsFixed(1)} km",
                   style: GoogleFonts.poppins(
                       fontSize: 14, fontWeight: FontWeight.w600),
                 ),
@@ -211,13 +233,14 @@ class _WellnessZonePageState extends State<WellnessZonePage> {
               ],
             ),
           ),
-          onTap: () => _onListItemTap(
-              index, zone.closestPoint['Lat'], zone.closestPoint['Lon']),
+          onTap: () => _onListItemTap(index, zone.closestPoint['Lat'],
+              zone.closestPoint['Lon'], zone.name),
         ),
       ),
     );
   }
 
+  //initial state of this widget
   @override
   void initState() {
     super.initState();
@@ -241,74 +264,141 @@ class _WellnessZonePageState extends State<WellnessZonePage> {
                   width: 400,
                   child: const Center(child: Text("<Insert Map Here>")),
                 ),
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 15, horizontal: 5),
-                  child: Align(
-                    alignment: Alignment.bottomCenter,
-                    child: Container(
-                      decoration: BoxDecoration(
-                          color: const Color.fromARGB(50, 0, 0, 0),
-                          borderRadius: BorderRadius.circular(10)),
-                      height: 45,
-                      width: 300,
-                      child: Column(
-                        children: [
-                          const Padding(
-                            padding:
-                                EdgeInsets.only(left: 20, top: 3, bottom: 0),
-                            child: Align(
-                                alignment: Alignment.topLeft,
-                                child: Text(
-                                  "Search Radius",
-                                  style: TextStyle(color: Colors.white),
-                                )),
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SizedBox(
-                                height: 18,
-                                width: 240,
-                                child: SliderTheme(
-                                  data: SliderTheme.of(context).copyWith(
-                                    thumbShape: const RoundSliderThumbShape(
-                                        pressedElevation: 0,
-                                        enabledThumbRadius:
-                                            7.0), // Change thumb size here
-                                    overlayShape: const RoundSliderOverlayShape(
-                                        overlayRadius:
-                                            8.0), // Change overlay size
-                                  ),
-                                  child: Slider(
-                                    activeColor: Colors.black,
-                                    overlayColor: const WidgetStatePropertyAll(
-                                        Colors.black),
-                                    value: _sliderValue,
-                                    min: _sliderMin,
-                                    max: _sliderMax,
-                                    divisions: 200,
-                                    onChanged: (double value) {
-                                      _filterWellnessZones(value);
-                                    },
+                if (!_showWeather)
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 15, horizontal: 5),
+                    child: Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Container(
+                        decoration: BoxDecoration(
+                            color: const Color.fromARGB(50, 0, 0, 0),
+                            borderRadius: BorderRadius.circular(10)),
+                        height: 45,
+                        width: 300,
+                        child: Column(
+                          children: [
+                            const Padding(
+                              padding:
+                                  EdgeInsets.only(left: 20, top: 3, bottom: 0),
+                              child: Align(
+                                  alignment: Alignment.topLeft,
+                                  child: Text(
+                                    "Search Radius",
+                                    style: TextStyle(color: Colors.white),
+                                  )),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  height: 18,
+                                  width: 240,
+                                  child: SliderTheme(
+                                    data: SliderTheme.of(context).copyWith(
+                                      thumbShape: const RoundSliderThumbShape(
+                                          pressedElevation: 0,
+                                          enabledThumbRadius:
+                                              7.0), // Change thumb size here
+                                      overlayShape:
+                                          const RoundSliderOverlayShape(
+                                              overlayRadius:
+                                                  8.0), // Change overlay size
+                                    ),
+                                    child: Slider(
+                                      activeColor: Colors.black,
+                                      overlayColor:
+                                          const WidgetStatePropertyAll(
+                                              Colors.black),
+                                      value: _sliderValue,
+                                      min: _sliderMin,
+                                      max: _sliderMax,
+                                      divisions: 200,
+                                      onChanged: (double value) {
+                                        _filterWellnessZones(value);
+                                      },
+                                    ),
                                   ),
                                 ),
-                              ),
-                              const SizedBox(
-                                width: 7,
-                              ),
-                              Align(
-                                  alignment: Alignment.bottomRight,
-                                  child: Text(_sliderValue.toStringAsFixed(1),
-                                      style: const TextStyle(
-                                          color: Colors.white))),
-                            ],
-                          ),
-                        ],
+                                const SizedBox(
+                                  width: 7,
+                                ),
+                                Align(
+                                    alignment: Alignment.bottomRight,
+                                    child: Text(_sliderValue.toStringAsFixed(1),
+                                        style: const TextStyle(
+                                            color: Colors.white))),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
+                if (_showWeather)
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      child: Container(
+                        height: 65,
+                        width: 270,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: const Color.fromARGB(50, 0, 0, 0),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 2, horizontal: 2),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "Next 2-hr forecast",
+                                    style: TextStyle(
+                                        fontSize: 10,
+                                        color: Colors.grey.shade200),
+                                  ),
+                                  Text(
+                                    _weatherForecast,
+                                    style: const TextStyle(
+                                        color: Colors.white, fontSize: 15),
+                                  ),
+                                ],
+                              ),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  SizedBox(
+                                    width: 100,
+                                    child: Text(
+                                      _selectedPark,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontSize: 9,
+                                          color: Colors.grey.shade100),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 30,
+                                    height: 30,
+                                    child: Transform.scale(
+                                        scale: 1.5, child: _weatherIcon),
+                                  )
+                                ],
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
               ],
             ),
           ),
@@ -341,17 +431,31 @@ class _WellnessZonePageState extends State<WellnessZonePage> {
             ),
           ),
           Expanded(
-            child: Container(
-              color: Colors.white,
-              child: ListView.builder(
-                scrollDirection: Axis.vertical,
-                shrinkWrap: true,
-                itemCount: _filteredZones.length,
-                itemBuilder: (context, index) {
-                  Park currentItem = _filteredZones[index];
-                  return _buildListItem(index, currentItem);
-                },
-              ),
+            child: Stack(
+              children: [
+                SizedBox.expand(
+                  child: Container(
+                    color: Colors.white,
+                    child: ListView.builder(
+                      scrollDirection: Axis.vertical,
+                      shrinkWrap: true,
+                      itemCount: _filteredZones.length,
+                      itemBuilder: (context, index) {
+                        Park currentItem = _filteredZones[index];
+                        return _buildListItem(index, currentItem);
+                      },
+                    ),
+                  ),
+                ),
+                if (_loading)
+                  Center(
+                    child: LoadingAnimationWidget.discreteCircle(
+                        color: PrimaryColors.orange,
+                        size: 100,
+                        secondRingColor: PrimaryColors.brightGreen,
+                        thirdRingColor: PrimaryColors.orange),
+                  )
+              ],
             ),
           )
         ],

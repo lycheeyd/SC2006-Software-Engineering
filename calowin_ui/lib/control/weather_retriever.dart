@@ -1,5 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
-import 'package:flutter/material.dart';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'dart:math';
 import 'package:intl/intl.dart';
@@ -35,7 +36,7 @@ class WeatherRetriever {
           }
         }
 
-        print(nearestArea['name']);
+        //print(nearestArea['name']);
 
         if (nearestForecast != null) {
           return nearestForecast['forecast'];
@@ -47,6 +48,10 @@ class WeatherRetriever {
       } else {
         return 'Failed to fetch weather data';
       }
+    } on SocketException {
+      return 'Network issue: Unable to reach the server.';
+    } on TimeoutException {
+      return 'Request timed out. Server might be down or too slow.';
     } catch (e) {
       return 'Error occurred here: $e';
     }
