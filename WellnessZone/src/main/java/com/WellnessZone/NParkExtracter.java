@@ -19,11 +19,16 @@ public class NParkExtracter {
         userCoordinate.put("Lon", userLong);
         downloader.initiateDownload();
         String responseData = downloader.getResponseData();
+        String errorMessage = downloader.getErrorMessage();
         // System.out.println("Response Data: " + responseData);
-        System.out.println("Error Message: " + downloader.getErrorMessage());
+        if (errorMessage != null && !errorMessage.isEmpty()) {
+            throw new Exception("Data download error: " + errorMessage);
+        }
 
         if (responseData != null && !responseData.isEmpty()) {
             extractParks(responseData);
+        } else {
+            throw new Exception("No response data received from downloader.");
         }
     }
 
