@@ -54,14 +54,6 @@ class _WellnessZonePageState extends State<WellnessZonePage> {
         _loading = false;
       }
       _wellnessZones = _wellnessZones;
-      //testing list for filtering
-      // _wellnessZones = [
-      //   Park(
-      //     name: "Changi Airport",
-      //     distance: 5.3,
-      //     closestPoint: {"Lat": 1.348740, "Lon": 103.984940},
-      //   )
-      // ];
     });
 
     _filterWellnessZones(_sliderValue);
@@ -94,18 +86,18 @@ class _WellnessZonePageState extends State<WellnessZonePage> {
         icon = const Icon(Icons.cloud, color: Colors.blueGrey);
 
       case 'Cloudy':
-        icon = const Icon(Icons.cloud_queue, color: Colors.grey);
+        icon =  Icon(Icons.cloud, color: Colors.grey.shade700);
 
       case 'Hazy':
       case 'Slightly Hazy':
-        icon = const Icon(Icons.filter_drama, color: Colors.orange);
+        icon = const Icon(Icons.deblur, color: Colors.orange);
 
       case 'Windy':
         icon = const Icon(Icons.air, color: Colors.blue);
 
       case 'Mist':
       case 'Fog':
-        icon = const Icon(Icons.blur_on, color: Colors.grey);
+        icon =  Icon(Icons.blur_on, color: Colors.grey.shade700);
 
       case 'Light Rain':
       case 'Moderate Rain':
@@ -124,7 +116,7 @@ class _WellnessZonePageState extends State<WellnessZonePage> {
         icon = const Icon(Icons.flash_on, color: Colors.purple);
 
       default:
-        icon = const Icon(Icons.help_outline, color: Colors.grey);
+        icon =  Icon(Icons.help_outline, color: Colors.grey.shade700);
     }
 
     setState(() {

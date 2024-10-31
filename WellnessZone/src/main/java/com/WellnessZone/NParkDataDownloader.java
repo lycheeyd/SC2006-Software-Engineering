@@ -113,7 +113,6 @@ public class NParkDataDownloader {
         URL url = new URL(urlString);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod(requestMethod);
-        connection.setRequestProperty("Content-Type", "application/json");
         return connection;
     }
 
