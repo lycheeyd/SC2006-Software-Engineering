@@ -6,11 +6,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "OTP")
+@Table(name = "OTPRegister")
 
 public class OTPEntry {
 
@@ -25,14 +27,19 @@ public class OTPEntry {
     @Column(name = "expires_at", nullable = false)
     private LocalDateTime expiresAt;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "otp_type", nullable = false)
+    private ActionType otpType;
+
     // Default constructor is required by JPA
     public OTPEntry() {
     }
 
-    public OTPEntry(String email, String otpCode, LocalDateTime expiresAt) {
+    public OTPEntry(String email, String otpCode, LocalDateTime expiresAt, ActionType otpType) {
         this.email = email;
         this.otpCode = otpCode;
         this.expiresAt = expiresAt;
+        this.otpType = otpType;
     }
 
     public String getEmail() {
@@ -57,6 +64,14 @@ public class OTPEntry {
 
     public void setExpiresAt(LocalDateTime expiresAt) {
         this.expiresAt = expiresAt;
+    }
+
+    public ActionType getOtpType() {
+        return this.otpType;
+    }
+
+    public void setOtpType(ActionType otpType) {
+        this.otpType = otpType;
     }
 
 }

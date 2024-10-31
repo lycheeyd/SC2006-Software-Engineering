@@ -1,6 +1,6 @@
 package com.Account.Entities;
 
-public enum EmailType {
+public enum ActionType {
     DEFAULT(
         "[Calowin] One-time password (do not reply)",
         "Hi there!\n\nHere is your OTP: {placeholder}\n\nIf you don't use this code within 1 day, it will expire.\n\nPlease do not share this code with anyone.\n\nThanks,\nThe Calowin Team"
@@ -25,7 +25,7 @@ public enum EmailType {
     private final String subject;
     private final String messageBody;
 
-    EmailType(String subject, String messageBody) {
+    ActionType(String subject, String messageBody) {
         this.subject = subject;
         this.messageBody = messageBody;
     }

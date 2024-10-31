@@ -1,8 +1,10 @@
-package com.DataTransferObject.AccountDTO;
+package com.DataTransferObject;
+
+import com.Account.Entities.ActionType;
 
 public class SendOtpDTO {
     private String email;
-    private String type;
+    private ActionType type;
 
     public String getEmail() {
         return email;
@@ -12,11 +14,11 @@ public class SendOtpDTO {
         this.email = email;
     }
 
-    public String getType() {
+    public ActionType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(ActionType type) {
         this.type = type;
     }
 }
