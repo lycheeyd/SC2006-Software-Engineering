@@ -7,9 +7,9 @@ import org.springframework.web.client.RestTemplate;
 
 
 @SpringBootApplication
-public class Main {
+public class CalowinSpringNode {
     public static void main(String[] args) {
-        SpringApplication.run(Main.class, args);
+        SpringApplication.run(CalowinSpringNode.class, args);
     }
 
     // For forwarding https request
