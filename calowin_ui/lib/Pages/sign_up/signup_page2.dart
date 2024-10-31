@@ -48,6 +48,7 @@ class _SignupPage2State extends State<SignupPage2> {
   }
 
   void _checkWeight() {
+    final weightPattern = r'^\d+(\.\d{1})?$';
     setState(() {
       if (_inputWeight.text.isEmpty) {
         _weightError = "Weight is required";
