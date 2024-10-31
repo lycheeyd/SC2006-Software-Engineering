@@ -18,6 +18,7 @@ import com.DataTransferObject.AccountDTO.ForgotPasswordDTO;
 import com.DataTransferObject.AccountDTO.LoginDTO;
 import com.DataTransferObject.AccountDTO.SendOtpDTO;
 import com.DataTransferObject.AccountDTO.SignupDTO;
+import com.DataTransferObject.AccountDTO.VerifyOtpDTO;
 
 @RestController
 @RequestMapping("/central/account")
@@ -46,6 +47,12 @@ public class AccountController extends HttpReqController{
     @PostMapping("/send-OTP")
     public ResponseEntity<?> login(@RequestBody SendOtpDTO DTO) {
         String url = "http://localhost:8081/account/send-OTP";
+        return restTemplate.postForEntity(url, DTO, String.class);
+    }
+
+    @PostMapping("/verify-OTP")
+    public ResponseEntity<?> login(@RequestBody VerifyOtpDTO DTO) {
+        String url = "http://localhost:8081/account/verify-OTP";
         return restTemplate.postForEntity(url, DTO, String.class);
     }
 

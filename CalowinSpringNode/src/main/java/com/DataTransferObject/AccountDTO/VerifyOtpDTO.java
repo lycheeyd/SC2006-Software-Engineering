@@ -1,11 +1,9 @@
-package com.DataTransferObject;
-
-import com.Account.Entities.ActionType;
+package com.DataTransferObject.AccountDTO;
 
 public class VerifyOtpDTO {
     private String email;
     private String otpCode;
-    private ActionType type;
+    private String type;
 
     public String getEmail() {
         return this.email;
@@ -23,11 +21,11 @@ public class VerifyOtpDTO {
         this.otpCode = otpCode;
     }
 
-    public ActionType getType() {
+    public String getType() {
         return this.type;
     }
 
-    public void setType(ActionType type) {
+    public void setType(String type) {
         this.type = type;
     }
 
