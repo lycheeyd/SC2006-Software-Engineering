@@ -3,7 +3,7 @@ import 'package:encrypt/encrypt.dart' as encrypt;
 
 class AES_Encryptor {
   static const String _key = "hd8Hd7K8djHY8dh4"; // Ensure this matches your backend key
-  static final _iv = encrypt.IV.fromLength(16);
+  static final encrypt.IV _iv = encrypt.IV.fromLength(16);
 
   /// Encrypts the given plaintext using AES-128 CBC mode with PKCS7 padding.
   static String encrypt(String plainText) {

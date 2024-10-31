@@ -2,7 +2,7 @@ import 'package:calowin/common/custom_scaffold.dart';
 import 'package:calowin/common/input_field.dart';
 import 'package:calowin/common/colors_and_fonts.dart';
 import 'package:calowin/control/page_navigator.dart';
-import 'package:calowin/control/AES_Encryptor.dart';
+import 'package:calowin/common/AES_Encryptor.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/services.dart';

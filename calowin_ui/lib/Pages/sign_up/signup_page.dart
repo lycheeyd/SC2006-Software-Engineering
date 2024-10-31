@@ -89,7 +89,7 @@ class _SignupPageState extends State<SignupPage> {
       final response = await http.post(
         Uri.parse('http://172.21.146.188:8080/central/account/send-otp'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'email': email, 'type': OtpType.SIGN_UP.value}),
+        body: jsonEncode({'email': email, 'type': ActionType.SIGN_UP.value}),
       );
 
       if (response.statusCode == 200) {
@@ -125,7 +125,7 @@ class _SignupPageState extends State<SignupPage> {
       final response = await http.post(
         Uri.parse('http://172.21.146.188:8080/central/account/verify-otp'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'email': email, 'otp': otp, 'type': OtpType.SIGN_UP.value}),
+        body: jsonEncode({'email': email, 'otp': otp, 'type': ActionType.SIGN_UP.value}),
       );
 
       if (response.statusCode == 200) {
