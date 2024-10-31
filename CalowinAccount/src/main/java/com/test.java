@@ -8,7 +8,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.ApplicationContext;
 
 import com.Account.Entities.EmailServiceProperties;
-import com.Account.Entities.EmailType;
+import com.Account.Entities.ActionType;
 import com.Account.Services.EmailService;
 import com.Account.Services.OTPService;
 import com.Database.CalowinDB.CalowinDBProperties;
@@ -33,11 +33,11 @@ public class test {
 
         // Call the sendEmail method to send the test email
         try {
-            otpService.sendOtpCode(recipient, EmailType.DEFAULT);
-            otpService.sendOtpCode(recipient, EmailType.SIGN_UP);
-            otpService.sendOtpCode(recipient, EmailType.FORGOT_PASSWORD);
-            otpService.sendOtpCode(recipient, EmailType.DELETE_ACCOUNT);
-            otpService.sendOtpCode(recipient, EmailType.SEND_NEW_PASSWORD);
+            otpService.sendOtpCode(recipient, ActionType.DEFAULT);
+            otpService.sendOtpCode(recipient, ActionType.SIGN_UP);
+            otpService.sendOtpCode(recipient, ActionType.FORGOT_PASSWORD);
+            otpService.sendOtpCode(recipient, ActionType.DELETE_ACCOUNT);
+            otpService.sendOtpCode(recipient, ActionType.SEND_NEW_PASSWORD);
             System.out.println("SUCCESSSS");
         } catch (Exception e) {
             System.out.println("ERRORRRRRRRRRRRRRR");

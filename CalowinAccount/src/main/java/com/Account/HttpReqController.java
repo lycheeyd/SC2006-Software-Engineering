@@ -22,6 +22,7 @@ import com.DataTransferObject.LoginDTO;
 import com.DataTransferObject.LoginResponseDTO;
 import com.DataTransferObject.SendOtpDTO;
 import com.DataTransferObject.SignupDTO;
+import com.DataTransferObject.VerifyOtpDTO;
 import com.DataTransferObject.ViewProfileResponseDTO;
 
 @RestController
@@ -44,7 +45,7 @@ public class HttpReqController {
     public ResponseEntity<?> signup(@RequestBody SignupDTO signupDTO) {
         // Signup logic (save user details to DB)
         try {
-            LoginResponseDTO responseDTO = accountManagementService.signup(signupDTO.getEmail(), signupDTO.getPassword(), signupDTO.getConfirm_password(), signupDTO.getName(), signupDTO.getWeight(), signupDTO.getOtpCode());
+            LoginResponseDTO responseDTO = accountManagementService.signup(signupDTO.getEmail(), signupDTO.getPassword(), signupDTO.getConfirm_password(), signupDTO.getName(), signupDTO.getWeight());
     
             // Prepare response after successful signup
             Map<String, Object> response = new HashMap<>();
@@ -94,6 +95,22 @@ public class HttpReqController {
         
         } catch (Exception e) {
            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error sending OTP: " + e.getMessage());
+        }
+
+    }
+
+    @PostMapping("/verify-otp")
+    public ResponseEntity<?> verifyOTP(@RequestParam VerifyOtpDTO verifyOtpDTO) {
+        try {
+            // Verify the OTP
+            if (!otpService.verifyOTP(verifyOtpDTO.getEmail(), verifyOtpDTO.getOtpCode(), verifyOtpDTO.getType())) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid OTP");
+            }
+            
+            return ResponseEntity.ok("OTP valid");
+        
+        } catch (Exception e) {
+           return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error validating OTP: " + e.getMessage());
         }
 
     }

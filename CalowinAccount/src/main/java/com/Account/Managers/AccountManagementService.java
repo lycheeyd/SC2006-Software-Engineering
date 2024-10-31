@@ -2,6 +2,7 @@ package com.Account.Managers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -9,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.Account.Entities.ProfileEntity;
 import com.Account.Entities.UserEntity;
-import com.Account.Services.OTPService;
 import com.Account.Services.PasswordSecurityService;
 import com.DataTransferObject.LoginResponseDTO;
 import com.Database.CalowinDB.UserInfoRepository;
@@ -41,19 +41,12 @@ public class AccountManagementService {
     @Autowired
     private PasswordSecurityService passwordSecurityService;
 
-    @Autowired
-    private OTPService otpService;
-
-    private static final String SECRET_KEY = "ASK RAPHEL FOR KEY"; // Should be a 16/32-byte key
+    @Value("${aes.secret-key}")
+    private String SECRET_KEY;
 
     // Signup method
     @Transactional // (transactionManager = "calowinSecureDBTransactionManager")
-    public LoginResponseDTO signup(String email, String encryptedPassword, String encryptedConfirmPassword, String name, float weight, String otpCode) throws Exception {
-        // Authenticate OTP
-        if (!otpService.verifyOTP(email, otpCode)) {
-            throw new RuntimeException("Invalid OTP");
-        }
-        
+    public LoginResponseDTO signup(String email, String encryptedPassword, String encryptedConfirmPassword, String name, float weight) throws Exception {
         // Check if user exist
         if (calowinSecureDBRepository.findByEmail(email).isPresent()) {
             throw new RuntimeException("User already exists");
@@ -103,9 +96,11 @@ public class AccountManagementService {
     @Transactional // (transactionManager = "CalowinSecureDBTransactionManager")
     public void deleteAccount(String userID, String email, String otpCode) throws Exception {
         // Authenticate OTP
+        /*
         if (!otpService.verifyOTP(email, otpCode)) {
             throw new RuntimeException("Invalid OTP");
         }
+        */
 
         // Delete from CalowinSecureDB
         calowinSecureDBRepository.deleteByUserID(userID); //UserEntity

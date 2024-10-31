@@ -2,14 +2,14 @@ package com.Account.Managers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import com.Account.Entities.EmailType;
+import com.Account.Entities.ActionType;
 import com.Account.Entities.UserEntity;
 import com.Account.Services.EmailService;
-import com.Account.Services.OTPService;
 import com.Account.Services.PasswordSecurityService;
 import com.Database.CalowinSecureDB.SecureInfoDBRepository;
 
@@ -30,12 +30,10 @@ public class PasswordManagementService {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    private OTPService otpService;
-
-    @Autowired
     private EmailService emailService;
 
-    private static final String SECRET_KEY = "ASK RAPHEL FOR KEY"; // Should be a 16/32-byte key
+    @Value("${aes.secret-key}")
+    private String SECRET_KEY;
 
     // Change password method
     public void changePassword(String userid, String oldPassword, String newPassword, String confirmNewPassword) throws Exception {
@@ -64,14 +62,16 @@ public class PasswordManagementService {
     // Forgot password method
     public void forgotPassword(String email, String otpCode) throws Exception {
         // Authenticate OTP
+        /*
         if (!otpService.verifyOTP(email, otpCode)) {
             throw new RuntimeException("Invalid OTP");
         }
+        */
 
         String newPassword = passwordSecurityService.generateRandomPassword();
         
         // Send new password to email
-        EmailType type = EmailType.SEND_NEW_PASSWORD;
+        ActionType type = ActionType.SEND_NEW_PASSWORD;
         emailService.sendEmail(email, type.getSubject(), type.getMessageBody(newPassword));
 
     }

@@ -2,6 +2,7 @@ import 'package:calowin/common/custom_scaffold.dart';
 import 'package:calowin/common/input_field.dart';
 import 'package:calowin/common/colors_and_fonts.dart';
 import 'package:calowin/control/page_navigator.dart';
+import 'package:calowin/control/AES_Encryptor.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/services.dart';
@@ -63,6 +64,9 @@ class _SignupPage2State extends State<SignupPage2> {
     _checkWeight();
 
     if (_nameError == null && _weightError == null) {
+      final String encryptedPassword = AES_Encryptor.encrypt(widget.password);
+      final String encryptedConfirmPassword = AES_Encryptor.encrypt(widget.confirmPassword);
+
       final String url = "http://172.21.146.188:8080/central/account/signup";
 
       try {
@@ -71,8 +75,8 @@ class _SignupPage2State extends State<SignupPage2> {
           headers: {"Content-Type": "application/json"},
           body: json.encode({
             "email": widget.email,
-            "password": widget.password,
-            "confirm_password": widget.confirmPassword,
+            "password": encryptedPassword,
+            "confirm_password": encryptedConfirmPassword,
             "name": _inputName.text,
             "weight": double.parse(_inputWeight.text),
           }),
