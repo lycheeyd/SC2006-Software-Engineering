@@ -89,7 +89,7 @@ public class HttpReqController {
     public ResponseEntity<?> sendOTP(@RequestParam SendOtpDTO sendOtpDTO) {
         try {
             // Send the OTP
-            otpService.sendOtpCode(sendOtpDTO.getEmail(), sendOtpDTO.getType());;
+            otpService.sendOtpCode(sendOtpDTO.getEmail(), sendOtpDTO.getType());
             
             return ResponseEntity.ok("OTP sent to email associate with the account");
         

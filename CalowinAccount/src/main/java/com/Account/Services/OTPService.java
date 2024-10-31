@@ -32,7 +32,7 @@ public class OTPService {
         LocalDateTime expiresAt = LocalDateTime.now().plusDays(1);
 
         // Check if the OTP of action type already exists for user, then delete
-        otpRepository.findByEmailAndActionType(email, type)
+        otpRepository.findByEmailAndOtpType(email, type)
                         .ifPresent(existingOtp -> otpRepository.delete(existingOtp));
 
         // Save new OTP to database (CALOWIN_SECURE)
@@ -53,7 +53,7 @@ public class OTPService {
 
     // Verify if the OTP is valid (not expired and matches)
     public boolean verifyOTP(String email, String otpCode, ActionType type) {
-        Optional<OTPEntry> otpEntityOptional = otpRepository.findByEmailAndActionType(email, type);
+        Optional<OTPEntry> otpEntityOptional = otpRepository.findByEmailAndOtpType(email, type);
 
         if (otpEntityOptional.isPresent()) {
             OTPEntry otpEntity = otpEntityOptional.get();
@@ -61,14 +61,14 @@ public class OTPService {
             // Check if the OTP has expired
             if (otpEntity.getExpiresAt().isBefore(LocalDateTime.now())) {
                 // Clean up expired OTP
-                otpRepository.deleteByEmailAndActionType(email, type); 
+                otpRepository.deleteByEmailAndOtpType(email, type); 
                 return false;
             }
 
             // Check if OTP matches
             if (otpEntity.getOtpCode().equals(otpCode)) {
                 // Delete OTP entry after verification
-                otpRepository.deleteByEmailAndActionType(email, type);
+                otpRepository.deleteByEmailAndOtpType(email, type);
                 return true;
             }
         }
