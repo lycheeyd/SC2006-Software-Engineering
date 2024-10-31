@@ -101,7 +101,8 @@ class _SignupPageState extends State<SignupPage> {
           const SnackBar(content: Text('OTP sent to email')),
         );
       } else {
-        throw Exception("Failed to send OTP");
+        //throw Exception("Failed to send OTP");
+        print(response.statusCode);
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -207,7 +208,7 @@ class _SignupPageState extends State<SignupPage> {
                   errorText: _emailError ?? "",
                   hasError: _emailError != null,
                 ),
-                const SizedBox(height: 30),
+                const SizedBox(height: 20),
 
                 InputField(
                   obscureText: true,
@@ -219,7 +220,7 @@ class _SignupPageState extends State<SignupPage> {
                   errorText: _passwordError ?? "",
                   hasError: _passwordError != null,
                 ),
-                const SizedBox(height: 50),
+                const SizedBox(height: 20),
 
                 InputField(
                   obscureText: true,
@@ -229,7 +230,7 @@ class _SignupPageState extends State<SignupPage> {
                   errorText: _confirmPasswordError ?? "",
                   hasError: _confirmPasswordError != null,
                 ),
-                const SizedBox(height: 50),
+                const SizedBox(height: 20),
 
                 // OTP Field
                 Row(
@@ -257,10 +258,11 @@ class _SignupPageState extends State<SignupPage> {
                             border: inputBorder,
                             enabledBorder: inputBorder,
                             focusedBorder: inputBorder,
-                            contentPadding: const EdgeInsets.symmetric(vertical: 2, horizontal: 15),
+                            contentPadding: EdgeInsets.all(10),//const EdgeInsets.symmetric(vertical: 2, horizontal: 15),
+                            isDense: true,
                             hintText: "Enter OTP sent to your Email",
                             hintStyle: GoogleFonts.roboto(fontSize: 12, color: PrimaryColors.grey),
-                            errorText: _otpError ?? "",
+                            //errorText: _otpError ?? "",
                           )),
                     ),
                     SizedBox(
@@ -282,7 +284,7 @@ class _SignupPageState extends State<SignupPage> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 30),
+
 
                 Padding(
                   padding:
