@@ -5,9 +5,20 @@ import 'package:calowin/control/page_navigator.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class SignupPage2 extends StatefulWidget {
-  const SignupPage2({super.key});
+  final String email;
+  final String password;
+  final String confirmPassword;
+
+  const SignupPage2({
+    super.key,
+    required this.email,
+    required this.password,
+    required this.confirmPassword,
+  });
 
   @override
   State<SignupPage2> createState() => _SignupPage2State();
@@ -16,36 +27,102 @@ class SignupPage2 extends StatefulWidget {
 class _SignupPage2State extends State<SignupPage2> {
   final TextEditingController _inputWeight = TextEditingController();
   final TextEditingController _inputName = TextEditingController();
-  bool _invalidName = false;
-  bool _invalidWeight = false;
+
+  String? _nameError;
+  String? _weightError;
+
   final InputBorder inputBorder = UnderlineInputBorder(
       borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none);
 
   void _checkName() {
     setState(() {
-      _invalidName = true; //define the conditions laterf
+      if (_inputName.text.isEmpty) {
+        _nameError = "Name is required";
+      } else if (_inputName.text.length > 16) {
+        _nameError = "Name cannot exceed 16 characters";
+      } else {
+        _nameError = null;
+      }
     });
   }
 
   void _checkWeight() {
     setState(() {
-      _invalidWeight = true; //define the conditions later
+      if (_inputWeight.text.isEmpty) {
+        _weightError = "Weight is required";
+      } else if (!RegExp(weightPattern).hasMatch(_inputWeight.text)) {
+        _weightError = "Enter weight in kg (e.g., 70 or 70.5)";
+      } else {
+        _weightError = null;
+      }
     });
   }
 
-  void _handleSignup() {
-    //check conditions and communicate with backend
-    Navigator.of(context).push(
-      PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) =>
-            const PageNavigator(),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return child; // No custom transition
-        },
-        // This will disable the swipe back gesture
-        settings: const RouteSettings(arguments: 'disableSwipe'),
-      ),
-    );
+  Future<void> _handleSignup() async {
+    _checkName();
+    _checkWeight();
+
+    if (_nameError == null && _weightError == null) {
+      final String url = "http://172.21.146.188:8080/central/account/signup";
+
+      try {
+        final response = await http.post(
+          Uri.parse(url),
+          headers: {"Content-Type": "application/json"},
+          body: json.encode({
+            "email": widget.email,
+            "password": widget.password,
+            "confirm_password": widget.confirmPassword,
+            "name": _inputName.text,
+            "weight": double.parse(_inputWeight.text),
+          }),
+        );
+
+        if (response.statusCode == 201) {
+          // Signup successful
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Signup successful! Welcome to CaloWin!")),
+          );
+
+          // Navigate to the next page
+          Navigator.of(context).push(
+            PageRouteBuilder(
+              pageBuilder: (context, animation, secondaryAnimation) =>
+                  const PageNavigator(),
+              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                return child; // No custom transition
+              },
+              settings: const RouteSettings(arguments: 'disableSwipe'),
+            ),
+          );
+        } else if (response.statusCode == 400) {
+          // Bad request - likely due to invalid input
+          final errorMessage = response.body;
+          if (errorMessage.contains("Password")) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Signup failed: Password is invalid")),
+            );
+          } else if (errorMessage.contains("Email")) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Signup failed: Email is already registered")),
+            );
+          }
+        } else {
+          // Other errors
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Error: ${response.body}")),
+          );
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Network error: ${e.toString()}")),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please correct errors before proceeding.")),
+      );
+    }
   }
 
   @override
@@ -83,20 +160,20 @@ class _SignupPage2State extends State<SignupPage2> {
               const SizedBox(
                 height: 30,
               ),
+
               InputField(
                   obscureText: false,
                   inputController: _inputName,
                   title: "Name",
                   inputHint: "This name is what others will see!",
-                  errorText: "Invalid Name!! Try another one",
-                  hasError: _invalidName),
-              const SizedBox(
-                height: 30,
+                  errorText: _nameError,
+                  hasError: _nameError != null,
               ),
+              const SizedBox(height: 30),
+
               InputField(
                 obscureText: false,
-                keyboardType:
-                    const TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 inputFormatter: <TextInputFormatter>[
                   FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,1}'))
                 ],
@@ -104,13 +181,11 @@ class _SignupPage2State extends State<SignupPage2> {
                 title: "Weight",
                 inputHint: "Enter your weight in KG",
                 bottomHint: "You can give up to the first decimal place!",
-                errorText:
-                    "Invalid Weight!! Please make sure you entered your weight in all numbers and to the nearest 1 decimal.",
-                hasError: _invalidName,
+                errorText: _weightError,
+                hasError: _weightError != null,
               ),
-              const SizedBox(
-                height: 150,
-              ),
+              const SizedBox(height: 30),
+
               Padding(
                 padding:
                     const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
