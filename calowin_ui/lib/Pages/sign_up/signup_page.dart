@@ -19,6 +19,7 @@ class _SignupPageState extends State<SignupPage> {
   final TextEditingController _inputOTP = TextEditingController();
   bool _invalidPassword = false;
   bool _invalidEmail = false;
+  bool _invalidOTP = false;
   final InputBorder inputBorder = UnderlineInputBorder(
       borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none);
 
@@ -112,30 +113,36 @@ class _SignupPageState extends State<SignupPage> {
                           color: Colors.white,
                           fontWeight: FontWeight.bold),
                     ),
-                    SizedBox(
-                      height: 50,
-                      width: 200,
-                      child: TextField(
-                          keyboardType: TextInputType
-                              .number, // Set the keyboard type to numbers
-                          inputFormatters: <TextInputFormatter>[
-                            FilteringTextInputFormatter
-                                .digitsOnly // Allow only digits
-                          ],
-                          controller: _inputOTP,
-                          textAlign: TextAlign.left,
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: Colors.white,
-                            border: inputBorder,
-                            enabledBorder: inputBorder,
-                            focusedBorder: inputBorder,
-                            contentPadding: const EdgeInsets.symmetric(
-                                vertical: 2, horizontal: 15),
-                            hintText: "Enter OTP sent to your Email",
-                            hintStyle: GoogleFonts.roboto(
-                                fontSize: 12, color: PrimaryColors.grey),
-                          )),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          height: 50,
+                          width: 200,
+                          child: TextField(
+                              keyboardType: TextInputType
+                                  .number, // Set the keyboard type to numbers
+                              inputFormatters: <TextInputFormatter>[
+                                FilteringTextInputFormatter
+                                    .digitsOnly // Allow only digits
+                              ],
+                              controller: _inputOTP,
+                              textAlign: TextAlign.left,
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: Colors.white,
+                                border: inputBorder,
+                                enabledBorder: inputBorder,
+                                focusedBorder: inputBorder,
+                                contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 2, horizontal: 15),
+                                hintText: "Enter OTP sent to your Email",
+                                hintStyle: GoogleFonts.roboto(
+                                    fontSize: 12, color: PrimaryColors.grey),
+                              )),
+                        ),
+                        if(_invalidOTP) Text("Wrong OTP", style: TextStyle(color: Colors.red),)
+                      ],
                     ),
                     SizedBox(
                       width: 70,

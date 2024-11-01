@@ -24,7 +24,7 @@ class _WellnessZonePageState extends State<WellnessZonePage> {
   final double _sliderMin = 1;
   final double _sliderMax = 20;
   late Icon _weatherIcon;
-  late String _weatherForecast;
+  late String _weatherForecast = "Loading";
   double _sliderValue = 5;
   final ParkRetriever _parkRetriever = ParkRetriever();
   final WeatherRetriever _weatherRetriever = WeatherRetriever();
