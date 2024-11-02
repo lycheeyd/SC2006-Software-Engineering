@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -28,11 +29,17 @@ class _SignupPageState extends State<SignupPage> {
   String? _otpError;
   bool _isOTPRequested = false;
 
-  bool _invalidPassword = false;
-  bool _invalidEmail = false;
-  bool _invalidOTP = false;
+  int _otpCountdown = 0;
+  Timer? _otpTimer;
+
   final InputBorder inputBorder = UnderlineInputBorder(
       borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none);
+
+  @override
+  void dispose() {
+    _otpTimer?.cancel();
+    super.dispose();
+  }
 
   void _checkEmail() {
     final emailPattern = r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$';
@@ -77,14 +84,32 @@ class _SignupPageState extends State<SignupPage> {
     });
   }
 
+  void _startOTPTimer() {
+    const oneMinute = 60;
+    setState(() {
+      _otpCountdown = oneMinute;
+    });
+
+    _otpTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {
+        if (_otpCountdown > 0) {
+          _otpCountdown--;
+        } else {
+          _otpTimer?.cancel();
+        }
+      });
+    });
+  }
+
   Future<void> _sendOTP() async {
     _checkEmail(); // Validate email before sending OTP
-    if (_emailError != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a valid email address.')),
-      );
+    
+    if (_emailError  != null ) {
+      _showErrorDialog(_emailError!);
       return;
     }
+
+    if (_otpCountdown > 0) return;
 
     final email = _inputEmail.text;
 
@@ -95,26 +120,33 @@ class _SignupPageState extends State<SignupPage> {
         body: jsonEncode({'email': email, 'type': ActionType.SIGN_UP.value}),
       );
 
+      final responseMessage = response.body;
+
       if (response.statusCode == 200) {
         setState(() {
           _isOTPRequested = true;
           _otpError = null;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('OTP sent to email')),
-        );
+        _showSuccessDialog(responseMessage);
+        _startOTPTimer();
       } else {
-        //throw Exception("Failed to send OTP");
-        print(response.statusCode);
+        _showErrorDialog(responseMessage);
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: ${e.toString()}')),
-      );
+      setState(() {
+        _showErrorDialog('Error: ${e.toString()}');
+      });
     }
   }
 
   Future<void> _verifyOTP() async {
+    setState(() {
+      _checkEmail();
+      _checkPasswordMatch();
+      _checkPasswordValid();
+    });
+
+
     final otp = _inputOTP.text;
     final email = _inputEmail.text;
 
@@ -129,20 +161,23 @@ class _SignupPageState extends State<SignupPage> {
       final response = await http.post(
         Uri.parse('http://172.21.146.188:8080/central/account/verify-otp'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'email': email, 'otp': otp, 'type': ActionType.SIGN_UP.value}),
+        body: jsonEncode({'email': email, 'otpCode': otp, 'type': ActionType.SIGN_UP.value}),
       );
 
+      final responseMessage = response.body;
+
       if (response.statusCode == 200) {
+        setState(() {
+          _otpError = null;
+        });
         _handleContinue();
       } else {
-        setState(() {
-          _otpError = "Invalid OTP, please try again";
-        });
+        _showErrorDialog(responseMessage);
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error validating OTP. Please try again later.')),
-      );
+      setState(() {
+        _showErrorDialog('Error validating OTP. Please try again later.');
+      });
     }
   }
 
@@ -166,11 +201,43 @@ class _SignupPageState extends State<SignupPage> {
           ),
         ),
       );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please correct errors before proceeding.')),
-      );
     }
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(message),
+          //content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showSuccessDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(message),
+        //content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -208,8 +275,23 @@ class _SignupPageState extends State<SignupPage> {
                   inputController: _inputEmail,
                   title: "Email Address",
                   inputHint: "Enter Your Email",
-                  errorText: _emailError ?? "",
-                  hasError: _emailError != null,
+                  errorText: '',
+                  hasError: false,
+                ),
+                if(_emailError != null)
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 20.0), // Adjust padding as needed
+                      child: Text(
+                        _emailError!,
+                        style: GoogleFonts.roboto(
+                          fontSize: 11,
+                          color: Colors.redAccent.shade400,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
                 ),
                 const SizedBox(height: 20),
 
@@ -220,8 +302,23 @@ class _SignupPageState extends State<SignupPage> {
                   inputHint: "Enter Your Password",
                   bottomHint:
                       "Password must be at least 8 characters long, have at least 1 digit, 1 uppercase, 1 lowercase, and 1 special character.",
-                  errorText: _passwordError ?? "",
-                  hasError: _passwordError != null,
+                  errorText: '',
+                  hasError: false,
+                ),
+                if(_passwordError != null)
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 20.0),
+                      child: Text(
+                        _passwordError!,
+                        style: GoogleFonts.roboto(
+                          fontSize: 11,
+                          color: Colors.redAccent.shade400,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
                 ),
                 const SizedBox(height: 20),
 
@@ -230,8 +327,23 @@ class _SignupPageState extends State<SignupPage> {
                   inputController: _inputConfirmPassword,
                   title: "Confirm Password",
                   inputHint: "Re-enter Your Password",
-                  errorText: _confirmPasswordError ?? "",
-                  hasError: _confirmPasswordError != null,
+                  errorText: '',
+                  hasError: false,
+                ),
+                if(_confirmPasswordError != null)
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 20.0),
+                      child: Text(
+                        _confirmPasswordError!,
+                        style: GoogleFonts.roboto(
+                          fontSize: 11,
+                          color: Colors.redAccent.shade400,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
                 ),
                 const SizedBox(height: 20),
 
@@ -253,12 +365,8 @@ class _SignupPageState extends State<SignupPage> {
                         SizedBox(
                           height: 50,
                           width: 200,
-                          child: TextField(
-                              keyboardType: TextInputType
-                                  .number, // Set the keyboard type to numbers
-                              inputFormatters: <TextInputFormatter>[
-                                FilteringTextInputFormatter
-                                    .digitsOnly // Allow only digits
+                          child: TextField(keyboardType: TextInputType.number, // Set the keyboard type to numbers
+                              inputFormatters: <TextInputFormatter>[FilteringTextInputFormatter.digitsOnly // Allow only digits
                               ],
                               controller: _inputOTP,
                               textAlign: TextAlign.left,
@@ -268,32 +376,46 @@ class _SignupPageState extends State<SignupPage> {
                                 border: inputBorder,
                                 enabledBorder: inputBorder,
                                 focusedBorder: inputBorder,
-                                contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 2, horizontal: 15),
+                                contentPadding: const EdgeInsets.symmetric(vertical: 2, horizontal: 15),
                                 hintText: "Enter OTP sent to your Email",
-                                hintStyle: GoogleFonts.roboto(
-                                    fontSize: 12, color: PrimaryColors.grey),
-                              )),
-                        ),
-                        if(_invalidOTP) Text("Wrong OTP", style: TextStyle(color: Colors.red),)
+                                hintStyle: GoogleFonts.roboto(fontSize: 12, color: PrimaryColors.grey),
+                              ),
+                            ),
+                          ),
+                          if(_otpError != null)
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 5.0),
+                                child: Text(
+                                  _otpError!,
+                                  style: GoogleFonts.roboto(
+                                    fontSize: 11,
+                                    color: Colors.redAccent.shade400,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
                       ],
                     ),
                     SizedBox(
                       width: 70,
                       height: 30,
                       child: ElevatedButton(
-                          onPressed: _sendOTP,
+                          onPressed: _otpCountdown > 0 ? null : _sendOTP,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue,
+                            backgroundColor: _otpCountdown > 0 ? Colors.grey : Colors.blue,
                             padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10), // Rounded corners
                             ),
                           ),
                           child: Text(
-                            "Send OTP",
+                            _otpCountdown > 0 ? 'Wait $_otpCountdown s' : "Send OTP",
                             style: GoogleFonts.roboto(fontSize: 12, color: Colors.white),
-                          )),
+                          ),
+                      ),
                     ),
                   ],
                 ),
