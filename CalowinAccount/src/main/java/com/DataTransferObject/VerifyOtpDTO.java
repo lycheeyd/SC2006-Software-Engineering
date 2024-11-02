@@ -2,23 +2,33 @@ package com.DataTransferObject;
 
 import com.Account.Entities.ActionType;
 
-public class SendOtpDTO {
+public class VerifyOtpDTO {
     private String email;
+    private String otpCode;
     private ActionType type;
 
     public String getEmail() {
-        return email;
+        return this.email;
     }
 
     public void setEmail(String email) {
         this.email = email;
     }
 
+    public String getOtpCode() {
+        return this.otpCode;
+    }
+
+    public void setOtpCode(String otpCode) {
+        this.otpCode = otpCode;
+    }
+
     public ActionType getType() {
-        return type;
+        return this.type;
     }
 
     public void setType(ActionType type) {
         this.type = type;
     }
+
 }

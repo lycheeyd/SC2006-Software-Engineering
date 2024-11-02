@@ -2,6 +2,7 @@ package com.controller;
 
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +19,7 @@ import com.DataTransferObject.AccountDTO.ForgotPasswordDTO;
 import com.DataTransferObject.AccountDTO.LoginDTO;
 import com.DataTransferObject.AccountDTO.SendOtpDTO;
 import com.DataTransferObject.AccountDTO.SignupDTO;
+import com.DataTransferObject.AccountDTO.VerifyOtpDTO;
 
 @RestController
 @RequestMapping("/central/account")
@@ -27,60 +29,69 @@ public class AccountController extends HttpReqController{
         super(restTemplate);
     }
 
+    @Value("${account.module.urlPrefix}")
+    private String urlPrefix;
+
     // Implemenet your own mapping below
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody SignupDTO DTO) {
         // Forward signup request to AccountModule
-        String url = "http://localhost:8081/account/signup"; // URL of Account Java application
+        String url = urlPrefix + "/account/signup"; // URL of Account Java application
         return restTemplate.postForEntity(url, DTO, Map.class);
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginDTO DTO) {
         // Forward login request to AccountModule
-        String url = "http://localhost:8081/account/login";
+        String url = urlPrefix + "/account/login";
         return restTemplate.postForEntity(url, DTO, Map.class);
     }
 
-    @PostMapping("/send-OTP")
+    @PostMapping("/send-otp")
     public ResponseEntity<?> login(@RequestBody SendOtpDTO DTO) {
-        String url = "http://localhost:8081/account/send-OTP";
+        String url = urlPrefix + "/account/send-otp";
+        return restTemplate.postForEntity(url, DTO, String.class);
+    }
+
+    @PostMapping("/verify-otp")
+    public ResponseEntity<?> login(@RequestBody VerifyOtpDTO DTO) {
+        String url = urlPrefix + "/account/verify-otp";
         return restTemplate.postForEntity(url, DTO, String.class);
     }
 
     @PostMapping("/change-password")
     public ResponseEntity<?> changePassword(@RequestBody ChangePasswordDTO DTO) {
         // Forward change password request to AccountModule
-        String url = "http://localhost:8081/account/change-password";
+        String url = urlPrefix + "/account/change-password";
         return restTemplate.postForEntity(url, DTO, String.class);
     }
 
     @PostMapping("/forget-password")
     public ResponseEntity<?> forgetPassword(@RequestBody ForgotPasswordDTO DTO) {
         // Forward forget password request to AccountModule
-        String url = "http://localhost:8081/account/forget-password";
+        String url = urlPrefix + "/account/forget-password";
         return restTemplate.postForEntity(url, DTO, String.class);
     }
 
     @PostMapping("/edit-profile")
     public ResponseEntity<?> editProfile(@RequestBody EditProfileDTO DTO) {
         // Forward edit profile request to AccountModule
-        String url = "http://localhost:8081/account/edit-profile";
+        String url = urlPrefix + "/account/edit-profile";
         return restTemplate.postForEntity(url, DTO, Map.class);
     }
 
     @PostMapping("/delete-account")
     public ResponseEntity<?> deleteAccount(@RequestBody DeleteAccountDTO DTO) {
         // Forward delete account request to AccountModule
-        String url = "http://localhost:8081/account/delete-account";
+        String url = urlPrefix + "/account/delete-account";
         return restTemplate.postForEntity(url, DTO, String.class);
     }
 
     @GetMapping("/view-profile/{userID}")
     public ResponseEntity<?> viewProfile(@PathVariable String userID) {
         // Forward view profile request to AccountModule
-        String url = "http://localhost:8081/account/view-profile/" + userID;
+        String url = urlPrefix + "/account/view-profile/" + userID;
         return restTemplate.getForEntity(url, Map.class);
     }
     
