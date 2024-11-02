@@ -49,13 +49,13 @@ public class AccountController extends HttpReqController{
     }
 
     @PostMapping("/send-otp")
-    public ResponseEntity<?> login(@RequestBody SendOtpDTO DTO) {
+    public ResponseEntity<?> sendOtp(@RequestBody SendOtpDTO DTO) {
         String url = urlPrefix + "/account/send-otp";
         return restTemplate.postForEntity(url, DTO, String.class);
     }
 
     @PostMapping("/verify-otp")
-    public ResponseEntity<?> login(@RequestBody VerifyOtpDTO DTO) {
+    public ResponseEntity<?> verifyOtp(@RequestBody VerifyOtpDTO DTO) {
         String url = urlPrefix + "/account/verify-otp";
         return restTemplate.postForEntity(url, DTO, String.class);
     }

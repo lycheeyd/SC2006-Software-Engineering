@@ -86,7 +86,7 @@ public class HttpReqController {
     }
 
     @PostMapping("/send-otp")
-    public ResponseEntity<?> sendOTP(@RequestBody SendOtpDTO sendOtpDTO) {
+    public ResponseEntity<?> sendOtp(@RequestBody SendOtpDTO sendOtpDTO) {
         try {
             // Send the OTP
             otpService.sendOtpCode(sendOtpDTO.getEmail(), sendOtpDTO.getType());
@@ -100,7 +100,7 @@ public class HttpReqController {
     }
 
     @PostMapping("/verify-otp")
-    public ResponseEntity<?> verifyOTP(@RequestBody VerifyOtpDTO verifyOtpDTO) {
+    public ResponseEntity<?> verifyOtp(@RequestBody VerifyOtpDTO verifyOtpDTO) {
         try {
             // Verify the OTP
             if (!otpService.verifyOTP(verifyOtpDTO.getEmail(), verifyOtpDTO.getOtpCode(), verifyOtpDTO.getType())) {
