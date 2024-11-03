@@ -1,6 +1,8 @@
 package com.config;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.support.MethodArgumentNotValidException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
@@ -10,10 +12,26 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.HttpStatusCodeException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    // Handle HTTP status code exceptions and return them as-is
+    @ExceptionHandler(HttpStatusCodeException.class)
+    public ResponseEntity<String> handleHttpStatusCodeException(HttpStatusCodeException ex) {
+        HttpStatusCode statusCode = ex.getStatusCode();
+        HttpHeaders headers = ex.getResponseHeaders();
+        String responseBody = ex.getResponseBodyAsString();
+        
+        // Return the exact status, headers, and body from the original exception
+        return ResponseEntity.status(statusCode)
+                             .headers(headers)
+                             .body(responseBody);
+    }
+
+    // Handled by above. Kept for reference.
+/* 
     // Handle 400 Bad Request - Typically for validation errors or missing parameters
     @ExceptionHandler({HttpClientErrorException.BadRequest.class, MethodArgumentNotValidException.class, MissingServletRequestParameterException.class})
     public ResponseEntity<String> handleBadRequest(Exception ex) {
@@ -77,7 +95,7 @@ public class GlobalExceptionHandler {
             //.body("Internal server error: " + ex.getMessage());
             .body(ex.getMessage());
     }
-
+*/
     // Handle any other exceptions - Fallback for any other unhandled exceptions
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleGenericException(Exception ex) {
@@ -85,5 +103,6 @@ public class GlobalExceptionHandler {
             //.body("An unexpected error occurred: " + ex.getMessage());
             .body(ex.getMessage());
     }
+    
 }
 
