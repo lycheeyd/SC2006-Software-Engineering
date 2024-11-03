@@ -26,3 +26,4 @@ public class CustomResponseErrorHandler extends DefaultResponseErrorHandler {
         throw new HttpStatusCodeException(response.getStatusCode(), responseBody) {};
     }
 }
+

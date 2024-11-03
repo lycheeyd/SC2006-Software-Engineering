@@ -17,10 +17,15 @@ public class CalowinSpringNode {
 
     // For forwarding https request
     @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
+/* 
+    @Bean
     public RestTemplate restTemplate(RestTemplateBuilder builder) {
         return builder
                 .errorHandler(new CustomResponseErrorHandler())
                 .build();
     }
-    
+*/
 }

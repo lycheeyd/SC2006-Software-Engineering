@@ -1,6 +1,8 @@
 package com.config;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.support.MethodArgumentNotValidException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
@@ -14,15 +16,22 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @ControllerAdvice
-public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+public class GlobalExceptionHandler {
 
     // Handle HTTP status code exceptions and return them as-is
-    @ExceptionHandler(HttpStatusCodeException.class)
-    public ResponseEntity<String> handleHttpStatusCodeException(HttpStatusCodeException ex) {
-        // Return the exact HTTP status and response body from the original exception
-        return ResponseEntity
-                .status(ex.getStatusCode())
-                .body(ex.getResponseBodyAsString());
+    @ExceptionHandler(HttpClientErrorException.class)
+    public ResponseEntity<String> handleHttpClientErrorException(HttpClientErrorException ex) {
+        // Extract status code from the exception
+        HttpStatusCode statusCode = ex.getStatusCode();
+
+        // Extract body from the exception
+        String responseBody = ex.getResponseBodyAsString();
+
+        // Extract headers from the exception
+        HttpHeaders headers = ex.getResponseHeaders() != null ? ex.getResponseHeaders() : new HttpHeaders();
+
+        // Return the exact status, body, and headers as received from 8081
+        return new ResponseEntity<>(responseBody, headers, statusCode);
     }
 
     // Handled by above. Kept for reference.
