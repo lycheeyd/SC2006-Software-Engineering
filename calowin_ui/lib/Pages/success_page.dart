@@ -1,134 +1,336 @@
 import 'package:calowin/common/colors_and_fonts.dart';
 import 'package:flutter/material.dart';
+import '../control/apiService.dart';
+import '../common/medals.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:calowin/common/medals.dart';
 
-class SuccessPage extends StatelessWidget {
-  final String congratsText;
+class SuccessPage extends StatefulWidget {
+  final int caloriesBurnt;
+  final int carbonSaved;
+  final String tripMethod;
+  final String currentLocation;
+  final String destination;
+  final double distance;
 
-  const SuccessPage({super.key, required this.congratsText});
+  SuccessPage({
+    required this.caloriesBurnt,
+    required this.carbonSaved,
+    required this.tripMethod,
+    required this.currentLocation,
+    required this.destination,
+    required this.distance,
+  });
 
-  Widget _progressBuilder(Color progressColor, int max, int currentProgress,
-      Image badge, int progressIncrement) {
-    return SizedBox(
-      height: 80,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SizedBox(
-            height: 50,
-            child: badge,
-          ),
-          const SizedBox(
-              width: 20), // Add some spacing between the badge and progress
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start, // Align text to start
-            children: [
-              Text(
-                "$currentProgress/$max",
-                style: GoogleFonts.averiaSerifLibre(
-                    fontSize: 15, color: Colors.black),
+  @override
+  _SuccessPageState createState() => _SuccessPageState();
+}
+
+class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStateMixin {
+  int totalCarbonSavedExp = 0;
+  int totalCalorieBurntExp = 0;
+  String carbonSavedMedal = "No Medal";
+  String calorieBurntMedal = "No Medal";
+
+  // Define thresholds for medals
+  final int pointsToNextCarbonBronze = 1000;
+  final int pointsToNextCarbonSilver = 5000;
+  final int pointsToNextCarbonGold = 10000;
+  final int pointsToNextCarbonPlatinum = 15000;
+
+  final int pointsToNextCalorieBronze = 1000;
+  final int pointsToNextCalorieSilver = 5000;
+  final int pointsToNextCalorieGold = 10000;
+  final int pointsToNextCaloriePlatinum = 15000;
+
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    );
+    _animation = Tween<double>(begin: 0.0, end: 1.0).animate(_controller);
+
+    fetchAchievements();
+  }
+
+  Future<void> fetchAchievements() async {
+    ApiService apiService = ApiService();
+    var achievements = await apiService.getAchievementProgress();
+    setState(() {
+      totalCarbonSavedExp = achievements['totalCarbonSavedExp'];
+      totalCalorieBurntExp = achievements['totalCalorieBurntExp'];
+      carbonSavedMedal = achievements['carbonSavedMedal'];
+      calorieBurntMedal = achievements['calorieBurntMedal'];
+    });
+    _controller.forward(); // Start the animation
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose(); // Dispose of the controller
+    super.dispose();
+  }
+
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: PrimaryColors.dullGreen,
+      body: Center(
+        child: SingleChildScrollView(
+          child: Card(
+            color: PrimaryColors.dullGreen,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    "Congratulations! 🎉",
+                    style: GoogleFonts.rammettoOne(
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    "You have traveled ${widget.distance} km to ${widget.destination}.",
+                    style: GoogleFonts.openSans(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black54,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 20),
+                  _buildProgressSection(
+                    title: "Carbon Saved EXP: ${_formatExpDisplay(totalCarbonSavedExp, pointsToNextCarbonPlatinum)}",
+                    value: totalCarbonSavedExp,
+                    medal: carbonSavedMedal,
+                    pointsToNextBronze: pointsToNextCarbonBronze,
+                    pointsToNextSilver: pointsToNextCarbonSilver,
+                    pointsToNextGold: pointsToNextCarbonGold,
+                    pointsToNextPlatinum: pointsToNextCarbonPlatinum,
+                    gainedExp: widget.carbonSaved,
+                    isCarbon: true,
+                  ),
+                  SizedBox(height: 15),
+                  _buildProgressSection(
+                    title: "Calories Burnt EXP: ${_formatExpDisplay(totalCalorieBurntExp, pointsToNextCaloriePlatinum)}",
+                    value: totalCalorieBurntExp,
+                    medal: calorieBurntMedal,
+                    pointsToNextBronze: pointsToNextCalorieBronze,
+                    pointsToNextSilver: pointsToNextCalorieSilver,
+                    pointsToNextGold: pointsToNextCalorieGold,
+                    pointsToNextPlatinum: pointsToNextCaloriePlatinum,
+                    gainedExp: widget.caloriesBurnt,
+                    isCarbon: false,
+                  ),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12), backgroundColor: Colors.green[700],
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text(
+                      "Back to Map",
+                      style: GoogleFonts.openSans(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 5), // Space between text and progress bar
-              SizedBox(
-                width: 200, // Set a fixed width for the progress bar
-                child: LinearProgressIndicator(
-                  value: currentProgress /
-                      max, // 0.0 to 1.0 for determinate progress; null for indeterminate
-                  backgroundColor: const Color.fromARGB(
-                      100, 0, 0, 0), // Background color of the progress bar
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                      progressColor), // Color of the progress indicator
-                ),
-              ),
-            ],
+            ),
           ),
-          const SizedBox(
-              width: 20), // Add some spacing before the increment text
-          Text(
-            "+$progressIncrement",
-            style: GoogleFonts.averiaSerifLibre(
-                fontSize: 20, color: progressColor),
-          )
-        ],
+        ),
       ),
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: PrimaryColors.brightGreen,
-      body: Padding(
-        padding: const EdgeInsets.all(10.0),
+  String _formatExpDisplay(int currentExp, int platinumThreshold) {
+    return currentExp >= platinumThreshold ? "$platinumThreshold/$platinumThreshold" : "$currentExp/$platinumThreshold";
+  }
+
+  Widget _buildProgressSection({
+    required String title,
+    required int value,
+    required String medal,
+    required int pointsToNextBronze,
+    required int pointsToNextSilver,
+    required int pointsToNextGold,
+    required int pointsToNextPlatinum,
+    required int gainedExp,
+    required bool isCarbon,
+  }) {
+    double progress = 0.0;
+    String nextMedal = "No Medal";
+
+    if (value >= pointsToNextPlatinum) {
+      nextMedal = "MAX";
+      medal = "Platinum";
+      progress = 1.0;
+    } else if (value >= pointsToNextGold) {
+      nextMedal = "Platinum";
+      medal = "Gold";
+      progress = (value - pointsToNextGold) / (pointsToNextPlatinum - pointsToNextGold);
+    } else if (value >= pointsToNextSilver) {
+      nextMedal = "Gold";
+      medal = "Silver";
+      progress = (value - pointsToNextSilver) / (pointsToNextGold - pointsToNextSilver);
+    } else if (value >= pointsToNextBronze) {
+      nextMedal = "Silver";
+      medal = "Bronze";
+      progress = (value - pointsToNextBronze) / (pointsToNextSilver - pointsToNextBronze);
+    } else {
+      nextMedal = "Bronze";
+      progress = value / pointsToNextBronze;
+    }
+
+    progress = progress.clamp(0.0, 1.0);
+
+    return Container(
+      decoration: _getCardBackgroundImage(medal), // Use image for background
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SizedBox(
-              height: 300,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text("Congratulations",
-                      style: GoogleFonts.rammettoOne(
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white)),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Text(congratsText,
-                      style: GoogleFonts.rammettoOne(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black)),
-                ],
+            Text(
+              title,
+              style: GoogleFonts.openSans(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
               ),
+              textAlign: TextAlign.center,
             ),
-            SizedBox(
-              height: 200,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _progressBuilder(
-                      Colors.yellow, 1000, 800, Medals.calorieBronze, 20),
-                  _progressBuilder(
-                      Colors.blue, 5000, 288, Medals.ecoSilver, 121),
+            SizedBox(height: 10),
+            Row(
+              children: [
+                if (nextMedal != "No Medal") ...[
+                  _getMedalImage(nextMedal, isCarbon: isCarbon, size: 25),
+                  SizedBox(width: 8),
                 ],
-              ),
-            ),
-            Flexible(
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: SizedBox(
-                  child: Align(
-                    alignment: Alignment.bottomCenter,
-                    child: ElevatedButton(
-                        onPressed: () => Navigator.pop(context),
-                        style: ElevatedButton.styleFrom(
-                          elevation: 0,
-                          backgroundColor: PrimaryColors.darkGreen,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 40, vertical: 3),
-                          shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(10), // Rounded corners
-                          ),
-                        ),
-                        child: Text(
-                          "Back To Map",
-                          style: GoogleFonts.roboto(
-                              fontSize: 16, color: Colors.white),
-                        )),
+                Expanded(
+                  child: AnimatedBuilder(
+                    animation: _animation,
+                    builder: (context, child) {
+                      double animatedProgress = progress * _animation.value;
+                      return LinearProgressIndicator(
+                        value: animatedProgress,
+                        backgroundColor: Colors.grey[300],
+                        color: Colors.red,
+                        minHeight: 8,
+                      );
+                    },
                   ),
                 ),
+                SizedBox(width: 10),
+                Text(
+                  value >= pointsToNextPlatinum ? "MAX" : "+$gainedExp EXP",
+                  style: GoogleFonts.openSans(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+            SizedBox(height: 10),
+            Text(
+              "Current Badge:",
+              style: GoogleFonts.openSans(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
               ),
-            )
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 5),
+            _getMedalImage(medal, isCarbon: isCarbon),
+            SizedBox(height: 5),
           ],
         ),
       ),
     );
+  }
+
+  Widget _getMedalImage(String medal, {required bool isCarbon, double size = 50}) {
+    if (isCarbon) {
+      switch (medal) {
+        case "Gold":
+          return SizedBox(width: size, height: size, child: Medals.ecoGold);
+        case "Silver":
+          return SizedBox(width: size, height: size, child: Medals.ecoSilver);
+        case "Bronze":
+          return SizedBox(width: size, height: size, child: Medals.ecoBronze);
+        case "Platinum":
+          return SizedBox(width: size, height: size, child: Medals.ecoPlatinum);
+        default:
+          return Container();
+      }
+    } else {
+      switch (medal) {
+        case "Gold":
+          return SizedBox(width: size, height: size, child: Medals.calorieGold);
+        case "Silver":
+          return SizedBox(width: size, height: size, child: Medals.calorieSilver);
+        case "Bronze":
+          return SizedBox(width: size, height: size, child: Medals.calorieBronze);
+        case "Platinum":
+          return SizedBox(width: size, height: size, child: Medals.caloriePlatinum);
+        default:
+          return Container();
+       }
+    }
+  }
+
+  BoxDecoration _getCardBackgroundImage(String medal) {
+    switch (medal) {
+      case "Platinum":
+        return BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/Platinum.jpg'), // Platinum image
+            fit: BoxFit.cover,
+          ),
+        );
+      case "Gold":
+        return BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/Gold.jpg'), // Gold image
+            fit: BoxFit.cover,
+          ),
+        );
+      case "Silver":
+        return BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/Silver.jpg'), // Silver image
+            fit: BoxFit.cover,
+          ),
+        );
+      case "Bronze":
+        return BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/Bronze.jpg'), // Bronze image
+            fit: BoxFit.cover,
+          ),
+        );
+      default:
+        return BoxDecoration(
+          color: Colors.white, // Default color if no medal is earned
+        );
+    }
   }
 }
