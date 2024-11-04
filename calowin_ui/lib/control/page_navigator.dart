@@ -9,11 +9,15 @@ import 'package:calowin/Pages/wellness_page.dart';
 import 'package:calowin/Pages/rank_page.dart';
 import 'package:calowin/common/colors_and_fonts.dart';
 import 'package:google_fonts/google_fonts.dart';
+<<<<<<< Updated upstream
 import 'package:calowin/control/notification_service.dart';
 import 'package:logger/logger.dart';
 
 final logger = Logger();
 
+=======
+import 'package:calowin/control/notification_service.dart'; // Import NotificationService
+>>>>>>> Stashed changes
 
 class PageNavigator extends StatefulWidget {
   const PageNavigator({super.key});
@@ -23,10 +27,10 @@ class PageNavigator extends StatefulWidget {
 }
 
 class PageNavigatorState extends State<PageNavigator> {
-  //this is to set the page index
+  // Set the page index
   int _currentIndex = 0;
 
-  //this is to set parameters to pass to the pages
+  // Set parameters to pass to the pages
   Map<String, dynamic>? _currentParams;
   bool _showNotifications = false;
   List<String> listOfNotifications = [];
@@ -37,13 +41,14 @@ class PageNavigatorState extends State<PageNavigator> {
     (params) => const ProfilePage(),
     (params) => const FriendsPage(),
     (params) => const WellnessZonePage(),
-    //below are all not available in navigation bar
+    // Below are all not available in the navigation bar
     (params) => OtheruserPage(
-          userID: params?['userID'], //passing the user's id to redirect
+          userID: params?['userID'], // Passing the user's id to redirect
         ),
     (params) => const AddfriendsPage(),
   ];
 
+<<<<<<< Updated upstream
   /*List<String> listOfNotifications = <String>[
     "John sent a Friend Request",
     "Notification 2",
@@ -72,13 +77,39 @@ class PageNavigatorState extends State<PageNavigator> {
 
 
   
+=======
+  List<String> listOfNotifications = [];
+  bool _showNotifications = false; // Track if notifications are visible
+
+  @override
+  void initState() {
+    super.initState();
+    _loadNotifications(); // Load notifications when the widget is initialized
+  }
+
+  Future<void> _loadNotifications() async {
+    try {
+      String userId = "0000001"; // Example user ID; replace with actual user ID if needed
+      NotificationService notificationService = NotificationService();
+      List<String> notifications = await notificationService.fetchFriendRequests(userId);
+      setState(() {
+        listOfNotifications = notifications;
+      });
+    } catch (e) {
+      print("Error loading notifications: $e");
+    }
+  }
+>>>>>>> Stashed changes
 
   void navigateToPage(int index, {Map<String, dynamic>? params}) {
     setState(() {
       _currentIndex = index;
-      _currentParams = params; // Save parameters if needed
+      _currentParams = params;
     });
+<<<<<<< Updated upstream
     print("Navigating to page $_currentIndex");
+=======
+>>>>>>> Stashed changes
   }
 
   void _toggleNotifications() {
@@ -97,25 +128,28 @@ class PageNavigatorState extends State<PageNavigator> {
   }
 
   void _handleNotificationTap(int index) {
+<<<<<<< Updated upstream
     setState(() {
       navigateToPage(5, params: {"userID": "00000001"});
       _toggleNotifications();
       //index should be passed to the profile page to be able to open the profile page of the person
       //alternately can just open the friend request page
     });
+=======
+    navigateToPage(5, params: {"userID": "888888"}); // Example user ID; modify as needed
+    _toggleNotifications();
+>>>>>>> Stashed changes
   }
 
-  //to build our custom navigation button decorations
+  // Build custom navigation button decorations
   Widget _buildBottomNavItem(IconData icon, int index, String label) {
     Color lightgreen = const Color.fromARGB(255, 197, 251, 196);
     double bottomNavFontSize = 8;
-    //label.length > 6 ? (label.length > 7 ? 6 : 7.5) : 8;
     return GestureDetector(
       onTap: () => _onItemTapped(index),
       child: Container(
         width: 60,
-        padding: const EdgeInsets.symmetric(
-            horizontal: 2, vertical: 5), // Add padding for better visuals
+        padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 5),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -126,7 +160,7 @@ class PageNavigatorState extends State<PageNavigator> {
                 color: (_currentIndex < 5 ? _currentIndex : 3) == index
                     ? PrimaryColors.darkGreen
                     : lightgreen,
-                borderRadius: BorderRadius.circular(20), // Rounded rectangle
+                borderRadius: BorderRadius.circular(20),
               ),
               child: Icon(
                 icon,
@@ -138,10 +172,9 @@ class PageNavigatorState extends State<PageNavigator> {
             const SizedBox(height: 4),
             Text(
               label,
-              style:
-                  TextStyle(color: Colors.black, fontSize: bottomNavFontSize),
+              style: TextStyle(color: Colors.black, fontSize: bottomNavFontSize),
             ),
-            const SizedBox(height: 10), //elevate from the bottom
+            const SizedBox(height: 10),
           ],
         ),
       ),
@@ -154,9 +187,7 @@ class PageNavigatorState extends State<PageNavigator> {
 
     return GestureDetector(
       onTap: () => setState(() {
-        {
-          _showNotifications = false;
-        }
+        _showNotifications = false;
       }),
       child: Scaffold(
         resizeToAvoidBottomInset: false,
@@ -188,9 +219,7 @@ class PageNavigatorState extends State<PageNavigator> {
           ),
           actions: [
             Padding(
-              padding: const EdgeInsets.only(
-                right: 5,
-              ),
+              padding: const EdgeInsets.only(right: 5),
               child: Container(
                 height: 40,
                 width: 40,
@@ -212,12 +241,10 @@ class PageNavigatorState extends State<PageNavigator> {
             index: _currentIndex,
             children: _pages.map((builder) => builder(_currentParams)).toList(),
           ),
-
-          // this is for the notification center
           if (_showNotifications)
             Positioned(
-              top: 5, // Adjust position to appear just below the AppBar
-              right: 10, // Position near the bell icon
+              top: 5,
+              right: 10,
               child: Material(
                 elevation: 4,
                 borderRadius: BorderRadius.circular(8),
@@ -249,13 +276,10 @@ class PageNavigatorState extends State<PageNavigator> {
                       SizedBox(
                         height: 230,
                         child: ListView.builder(
-                          scrollDirection: Axis.vertical,
-                          shrinkWrap: true,
                           itemCount: listOfNotifications.length,
                           itemBuilder: (context, index) {
                             return Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 4, horizontal: 5),
+                              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 5),
                               child: Container(
                                 decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(10),
@@ -265,8 +289,7 @@ class PageNavigatorState extends State<PageNavigator> {
                                   title: Text(
                                     listOfNotifications[index],
                                     style: GoogleFonts.poppins(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold),
+                                        fontSize: 12, fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               ),
@@ -283,8 +306,7 @@ class PageNavigatorState extends State<PageNavigator> {
         bottomNavigationBar: Theme(
           data: Theme.of(context).copyWith(canvasColor: lightgreen),
           child: Container(
-            color:
-                lightgreen, // Optional: If you want a background for the entire bottom nav bar
+            color: lightgreen,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
