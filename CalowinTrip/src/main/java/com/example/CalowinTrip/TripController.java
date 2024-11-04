@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.sql.Connection;
@@ -28,25 +29,6 @@ public class TripController {
         return Timestamp.valueOf(now); // Convert LocalDateTime to Timestamp
     }
 
-    @GetMapping("/locations")
-    public List<Location> getAvailableLocations() {
-        return getPredefinedLocations();
-    }
-
-    @GetMapping("/current-location")
-    public ResponseEntity<CurrentLocation> getCurrentLocation() {
-        CurrentLocation currentLocation = new CurrentLocation("KFC", 1.3521, 103.8198);
-        return ResponseEntity.ok(currentLocation);
-    }
-
-    private List<Location> getPredefinedLocations() {
-        List<Location> locations = new ArrayList<>();
-        locations.add(new Location("Bedok", 1.3216, 103.9335));
-        locations.add(new Location("Jurong East", 1.3340, 103.7432));
-        locations.add(new Location("NTU", 1.3453, 103.6831));
-        return locations;
-    }
-
     @GetMapping("/methods")
     public List<TravelMethod> getTravelMethods() {
         return Arrays.asList(TravelMethod.values());
@@ -54,15 +36,9 @@ public class TripController {
 
     @PostMapping("/start")
     public Trip startTrip(@RequestBody Trip trip) {
-        ResponseEntity<CurrentLocation> response = getCurrentLocation();
-        CurrentLocation userLocation = response.getBody();
-
-        if (userLocation == null) {
-            throw new RuntimeException("Unable to retrieve current location.");
-        }
-
         // Calculate the distance, calories burnt, and carbon saved
-        double distance = calculateDistance(userLocation, trip.getDestination());
+
+        double distance = calculateDistance(trip.getCurrentLocation(), trip.getDestination());
         int caloriesBurned = calculateCalories(trip.getTravelMethod(), distance);
         int carbonSaved = calculateCarbon(trip.getTravelMethod(), distance);
 
@@ -72,13 +48,13 @@ public class TripController {
         trip.setDistance(distance);
 
         // Insert trip data into the database
-        insertTripIntoDatabase(trip, userLocation);
+        insertTripIntoDatabase(trip);
 
         return trip;
     }
 
     private double calculateDistance(CurrentLocation userLocation, Location destination) {
-        double earthRadius = 6371;
+        double earthRadius = 6371; // Radius of the Earth in kilometers
         double dLat = toRadians(destination.getLatitude() - userLocation.getLatitude());
         double dLon = toRadians(destination.getLongitude() - userLocation.getLongitude());
 
@@ -88,19 +64,19 @@ public class TripController {
                    sin(dLon / 2) * sin(dLon / 2);
 
         double c = 2 * atan2(sqrt(a), sqrt(1 - a));
-        return earthRadius * c;
+        return earthRadius * c; // Distance in kilometers
     }
 
     private int calculateCalories(TravelMethod method, double distance) {
         switch (method) {
             case WALK:
-                return (int) (distance * 50);
+                return (int) (distance * 50); // Example calculation for walking
             case CYCLE:
-                return (int) (distance * 30);
+                return (int) (distance * 30); // Example calculation for cycling
             case PUBLIC_TRANSPORT:
-                return (int) (distance * 10);
+                return (int) (distance * 10); // Example calculation for public transport
             case CAR:
-                return 0;
+                return 0; // No calories burned while driving
             default:
                 return 0;
         }
@@ -109,56 +85,50 @@ public class TripController {
     private int calculateCarbon(TravelMethod method, double distance) {
         switch (method) {
             case WALK:
-                return (int) (distance * 2);
             case CYCLE:
-                return (int) (distance * 2);
+                return (int) (distance * 2); // Example calculation for walking/cycling
             case PUBLIC_TRANSPORT:
-                return 0;
             case CAR:
-                return 0;
+                return 0; // No carbon saved while using these methods
             default:
                 return 0;
         }
     }
 
-
-    private void insertTripIntoDatabase(Trip trip, CurrentLocation startLocation) {
+    private void insertTripIntoDatabase(Trip trip) {
         String insertSQL = "INSERT INTO trips (trip_id, start_location, start_longitude, "
                          + "start_latitude, end_location, end_latitude, "
-                         + "end_longitude, distance, calories_burnt, carbon_saved, trip_time, travel_method, status)"
-                         + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"; // Ensure correct count
-    
+                         + "end_longitude, distance, calories_burnt, carbon_saved, trip_time, travel_method, status, user_id) "
+                         + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"; // Ensure correct count
+
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
-    
-            // Generate a random trip ID
-            String tripId = generateUniqueTripId().toString(); // Generate a random UUID
-            Timestamp currentTimestamp = getCurrentSqlTimestamp();
-            preparedStatement.setString(1, tripId); // Set the trip ID
-            
+
             // Set values for the insert query
-            preparedStatement.setString(2, startLocation.getName());
-            preparedStatement.setDouble(3, startLocation.getLatitude());
-            preparedStatement.setDouble(4, startLocation.getLongitude());
+            preparedStatement.setString(1, generateUniqueTripId()); // Use generated user ID
+            preparedStatement.setString(2, trip.getCurrentLocation().getName());
+            preparedStatement.setDouble(3, trip.getCurrentLocation().getLatitude());
+            preparedStatement.setDouble(4, trip.getCurrentLocation().getLongitude());
             preparedStatement.setString(5, trip.getDestination().getName());
             preparedStatement.setDouble(6, trip.getDestination().getLatitude());
             preparedStatement.setDouble(7, trip.getDestination().getLongitude());
             preparedStatement.setDouble(8, trip.getDistance());
             preparedStatement.setInt(9, trip.getCaloriesBurnt());
-            preparedStatement.setInt(10, trip.getCarbonSaved()); 
+            preparedStatement.setInt(10, trip.getCarbonSaved());
             preparedStatement.setTimestamp(11, getCurrentSqlTimestamp());
             preparedStatement.setString(12, trip.getTravelMethod().toString()); // Store enum as string
             preparedStatement.setString(13, "ONGOING"); // Set status
-    
+            preparedStatement.setString(14, trip.getUserId()); // Set user ID
+
             // Execute the insert statement
             int rowsAffected = preparedStatement.executeUpdate();
-    
+
             if (rowsAffected > 0) {
                 System.out.println("Trip data inserted successfully.");
             } else {
                 System.out.println("No trip data was inserted.");
             }
-    
+
         } catch (SQLException e) {
             e.printStackTrace();
             System.err.println("SQLState: " + e.getSQLState());
@@ -166,7 +136,6 @@ public class TripController {
             System.err.println("Message: " + e.getMessage());
             throw new RuntimeException("Error inserting trip data into the database.", e);
         }
-        
     }
 
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -193,8 +162,6 @@ public class TripController {
 
     // Method to check if a trip ID already exists in the database
     private boolean tripIdExists(String tripId) {
-        // Logic to query the database to check for existing trip ID
-        // For example:
         String query = "SELECT COUNT(*) FROM trips WHERE trip_id = ?";
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -208,6 +175,4 @@ public class TripController {
         }
         return false;
     }
-        
 }
-

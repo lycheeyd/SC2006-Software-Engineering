@@ -10,6 +10,7 @@ public class Achievement {
     private final int BRONZE_THRESHOLD = 1000;
     private final int SILVER_THRESHOLD = 5000;
     private final int GOLD_THRESHOLD = 10000;
+    private final int PLATINUM_THRESHOLD = 15000;
 
     public Achievement() {
         this.totalCarbonSavedExp = 0; // Default value
@@ -33,7 +34,10 @@ public class Achievement {
 
     // Helper method to calculate medal based on experience
     private String calculateMedal(int exp) {
-        if (exp >= GOLD_THRESHOLD) {
+        if(exp >= PLATINUM_THRESHOLD){
+            return "Platinum";
+        }
+        else if (exp >= GOLD_THRESHOLD) {
             return "Gold";
         } else if (exp >= SILVER_THRESHOLD) {
             return "Silver";
@@ -57,6 +61,11 @@ public class Achievement {
         return GOLD_THRESHOLD - totalCarbonSavedExp > 0 ? GOLD_THRESHOLD - totalCarbonSavedExp : 0;
     }
 
+    public int pointsToNextCarbonPlatinum() {
+        return PLATINUM_THRESHOLD - totalCarbonSavedExp > 0 ? PLATINUM_THRESHOLD - totalCalorieBurntExp : 0;
+
+    }
+
     public int pointsToNextCalorieBronze() {
         return BRONZE_THRESHOLD - totalCalorieBurntExp > 0 ? BRONZE_THRESHOLD - totalCalorieBurntExp : 0;
     }
@@ -67,6 +76,11 @@ public class Achievement {
 
     public int pointsToNextCalorieGold() {
         return GOLD_THRESHOLD - totalCalorieBurntExp > 0 ? GOLD_THRESHOLD - totalCalorieBurntExp : 0;
+    }
+
+    public int pointsToNextCaloriePlatinum() {
+        return PLATINUM_THRESHOLD - totalCalorieBurntExp > 0 ? PLATINUM_THRESHOLD - totalCalorieBurntExp : 0;
+
     }
 
     // Getters for thresholds
@@ -80,6 +94,10 @@ public class Achievement {
 
     public final int GoldThreshold() {
         return GOLD_THRESHOLD;
+    }
+
+    public final int PlatinumThreshold() {
+        return PLATINUM_THRESHOLD;
     }
 
 

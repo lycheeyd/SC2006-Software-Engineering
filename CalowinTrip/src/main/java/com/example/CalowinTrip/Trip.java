@@ -1,91 +1,47 @@
 package com.example.CalowinTrip;
-import java.security.SecureRandom;
-
-
 
 public class Trip {
-    private CurrentLocation startLocation;
-    private Location destination; // The destination is of type Location
-    private TravelMethod travelMethod;
+    private String tripId;
+    private CurrentLocation currentLocation;
+    private Location destination;
+    private double distance;
     private int caloriesBurnt;
     private int carbonSaved;
-    private double distance;
-    private String userId; // New field
-    private final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"; // Alphanumeric characters
-    private final SecureRandom random = new SecureRandom(); // For better randomness
+    private TravelMethod travelMethod;
+    private String userId;
 
-
-    public Trip(CurrentLocation startLocation, Location destination, TravelMethod travelMethod) {
-        this.startLocation = startLocation;
+    public Trip(String tripId, CurrentLocation currentLocation, Location destination, TravelMethod travelMethod, String userId) {
+        this.tripId = tripId;
+        this.currentLocation = currentLocation;
         this.destination = destination;
         this.travelMethod = travelMethod;
+        this.userId = userId;
     }
 
-    
+    // Getters and setters
+    public String getTripId() { return tripId; }
+    public void setTripId(String tripId) { this.tripId = tripId; }
 
-     private String generateUserId() {
-        StringBuilder id = new StringBuilder();
-        for (int i = 0; i < 8; i++) {
-            id.append(CHARACTERS.charAt(random.nextInt(CHARACTERS.length())));
-        }
-        return id.toString();
-    }
+    public CurrentLocation getCurrentLocation() { return currentLocation; }
+    public void setCurrentLocation(CurrentLocation currentLocation) { this.currentLocation = currentLocation; }
 
-    public String getUserId() {
-        return userId;  // Getter for userId
-    }
+    public Location getDestination() { return destination; }
+    public void setDestination(Location destination) { this.destination = destination; }
 
-    public void setUserId(){
-        this.userId = generateUserId();
-    }
+    public double getDistance() { return distance; }
+    public void setDistance(double distance) { this.distance = distance; }
 
+    public int getCaloriesBurnt() { return caloriesBurnt; }
+    public void setCaloriesBurnt(int caloriesBurnt) { this.caloriesBurnt = caloriesBurnt; }
 
-    // Getters and Setters
-    public CurrentLocation getStartLocation() {
-        return startLocation;
-    }
+    public int getCarbonSaved() { return carbonSaved; }
+    public void setCarbonSaved(int carbonSaved) { this.carbonSaved = carbonSaved; }
 
-    public void setStartLocation(CurrentLocation startLocation) {
-        this.startLocation = startLocation;
-    }
+    public TravelMethod getTravelMethod() { return travelMethod; }
+    public void setTravelMethod(TravelMethod travelMethod) { this.travelMethod = travelMethod; }
 
-    public Location getDestination() {
-        return destination;
-    }
-
-    public void setDestination(Location destination) {
-        this.destination = destination;
-    }
-
-    public TravelMethod getTravelMethod() {
-        return travelMethod;
-    }
-
-    public void setTravelMethod(TravelMethod travelMethod) {
-        this.travelMethod = travelMethod;
-    }
-
-    public int getCaloriesBurnt() {
-        return caloriesBurnt;
-    }
-
-    public void setCaloriesBurnt(int caloriesBurnt) {
-        this.caloriesBurnt = caloriesBurnt;
-    }
-
-    public void setDistance(double distance){
-        this.distance = distance;
-    }
-
-    public double getDistance(){
-        return distance;
-    }
-
-    public int getCarbonSaved() {
-        return carbonSaved;
-    }
-
-    public void setCarbonSaved(int carbonSaved) {
-        this.carbonSaved = carbonSaved;
-    }
+    public String getUserId() { return userId; }
+    public void setUserId(String userId) { this.userId = userId; }
 }
+
+

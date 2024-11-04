@@ -1,22 +1,30 @@
-// lib/main.dart
-
+import 'package:calowin/Pages/login_page.dart';
 import 'package:flutter/material.dart';
-// Import the HomeScreen
-import 'screens/mapCalculationScreen.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Calowin',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: MapcalcPage(),  // Set HomeScreen as the starting page
+    return const MaterialApp(
+      title: 'CaloWin',
+      debugShowCheckedModeBanner: false,
+      home: Loginpage(),
+      // initialRoute: '/',
+      // routes: {
+      //   '/login': (context) => const Loginpage(),
+      //   '/signup': (context) => const SignupPage(),
+      //   '/home': (context) => const PageNavigator(
+      //         startPage: 0,
+      //       ),
+      //   '/profile': (context) => const ProfilePage(),
+      //   '/editprofile': (context) => const EditprofilePage()
+      //   },
     );
   }
 }
