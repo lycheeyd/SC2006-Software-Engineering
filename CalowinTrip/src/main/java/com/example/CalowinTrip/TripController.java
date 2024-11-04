@@ -70,11 +70,11 @@ public class TripController {
     private int calculateCalories(TravelMethod method, double distance) {
         switch (method) {
             case WALK:
-                return (int) (distance * 50); // Example calculation for walking
+                return (int) (distance * 50); 
             case CYCLE:
-                return (int) (distance * 30); // Example calculation for cycling
+                return (int) (distance * 30); 
             case PUBLIC_TRANSPORT:
-                return (int) (distance * 10); // Example calculation for public transport
+                return (int) (distance * 10); 
             case CAR:
                 return 0; // No calories burned while driving
             default:
@@ -85,9 +85,11 @@ public class TripController {
     private int calculateCarbon(TravelMethod method, double distance) {
         switch (method) {
             case WALK:
+                return (int) (distance * 30);
             case CYCLE:
-                return (int) (distance * 2); // Example calculation for walking/cycling
+                return (int) (distance * 20); 
             case PUBLIC_TRANSPORT:
+                return (int) (distance * 10);
             case CAR:
                 return 0; // No carbon saved while using these methods
             default:
