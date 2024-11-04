@@ -1,28 +1,32 @@
 package com.example.CalowinTrip;
 
-import org.springframework.http.ResponseEntity;
+import static java.lang.Math.atan2;
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
+import static java.lang.Math.sqrt;
+import static java.lang.Math.toRadians;
+import java.security.SecureRandom;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import static java.lang.Math.*;
-import java.sql.ResultSet;
-import java.security.SecureRandom;
-import java.time.LocalDateTime;
-import java.sql.Timestamp;
 
 @RestController
 @RequestMapping("/trips")
 public class TripController {
+
+    private final AchievementController achievementController = new AchievementController();
+
 
     public static Timestamp getCurrentSqlTimestamp() {
         LocalDateTime now = LocalDateTime.now();
@@ -46,6 +50,9 @@ public class TripController {
         trip.setCaloriesBurnt(caloriesBurned);
         trip.setCarbonSaved(carbonSaved);
         trip.setDistance(distance);
+
+        achievementController.addTripMetrics(carbonSaved, caloriesBurned, trip); // Pass trip with userId
+
 
         // Insert trip data into the database
         insertTripIntoDatabase(trip);
