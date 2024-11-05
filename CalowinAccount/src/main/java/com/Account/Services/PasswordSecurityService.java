@@ -7,6 +7,8 @@ import javax.crypto.spec.SecretKeySpec;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
@@ -15,17 +17,23 @@ import java.util.List;
 @Service
 public class PasswordSecurityService {
 
-    public String decrypt(String encrypted, String key) throws Exception {
+    public String decrypt(String encrypted, String SECRET_KEY) throws Exception {
         String[] parts = encrypted.split(":");
         byte[] iv = Base64.getDecoder().decode(parts[1]);
         byte[] encryptedBytes = Base64.getDecoder().decode(parts[0]);
 
-        SecretKeySpec secretKey = new SecretKeySpec(key.getBytes("UTF-8"), "AES");
+        byte[] keyBytes = SECRET_KEY.getBytes(StandardCharsets.UTF_8);
+        MessageDigest sha = MessageDigest.getInstance("SHA-256");
+        keyBytes = sha.digest(keyBytes);
+        byte[] truncatedKey = new byte[16];
+        System.arraycopy(keyBytes, 0, truncatedKey, 0, 16);
+
+        SecretKeySpec secretKey = new SecretKeySpec(truncatedKey, "AES");
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
         cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(iv));
 
         byte[] original = cipher.doFinal(encryptedBytes);
-        return new String(original);
+        return new String(original, StandardCharsets.UTF_8);
     }
 
     // Utility function to validate the password

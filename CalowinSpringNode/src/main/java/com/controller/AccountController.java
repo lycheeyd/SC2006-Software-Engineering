@@ -44,6 +44,7 @@ public class AccountController extends HttpReqController{
             String url = urlPrefix + "/account/signup"; // URL of Account Java application
             return restTemplate.postForEntity(url, DTO, Map.class);
         } catch (Exception ex) {
+            System.out.println(ex);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + ex.getMessage());
         }
     }
@@ -55,6 +56,7 @@ public class AccountController extends HttpReqController{
             String url = urlPrefix + "/account/login";
             return restTemplate.postForEntity(url, DTO, Map.class);
         } catch (Exception ex)  {
+            System.out.println(ex);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + ex.getMessage());
         }
     }
@@ -65,6 +67,7 @@ public class AccountController extends HttpReqController{
            String url = urlPrefix + "/account/send-otp";
             return restTemplate.postForEntity(url, DTO, String.class); 
         } catch (Exception ex)  {
+            System.out.println(ex);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + ex.getMessage());
         }
     }
@@ -83,6 +86,7 @@ public class AccountController extends HttpReqController{
             }
         } catch (Exception ex) {
             // Handle generic exceptions
+            System.out.println(ex);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + ex.getMessage());
         }
     }
@@ -94,6 +98,7 @@ public class AccountController extends HttpReqController{
             String url = urlPrefix + "/account/change-password";
             return restTemplate.postForEntity(url, DTO, String.class);
         } catch (Exception ex)  {
+            System.out.println(ex);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + ex.getMessage());
         }
     }
@@ -105,6 +110,7 @@ public class AccountController extends HttpReqController{
             String url = urlPrefix + "/account/forget-password";
             return restTemplate.postForEntity(url, DTO, String.class);
         } catch (Exception ex)  {
+            System.out.println(ex);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + ex.getMessage());
         }
     }
@@ -116,6 +122,7 @@ public class AccountController extends HttpReqController{
             String url = urlPrefix + "/account/edit-profile";
             return restTemplate.postForEntity(url, DTO, Map.class);
         } catch (Exception ex)  {
+            System.out.println(ex);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + ex.getMessage());
         }
     }
@@ -127,6 +134,7 @@ public class AccountController extends HttpReqController{
             String url = urlPrefix + "/account/delete-account";
             return restTemplate.postForEntity(url, DTO, String.class);
         } catch (Exception ex)  {
+            System.out.println(ex);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + ex.getMessage());
         }
     }
@@ -138,6 +146,7 @@ public class AccountController extends HttpReqController{
             String url = urlPrefix + "/account/view-profile/" + userID;
             return restTemplate.getForEntity(url, Map.class);
         } catch (Exception ex)  {
+            System.out.println(ex);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + ex.getMessage());
         }
     }
