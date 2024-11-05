@@ -1,7 +1,5 @@
 package com.example.CalowinTrip;
 
-import java.util.Map;
-
 public class CurrentLocation {
     private String name;
     private double latitude;
@@ -13,37 +11,13 @@ public class CurrentLocation {
         this.longitude = longitude;
     }
 
-    public String getName() {
-        return name;
-    }
+    // Getters and setters
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-    public void setName(String name){
-        this.name = name;
-    }
+    public double getLatitude() { return latitude; }
+    public void setLatitude(double latitude) { this.latitude = latitude; }
 
-    // Getters and Setters
-    public double getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(double latitude) {
-        this.latitude = latitude;
-    }
-
-    public double getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(double longitude) {
-        this.longitude = longitude;
-    }
-
-      // Method to create CurrentLocation from JSON
-    public static CurrentLocation fromJson(Map<String, Object> json) {
-        return new CurrentLocation(
-            (String) json.get("name"),
-            (Double) json.get("latitude"),
-            (Double) json.get("longitude")
-        );
-    }
+    public double getLongitude() { return longitude; }
+    public void setLongitude(double longitude) { this.longitude = longitude; }
 }

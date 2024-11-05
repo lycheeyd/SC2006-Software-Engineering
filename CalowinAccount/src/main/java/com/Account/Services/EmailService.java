@@ -43,7 +43,7 @@ public class EmailService {
             // Send email
             Transport.send(message);
 
-            System.out.println("Email sent successfully!");
+            System.out.println("Email titled '" + subject + "' sent successfully to '" + recipient);
 
         } catch (MessagingException e) {
             e.printStackTrace();

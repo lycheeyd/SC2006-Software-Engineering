@@ -1,3 +1,4 @@
+
 class Location {
   final String name;
   final double latitude;
@@ -13,3 +14,4 @@ class Location {
     };
   }
 }
+
