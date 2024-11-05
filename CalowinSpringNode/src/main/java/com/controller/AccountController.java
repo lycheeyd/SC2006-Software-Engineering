@@ -43,6 +43,13 @@ public class AccountController extends HttpReqController{
         try {
             String url = urlPrefix + "/account/signup"; // URL of Account Java application
             return restTemplate.postForEntity(url, DTO, Map.class);
+        } catch (HttpClientErrorException ex) {
+            HttpStatusCode statusCode = ex.getStatusCode();
+            if (statusCode == HttpStatus.BAD_REQUEST) {
+                return ResponseEntity.status(statusCode).body(ex.getMessage());
+            } else {
+                return ResponseEntity.status(statusCode).body(statusCode + ex.getMessage());
+            }
         } catch (Exception ex) {
             System.out.println(ex);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + ex.getMessage());
