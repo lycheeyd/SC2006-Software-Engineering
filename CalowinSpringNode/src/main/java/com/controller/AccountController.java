@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 
 import com.DataTransferObject.AccountDTO.ChangePasswordDTO;
 import com.DataTransferObject.AccountDTO.DeleteAccountDTO;
@@ -20,12 +19,13 @@ import com.DataTransferObject.AccountDTO.LoginDTO;
 import com.DataTransferObject.AccountDTO.SendOtpDTO;
 import com.DataTransferObject.AccountDTO.SignupDTO;
 import com.DataTransferObject.AccountDTO.VerifyOtpDTO;
+import com.config.CustomRestTemplate;
 
 @RestController
 @RequestMapping("/central/account")
 public class AccountController extends HttpReqController{
 
-    public AccountController(RestTemplate restTemplate) {
+    public AccountController(CustomRestTemplate restTemplate) {
         super(restTemplate);
     }
 
