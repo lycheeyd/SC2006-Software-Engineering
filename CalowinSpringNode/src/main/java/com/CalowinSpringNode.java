@@ -2,12 +2,8 @@ package com;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
-
-import com.config.CustomRestTemplate;
-
-
+import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
 public class CalowinSpringNode {
@@ -17,8 +13,8 @@ public class CalowinSpringNode {
 
     // For forwarding https request
     @Bean
-    public CustomRestTemplate customRestTemplate(RestTemplateBuilder builder) {
-        return new CustomRestTemplate(builder);
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
     }
 /* 
     @Bean

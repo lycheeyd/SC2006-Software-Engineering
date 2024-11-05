@@ -15,9 +15,9 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-//@ControllerAdvice
+@ControllerAdvice
 public class GlobalExceptionHandler {
-/*
+
     // Handle HTTP status code exceptions and return them as-is
     @ExceptionHandler(HttpClientErrorException.class)
     public ResponseEntity<String> handleHttpClientErrorException(HttpClientErrorException ex) {
@@ -99,7 +99,7 @@ public class GlobalExceptionHandler {
             //.body("Internal server error: " + ex.getMessage());
             .body(ex.getMessage());
     }
-
+*/
     // Handle any other exceptions - Fallback for any other unhandled exceptions
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleGenericException(Exception ex) {
@@ -107,6 +107,6 @@ public class GlobalExceptionHandler {
             //.body("An unexpected error occurred: " + ex.getMessage());
             .body(ex.getMessage());
     }
-*/
+
 }
 
