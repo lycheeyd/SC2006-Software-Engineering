@@ -3,6 +3,7 @@ package com.config;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.util.Assert;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.client.RequestCallback;
 import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestTemplate;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpMethod;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 
 import org.springframework.web.client.ResourceAccessException;
 
@@ -19,6 +21,7 @@ public class CustomRestTemplate extends RestTemplate {
 
     public CustomRestTemplate(RestTemplateBuilder builder) {
         super(builder.build().getRequestFactory());
+
     }
 
     @Override
@@ -39,6 +42,9 @@ public class CustomRestTemplate extends RestTemplate {
 
             // Log the status and headers for debugging purposes
             //logResponseStatus(method, url, response);
+            // Log response status for debugging
+            System.out.println("Response Status: " + response.getStatusCode());
+            System.out.println("Response Body: " + StreamUtils.copyToString(response.getBody(), StandardCharsets.UTF_8));
 
             // Directly return the response without throwing exceptions for error codes
             return (responseExtractor != null ? responseExtractor.extractData(response) : null);
