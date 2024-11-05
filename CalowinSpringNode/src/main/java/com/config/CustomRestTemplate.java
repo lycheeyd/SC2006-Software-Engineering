@@ -21,6 +21,7 @@ public class CustomRestTemplate extends RestTemplate {
 
     public CustomRestTemplate(RestTemplateBuilder builder) {
         super(builder.build().getRequestFactory());
+        this.setErrorHandler(new CustomResponseErrorHandler());
 
     }
 
