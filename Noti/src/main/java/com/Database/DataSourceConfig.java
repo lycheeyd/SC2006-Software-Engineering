@@ -16,21 +16,9 @@ import javax.sql.DataSource;
 public class DataSourceConfig {
 
     @Autowired
-    private CalowinSecureDBProperties calowinSecureDBProperties;
-
-    @Autowired
     private CalowinDBProperties calowinDBProperties;
 
-    @Bean(name = "calowinSecureDBDataSource")
-    public DataSource calowinSecureDBDataSource() {
-        AtomikosDataSourceBean ds = new AtomikosDataSourceBean();
-        ds.setUniqueResourceName("calowinSecureDBDataSource");
-        ds.setXaDataSourceClassName(calowinSecureDBProperties.getXaDataSourceClass());
-        ds.setXaProperties(calowinSecureDBProperties.toXaProperties());
-        ds.setMinPoolSize(calowinSecureDBProperties.getMinPoolSize());
-        ds.setMaxPoolSize(calowinSecureDBProperties.getMaxPoolSize());
-        return ds;
-    }
+    
 
     @Bean(name = "calowinDBDataSource")
     public DataSource calowinDBDataSource() {

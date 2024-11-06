@@ -1,4 +1,4 @@
-package main.java.com.Relationship.Managers;
+package com.Relationship.Managers;
 
 import org.springframework.stereotype.Service;
 import com.Database.CalowinDB.FriendRelationshipRepository;

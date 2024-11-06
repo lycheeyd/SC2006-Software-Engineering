@@ -1,4 +1,4 @@
-package main.java.com.Relationship.Entity;
+package com.Relationship.Entity;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
