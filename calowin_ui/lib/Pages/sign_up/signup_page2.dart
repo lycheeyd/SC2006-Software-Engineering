@@ -1,6 +1,7 @@
 import 'package:calowin/common/custom_scaffold.dart';
 import 'package:calowin/common/input_field.dart';
 import 'package:calowin/common/colors_and_fonts.dart';
+import 'package:calowin/common/user_profile.dart';
 import 'package:calowin/control/page_navigator.dart';
 import 'package:calowin/common/AES_Encryptor.dart';
 import 'package:flutter/material.dart';
@@ -88,12 +89,14 @@ class _SignupPage2State extends State<SignupPage2> {
         if (response.statusCode == 201) {
           // Signup successful
           _showSuccessDialog("Signup successful! Welcome to CaloWin!");
-
+          print(response.body);
+          final Map<String, dynamic> responseData = jsonDecode(response.body);
+          final loginResponse = UserProfile.fromJson(responseData);
           // Navigate to the next page
           Navigator.of(context).push(
             PageRouteBuilder(
               pageBuilder: (context, animation, secondaryAnimation) =>
-                  const PageNavigator(),
+                  PageNavigator(profile: loginResponse),
               transitionsBuilder: (context, animation, secondaryAnimation, child) {
                 return child; // No custom transition
               },

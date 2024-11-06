@@ -62,6 +62,13 @@ public class AccountController extends HttpReqController{
         try {
             String url = urlPrefix + "/account/login";
             return restTemplate.postForEntity(url, DTO, Map.class);
+        } catch (HttpClientErrorException ex) {
+            HttpStatusCode statusCode = ex.getStatusCode();
+            if (statusCode == HttpStatus.UNAUTHORIZED) {
+                return ResponseEntity.status(statusCode).body("Invalid email or password");
+            } else {
+                return ResponseEntity.status(statusCode).body(statusCode + ex.getMessage());
+            }
         } catch (Exception ex)  {
             System.out.println(ex);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + ex.getMessage());
@@ -104,18 +111,32 @@ public class AccountController extends HttpReqController{
         try {
             String url = urlPrefix + "/account/change-password";
             return restTemplate.postForEntity(url, DTO, String.class);
+        } catch (HttpClientErrorException ex) {
+            HttpStatusCode statusCode = ex.getStatusCode();
+            if (statusCode == HttpStatus.UNAUTHORIZED) {
+                return ResponseEntity.status(statusCode).body("Incorrect password.");
+            } else {
+                return ResponseEntity.status(statusCode).body(statusCode + ex.getMessage());
+            }
         } catch (Exception ex)  {
             System.out.println(ex);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + ex.getMessage());
         }
     }
 
-    @PostMapping("/forget-password")
-    public ResponseEntity<?> forgetPassword(@RequestBody ForgotPasswordDTO DTO) {
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordDTO DTO) {
         // Forward forget password request to AccountModule
         try {
-            String url = urlPrefix + "/account/forget-password";
+            String url = urlPrefix + "/account/forgot-password";
             return restTemplate.postForEntity(url, DTO, String.class);
+        } catch (HttpClientErrorException ex) {
+            HttpStatusCode statusCode = ex.getStatusCode();
+            if (statusCode == HttpStatus.UNAUTHORIZED) {
+                return ResponseEntity.status(statusCode).body("Invalid OTP");
+            } else {
+                return ResponseEntity.status(statusCode).body(statusCode + ex.getMessage());
+            }
         } catch (Exception ex)  {
             System.out.println(ex);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + ex.getMessage());
@@ -128,6 +149,13 @@ public class AccountController extends HttpReqController{
         try {
             String url = urlPrefix + "/account/edit-profile";
             return restTemplate.postForEntity(url, DTO, Map.class);
+        } catch (HttpClientErrorException ex) {
+            HttpStatusCode statusCode = ex.getStatusCode();
+            if (statusCode == HttpStatus.BAD_REQUEST) {
+                return ResponseEntity.status(statusCode).body(ex.getMessage());
+            } else {
+                return ResponseEntity.status(statusCode).body(statusCode + ex.getMessage());
+            }
         } catch (Exception ex)  {
             System.out.println(ex);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + ex.getMessage());
@@ -140,6 +168,13 @@ public class AccountController extends HttpReqController{
         try {
             String url = urlPrefix + "/account/delete-account";
             return restTemplate.postForEntity(url, DTO, String.class);
+        } catch (HttpClientErrorException ex) {
+            HttpStatusCode statusCode = ex.getStatusCode();
+            if (statusCode == HttpStatus.UNAUTHORIZED) {
+                return ResponseEntity.status(statusCode).body("Invalid OTP");
+            } else {
+                return ResponseEntity.status(statusCode).body(statusCode + ex.getMessage());
+            }
         } catch (Exception ex)  {
             System.out.println(ex);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + ex.getMessage());

@@ -4,10 +4,25 @@
 <dict>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+	<!-- This region is added for location purpose -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>We need access to your location to show it on the map.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>We need access to your location to show it on the map.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>We need access to your location to show it on the map.</string>
+	<key>GMSApiKey</key>
+	<string></string>
+	<!-- End location purpose region -->
+
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
 	<string>Calowin</string>
+	<key>io.flutter.embedded_views_preview</key>
+	<true/>
+	<key>GMSApiKey</key>
+	<string></string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>

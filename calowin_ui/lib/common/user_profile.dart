@@ -1,23 +1,23 @@
 class UserProfile {
-  late final String _name;
-  late final String? _email;
-  late final String _userID;
-  late String _bio;
-  late int _weight;
-  late int _carbonSaved;
-  late int _calorieBurn;
-  late List<String> _badges;
+  late String _name;
+  late String? _email;
+  late String _userID;
+  late String? _bio;
+  late double? _weight;
+  late int? _carbonSaved;
+  late int? _calorieBurn;
+  late List<String>? _badges;
 
   // Constructor
   UserProfile({
     required String name,
     String? email,
     required String userID,
-    required String bio,
-    required int weight,
-    required int carbonSaved,
-    required int calorieBurn,
-    required List<String> badges,
+    String? bio,
+    double? weight,
+    int? carbonSaved,
+    int? calorieBurn,
+    List<String>? badges,
   }) {
     _name = name;
     _email = email;
@@ -29,45 +29,35 @@ class UserProfile {
     _badges = badges;
   }
 
+  // Factory constructor for deserialization from LoginResponseDTO
+  factory UserProfile.fromJson(Map<String, dynamic> json) {
+    return UserProfile(
+      name: json['name'] as String,
+      email: json['email'] as String?,
+      userID: json['userID'] as String,
+      bio: json['bio'] as String?,
+      weight: (json['weight'] as num?)?.toDouble(),  // Convert to int if available
+      // Other fields like _carbonSaved, _calorieBurn, and _badges can remain null
+      // or be set later as they are not part of LoginResponseDTO
+    );
+  }
+
   // Getters
-  String getName() {
-    return _name;
-  }
-
-  String? getEmail() {
-    return _email;
-  }
-
-  String getUserID() {
-    return _userID;
-  }
-
-  String getBio() {
-    return _bio;
-  }
-
-  int getWeight() {
-    return _weight;
-  }
-
-  int getCarbonSaved() {
-    return _carbonSaved;
-  }
-
-  int getCalorieBurn() {
-    return _calorieBurn;
-  }
-
-  List<String> getBadges() {
-    return _badges;
-  }
+  String getName() => _name;
+  String? getEmail() => _email;
+  String getUserID() => _userID;
+  String getBio() => _bio ?? "";
+  double getWeight() => _weight ?? 0;
+  int getCarbonSaved() => _carbonSaved ?? 0;
+  int getCalorieBurn() => _calorieBurn ?? 0;
+  List<String> getBadges() => _badges ?? [];
 
   // Setters
   void setBio(String bio) {
     _bio = bio;
   }
 
-  void setWeight(int weight) {
+  void setWeight(double weight) {
     _weight = weight;
   }
 

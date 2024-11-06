@@ -7,7 +7,12 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.Account.Entities.ProfileEntity;
 import com.Account.Managers.AccountManagementService;
@@ -72,7 +77,7 @@ public class HttpReqController {
             Map<String, Object> response = new HashMap<>();
             response.put("message", "Login successful");
             response.put("UserObject", responseDTO);
-            
+            System.out.println(response);
             return ResponseEntity.ok(response);
 
         } catch (RuntimeException e) {
@@ -133,11 +138,11 @@ public class HttpReqController {
 
     }
 
-    @PostMapping("/forget-password")
-    public ResponseEntity<?> forgetPassword(@RequestBody ForgotPasswordDTO forgotPasswordDTO) {
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordDTO forgotPasswordDTO) {
         // Forget password logic
         try {
-            passwordManagementService.forgotPassword(forgotPasswordDTO.getEmail(), forgotPasswordDTO.getOtCode());
+            passwordManagementService.forgotPassword(forgotPasswordDTO.getEmail(), forgotPasswordDTO.getOtpCode());
 
             return ResponseEntity.ok("New password is sent to your email");
 
@@ -163,7 +168,7 @@ public class HttpReqController {
 
         } catch (RuntimeException e) {
             // Return unauthorized error for invalid credentials
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
             // Handle other exceptions
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + e.getMessage());
@@ -187,7 +192,7 @@ public class HttpReqController {
 
     }
 
-    @GetMapping("/view-profile/{userID}")
+    @GetMapping("/view-profile/{selfID}/{otherID}")
     public ResponseEntity<?> viewProfile(@PathVariable String userID) {
         // View account logic
         try {

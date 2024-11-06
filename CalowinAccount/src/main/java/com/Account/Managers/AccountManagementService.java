@@ -8,8 +8,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.Account.Entities.ActionType;
 import com.Account.Entities.ProfileEntity;
 import com.Account.Entities.UserEntity;
+import com.Account.Services.OTPService;
 import com.Account.Services.PasswordSecurityService;
 import com.DataTransferObject.LoginResponseDTO;
 import com.Database.CalowinDB.UserInfoRepository;
@@ -41,6 +43,9 @@ public class AccountManagementService {
     @Autowired
     private PasswordSecurityService passwordSecurityService;
 
+    @Autowired
+    private OTPService otpService;
+
     @Value("${aes.secret-key}")
     private String SECRET_KEY;
 
@@ -62,7 +67,7 @@ public class AccountManagementService {
         String userID = generateUniqueUserId();
 
         // Create and store user credentials in database (CALOWIN_SECURE)
-        UserEntity user = new UserEntity(userID, email, passwordEncoder.encode(encryptedConfirmPassword));
+        UserEntity user = new UserEntity(userID, email, passwordEncoder.encode(decryptedConfirmPassword));
         calowinSecureDBRepository.save(user);
 
         // Create and store user info in database (CALOWIN)
@@ -86,7 +91,7 @@ public class AccountManagementService {
         }
 
         ProfileEntity profile = calowinDBRepository.findByUserID(user.getUserID())
-        .orElseThrow(() -> new RuntimeException("Failed to retrieve userdata"));;
+        .orElseThrow(() -> new Exception("Failed to retrieve userdata"));
 
         return new LoginResponseDTO(user.getUserID(), user.getEmail(), profile.getName(), profile.getWeight(), profile.getBio());
     
@@ -96,11 +101,9 @@ public class AccountManagementService {
     @Transactional // (transactionManager = "CalowinSecureDBTransactionManager")
     public void deleteAccount(String userID, String email, String otpCode) throws Exception {
         // Authenticate OTP
-        /*
-        if (!otpService.verifyOTP(email, otpCode)) {
+        if (!otpService.verifyOTP(email, otpCode, ActionType.DELETE_ACCOUNT)) {
             throw new RuntimeException("Invalid OTP");
         }
-        */
 
         // Delete from CalowinSecureDB
         calowinSecureDBRepository.deleteByUserID(userID); //UserEntity

@@ -1,12 +1,15 @@
 import 'package:calowin/common/colors_and_fonts.dart';
+import 'package:calowin/control/current_location.dart';
 import 'package:calowin/control/page_navigator.dart';
 import 'package:calowin/control/park_retriever.dart';
 import 'package:calowin/control/weather_retriever.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'dart:async';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+
+//default address 1.3521,103.8198
 class WellnessZonePage extends StatefulWidget {
   const WellnessZonePage({super.key});
 
@@ -15,15 +18,19 @@ class WellnessZonePage extends StatefulWidget {
 }
 
 class _WellnessZonePageState extends State<WellnessZonePage> {
-  //to be retrieved
-  final double _userLat = 1.385170;
-  final double _userLon = 103.79615;
+  //for locations
+  CurrentLocation _userCurrentLocation = CurrentLocation();
+  late GoogleMapController _mapController;
+
+  //for maps
+  Marker? _selectedLocationMarker;
+  Marker? _currentLocationMarker;
 
   //private variables
   int _currentIndex = -1;
   final double _sliderMin = 1;
   final double _sliderMax = 20;
-  late Icon _weatherIcon;
+  late Icon _weatherIcon = Icon(Icons.help_outline, color: Colors.grey.shade300);
   late String _weatherForecast = "Loading";
   double _sliderValue = 5;
   final ParkRetriever _parkRetriever = ParkRetriever();
@@ -35,6 +42,38 @@ class _WellnessZonePageState extends State<WellnessZonePage> {
   List<Park> _wellnessZones = [];
   List<Park> _filteredZones = [];
 
+
+  //functions for GoogleMap
+  void _onMapCreated(GoogleMapController controller) {
+    _mapController = controller;
+  }
+
+  Future<void> _setUserLocation() async {
+    try {
+      await _userCurrentLocation.getCurrentLocation();
+      //print("User location: ${_userCurrentLocation.name} Lat: ${_userCurrentLocation.latitude} Long: ${_userCurrentLocation.longitude}");
+      setState(() {
+        _currentLocationMarker = Marker(
+          markerId: MarkerId('currentLocation'),
+          position: LatLng(_userCurrentLocation.latitude ?? 0, _userCurrentLocation.longitude ?? 0),
+          infoWindow: InfoWindow(title: 'Current Location'),
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen), // Set the color
+        );
+      });
+
+        _mapController.animateCamera(
+          CameraUpdate.newLatLngZoom(
+            LatLng(_userCurrentLocation.latitude ?? 0, _userCurrentLocation.longitude ?? 0),
+            15,
+          ),
+        );
+      
+      _retrieveWellnessZones();
+    } catch (e) {
+      print('Error initializing location: $e');
+    }
+  }
+
   void _retrieveWellnessZones() async {
     //enable loading screen
     setState(() {
@@ -43,8 +82,92 @@ class _WellnessZonePageState extends State<WellnessZonePage> {
       _loading = true;
     });
 
-    //await Future.delayed(const Duration(seconds: 5));
-    _wellnessZones = await _parkRetriever.retrievePark(_userLat, _userLon);
+    // uncomment when the server can run
+    _wellnessZones = await _parkRetriever.retrievePark(_userCurrentLocation.latitude ?? 1.3521, _userCurrentLocation.longitude ?? 103.8198);
+
+    //for testing purposes
+//     _wellnessZones =[
+//   Park(
+//     name: "East Coast Park",
+//     distance: 5.2,
+//     closestPoint: {
+//       "Lat": 1.3012,
+//       "Lon": 103.9123,
+//     },
+//   ),
+//   Park(
+//     name: "MacRitchie Reservoir Park",
+//     distance: 8.1,
+//     closestPoint: {
+//       "Lat": 1.3427,
+//       "Lon": 103.8205,
+//     },
+//   ),
+//   Park(
+//     name: "Bishan-Ang Mo Kio Park",
+//     distance: 6.5,
+//     closestPoint: {
+//       "Lat": 1.3725,
+//       "Lon": 103.8446,
+//     },
+//   ),
+//   Park(
+//     name: "Gardens by the Bay",
+//     distance: 4.0,
+//     closestPoint: {
+//       "Lat": 1.2816,
+//       "Lon": 103.8636,
+//     },
+//   ),
+//   Park(
+//     name: "Bukit Timah Nature Reserve",
+//     distance: 10.3,
+//     closestPoint: {
+//       "Lat": 1.3483,
+//       "Lon": 103.7767,
+//     },
+//   ),
+//   Park(
+//     name: "Singapore Botanic Gardens",
+//     distance: 3.7,
+//     closestPoint: {
+//       "Lat": 1.3138,
+//       "Lon": 103.8159,
+//     },
+//   ),
+//   Park(
+//     name: "Fort Canning Park",
+//     distance: 2.5,
+//     closestPoint: {
+//       "Lat": 1.2956,
+//       "Lon": 103.8454,
+//     },
+//   ),
+//   Park(
+//     name: "Pasir Ris Park",
+//     distance: 12.0,
+//     closestPoint: {
+//       "Lat": 1.3837,
+//       "Lon": 103.9465,
+//     },
+//   ),
+//   Park(
+//     name: "Sembawang Park",
+//     distance: 15.0,
+//     closestPoint: {
+//       "Lat": 1.4581,
+//       "Lon": 103.8262,
+//     },
+//   ),
+//   Park(
+//     name: "Labrador Nature Reserve",
+//     distance: 7.0,
+//     closestPoint: {
+//       "Lat": 1.2686,
+//       "Lon": 103.8029,
+//     },
+//   ),
+// ];
 
     //disable loading screen after finished loading
     setState(() {
@@ -86,7 +209,7 @@ class _WellnessZonePageState extends State<WellnessZonePage> {
         icon = const Icon(Icons.cloud, color: Colors.blueGrey);
 
       case 'Cloudy':
-        icon =  Icon(Icons.cloud, color: Colors.grey.shade700);
+        icon =  Icon(Icons.cloud, color: Colors.grey.shade300);
 
       case 'Hazy':
       case 'Slightly Hazy':
@@ -97,7 +220,7 @@ class _WellnessZonePageState extends State<WellnessZonePage> {
 
       case 'Mist':
       case 'Fog':
-        icon =  Icon(Icons.blur_on, color: Colors.grey.shade700);
+        icon =  Icon(Icons.blur_on, color: Colors.grey.shade300);
 
       case 'Light Rain':
       case 'Moderate Rain':
@@ -116,7 +239,7 @@ class _WellnessZonePageState extends State<WellnessZonePage> {
         icon = const Icon(Icons.flash_on, color: Colors.purple);
 
       default:
-        icon =  Icon(Icons.help_outline, color: Colors.grey.shade700);
+        icon =  Icon(Icons.help_outline, color: Colors.grey.shade300);
     }
 
     setState(() {
@@ -140,10 +263,24 @@ class _WellnessZonePageState extends State<WellnessZonePage> {
       if (_currentIndex == index) {
         _showWeather = false;
         _currentIndex = -1;
+        _selectedLocationMarker = null;
       } else {
         _currentIndex = index;
         _showWeather = true;
         _selectedPark = selectedPark;
+        _selectedLocationMarker = lat!=null && lon!=null ? Marker(
+          markerId: MarkerId('SelectedLocation'),
+          position: LatLng(lat, lon),
+          infoWindow: InfoWindow(title: 'Selected Location'),
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed), // Set the color
+        ) : null;
+
+        _mapController.animateCamera(
+          CameraUpdate.newLatLngZoom(
+            LatLng(lat ??_userCurrentLocation.latitude ?? 0, lon ?? _userCurrentLocation.longitude ?? 0),
+            12,
+          ),
+        );
       }
     });
     if (lat == null || lon == null) {
@@ -156,12 +293,12 @@ class _WellnessZonePageState extends State<WellnessZonePage> {
     }
   }
 
-  void _handleGO() {
+  void _handleGO(Park zone) {
     final pageNavigatorState =
         context.findAncestorStateOfType<PageNavigatorState>();
     //change here
     if (pageNavigatorState != null) {
-      pageNavigatorState.navigateToPage(0); // Navigate to AddFriendsPage
+      pageNavigatorState.navigateToPage(0,params: {'targetName': zone.name , 'targetLat':zone.closestPoint['Lat'], 'targetLong':zone.closestPoint['Lon']}); // Navigate to AddFriendsPage
     }
   }
 
@@ -206,7 +343,7 @@ class _WellnessZonePageState extends State<WellnessZonePage> {
                   width: 60,
                   height: 30,
                   child: ElevatedButton(
-                      onPressed: _handleGO,
+                      onPressed: () => _handleGO(zone),
                       style: ElevatedButton.styleFrom(
                         elevation: 0,
                         backgroundColor: Colors.purple,
@@ -236,7 +373,7 @@ class _WellnessZonePageState extends State<WellnessZonePage> {
   @override
   void initState() {
     super.initState();
-    _retrieveWellnessZones();
+    _setUserLocation();
   }
 
   @override
@@ -247,15 +384,23 @@ class _WellnessZonePageState extends State<WellnessZonePage> {
         children: [
           SizedBox(
             height: 400,
-            width: 400,
             child: Stack(
               children: [
-                Container(
-                  color: const Color.fromARGB(255, 138, 218, 255),
-                  height: 400,
-                  width: 400,
-                  child: const Center(child: Text("<Insert Map Here>")),
-                ),
+                  GoogleMap(
+                      onMapCreated: _onMapCreated,
+                      initialCameraPosition: CameraPosition(
+                        target: LatLng(_userCurrentLocation.latitude ?? 1.3521, _userCurrentLocation.longitude ?? 103.8198),
+                        zoom: 10,
+                      ),
+                      myLocationButtonEnabled: false,
+                      myLocationEnabled: true,
+                      liteModeEnabled: false,
+                      mapType: MapType.terrain,
+                      markers: {
+                        if (_currentLocationMarker != null) _currentLocationMarker!,
+                        if (_selectedLocationMarker != null) _selectedLocationMarker!,
+                      },
+                    ),
                 if (!_showWeather)
                   Padding(
                     padding:
@@ -264,7 +409,7 @@ class _WellnessZonePageState extends State<WellnessZonePage> {
                       alignment: Alignment.bottomCenter,
                       child: Container(
                         decoration: BoxDecoration(
-                            color: const Color.fromARGB(50, 0, 0, 0),
+                            color: const Color.fromARGB(150, 0, 0, 0),
                             borderRadius: BorderRadius.circular(10)),
                         height: 45,
                         width: 300,
@@ -338,7 +483,7 @@ class _WellnessZonePageState extends State<WellnessZonePage> {
                         width: 270,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
-                          color: const Color.fromARGB(50, 0, 0, 0),
+                          color: const Color.fromARGB(150, 0, 0, 0),
                         ),
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
@@ -397,7 +542,6 @@ class _WellnessZonePageState extends State<WellnessZonePage> {
           Container(
             color: PrimaryColors.grey,
             height: 40,
-            width: 400,
             child: Stack(
               children: [
                 // Use Expanded to take all the available space for the text
@@ -412,7 +556,7 @@ class _WellnessZonePageState extends State<WellnessZonePage> {
                   alignment: Alignment.centerRight,
                   child: IconButton(
                     iconSize: 20,
-                    onPressed: _retrieveWellnessZones,
+                    onPressed: _setUserLocation,
                     icon: const Icon(
                       Icons.refresh,
                       color: Colors.black,

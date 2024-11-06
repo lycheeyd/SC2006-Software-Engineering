@@ -6,7 +6,8 @@ import 'package:calowin/control/words2widget_converter.dart';
 import 'package:flutter/material.dart';
 
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key});
+  final UserProfile profile;
+  const ProfilePage({super.key,required this.profile});
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -20,19 +21,11 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
-    getUserProfile();
+    getUserProfile(widget.profile);
   }
 
-  void getUserProfile() {
-    _profile = UserProfile(
-        name: "Eric Koh",
-        email: "Eric123@gmail.com",
-        userID: "#044612",
-        bio: "012345678901234567890123456789",
-        weight: 80,
-        carbonSaved: 4000,
-        calorieBurn: 2300,
-        badges: ["CalorieGold", "EcoBronze"]);
+  void getUserProfile(UserProfile profile) {
+    _profile = profile;
     for (int i = 0; i < _profile.getBadges().length; i++) {
       if (Words2widgetConverter.convert(_profile.getBadges()[i]) != null) {
         _badges.add(Words2widgetConverter.convert(_profile.getBadges()[i]));
@@ -40,12 +33,20 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  void _handleEditProfile() {
-    Navigator.push(context,
-        MaterialPageRoute(builder: (context) => const EditprofilePage()));
+  Future<void> _handleEditProfile() async {
+    final updatedProfile = await Navigator.push<UserProfile>(context,
+        MaterialPageRoute(builder: (context) => EditprofilePage(profile: _profile)));
+      
+    if (updatedProfile != null) {
+      setState(() {
+        _profile = updatedProfile;
+      });
+    }
   }
 
-  void _handleLogOut() {}
+  void _handleLogOut() {
+    Navigator.pop(context);
+  }
 
   Widget fieldBuilder(String title, String content) {
     return SizedBox(

@@ -267,7 +267,7 @@ class _SignupPageState extends State<SignupPage> {
                       fontSize: 10,
                       fontWeight: FontWeight.bold),
                 ),
-                const SizedBox(height: 30),
+                const SizedBox(height: 18),
 
                 // Input fields
                 InputField(
@@ -293,7 +293,7 @@ class _SignupPageState extends State<SignupPage> {
                       ),
                     ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 18),
 
                 InputField(
                   obscureText: true,
@@ -320,7 +320,7 @@ class _SignupPageState extends State<SignupPage> {
                       ),
                     ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 18),
 
                 InputField(
                   obscureText: true,

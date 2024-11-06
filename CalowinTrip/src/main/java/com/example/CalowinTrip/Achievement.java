@@ -7,9 +7,16 @@ public class Achievement {
     private String carbonSavedMedal;
     private String calorieBurntMedal;
 
-    private final int BRONZE_THRESHOLD = 1000;
-    private final int SILVER_THRESHOLD = 5000;
-    private final int GOLD_THRESHOLD = 10000;
+    // Separate thresholds for carbon and calorie medals
+    private final int CARBON_BRONZE_THRESHOLD = 1000;
+    private final int CARBON_SILVER_THRESHOLD = 5000;
+    private final int CARBON_GOLD_THRESHOLD = 10000;
+    private final int CARBON_PLATINUM_THRESHOLD = 15000;
+
+    private final int CALORIE_BRONZE_THRESHOLD = 1000;
+    private final int CALORIE_SILVER_THRESHOLD = 5000;
+    private final int CALORIE_GOLD_THRESHOLD = 10000;
+    private final int CALORIE_PLATINUM_THRESHOLD = 15000;
 
     public Achievement() {
         this.totalCarbonSavedExp = 0; // Default value
@@ -27,18 +34,35 @@ public class Achievement {
 
     // Method to check and update medal status
     private void updateMedalStatus() {
-        this.carbonSavedMedal = calculateMedal(totalCarbonSavedExp);
-        this.calorieBurntMedal = calculateMedal(totalCalorieBurntExp);
+        this.carbonSavedMedal = calculateCarbonMedal(totalCarbonSavedExp);
+        this.calorieBurntMedal = calculateCalorieMedal(totalCalorieBurntExp);
     }
 
-    // Helper method to calculate medal based on experience
-    private String calculateMedal(int exp) {
-        if (exp >= GOLD_THRESHOLD) {
-            return "Gold";
-        } else if (exp >= SILVER_THRESHOLD) {
-            return "Silver";
-        } else if (exp >= BRONZE_THRESHOLD) {
-            return "Bronze";
+     // Helper method to calculate carbon medal based on experience
+     private String calculateCarbonMedal(int exp) {
+        if (exp >= CARBON_PLATINUM_THRESHOLD) {
+            return "CarbonPlatinum";
+        } else if (exp >= CARBON_GOLD_THRESHOLD) {
+            return "CarbonGold";
+        } else if (exp >= CARBON_SILVER_THRESHOLD) {
+            return "CarbonSilver";
+        } else if (exp >= CARBON_BRONZE_THRESHOLD) {
+            return "CarbonBronze";
+        } else {
+            return "No Medal";
+        }
+    }
+
+    // Helper method to calculate calorie medal based on experience
+    private String calculateCalorieMedal(int exp) {
+        if (exp >= CALORIE_PLATINUM_THRESHOLD) {
+            return "CaloriePlatinum";
+        } else if (exp >= CALORIE_GOLD_THRESHOLD) {
+            return "CalorieGold";
+        } else if (exp >= CALORIE_SILVER_THRESHOLD) {
+            return "CalorieSilver";
+        } else if (exp >= CALORIE_BRONZE_THRESHOLD) {
+            return "CalorieBronze";
         } else {
             return "No Medal";
         }
@@ -46,43 +70,70 @@ public class Achievement {
 
     // New methods to calculate points needed for the next medal
     public int pointsToNextCarbonBronze() {
-        return BRONZE_THRESHOLD - totalCarbonSavedExp > 0 ? BRONZE_THRESHOLD - totalCarbonSavedExp : 0;
+        return CARBON_BRONZE_THRESHOLD - totalCarbonSavedExp > 0 ? CARBON_BRONZE_THRESHOLD - totalCarbonSavedExp : 0;
     }
 
     public int pointsToNextCarbonSilver() {
-        return SILVER_THRESHOLD - totalCarbonSavedExp > 0 ? SILVER_THRESHOLD - totalCarbonSavedExp : 0;
+        return CARBON_SILVER_THRESHOLD - totalCarbonSavedExp > 0 ? CARBON_SILVER_THRESHOLD - totalCarbonSavedExp : 0;
     }
 
     public int pointsToNextCarbonGold() {
-        return GOLD_THRESHOLD - totalCarbonSavedExp > 0 ? GOLD_THRESHOLD - totalCarbonSavedExp : 0;
+        return CARBON_GOLD_THRESHOLD - totalCarbonSavedExp > 0 ?  CARBON_GOLD_THRESHOLD - totalCarbonSavedExp : 0;
+    }
+
+    public int pointsToNextCarbonPlatinum() {
+        return CARBON_PLATINUM_THRESHOLD - totalCarbonSavedExp > 0 ? CARBON_PLATINUM_THRESHOLD - totalCarbonSavedExp : 0;
+
     }
 
     public int pointsToNextCalorieBronze() {
-        return BRONZE_THRESHOLD - totalCalorieBurntExp > 0 ? BRONZE_THRESHOLD - totalCalorieBurntExp : 0;
+        return CALORIE_BRONZE_THRESHOLD - totalCalorieBurntExp > 0 ? CALORIE_BRONZE_THRESHOLD - totalCalorieBurntExp : 0;
     }
 
     public int pointsToNextCalorieSilver() {
-        return SILVER_THRESHOLD - totalCalorieBurntExp > 0 ? SILVER_THRESHOLD - totalCalorieBurntExp : 0;
+        return CALORIE_SILVER_THRESHOLD - totalCalorieBurntExp > 0 ? CALORIE_SILVER_THRESHOLD - totalCalorieBurntExp : 0;
     }
 
     public int pointsToNextCalorieGold() {
-        return GOLD_THRESHOLD - totalCalorieBurntExp > 0 ? GOLD_THRESHOLD - totalCalorieBurntExp : 0;
+        return CALORIE_GOLD_THRESHOLD - totalCalorieBurntExp > 0 ? CALORIE_GOLD_THRESHOLD - totalCalorieBurntExp : 0;
     }
 
-    // Getters for thresholds
-    public final int BronzeThreshold() {
-        return BRONZE_THRESHOLD;
+    public int pointsToNextCaloriePlatinum() {
+        return CALORIE_PLATINUM_THRESHOLD - totalCalorieBurntExp > 0 ? CALORIE_PLATINUM_THRESHOLD - totalCalorieBurntExp : 0;
+
     }
 
-    public final int SilverThreshold() {
-        return SILVER_THRESHOLD;
+    public int getCarbonBronzeThreshold() {
+        return CARBON_BRONZE_THRESHOLD;
     }
 
-    public final int GoldThreshold() {
-        return GOLD_THRESHOLD;
+    public int getCarbonSilverThreshold() {
+        return CARBON_SILVER_THRESHOLD;
     }
 
+    public int getCarbonGoldThreshold() {
+        return CARBON_GOLD_THRESHOLD;
+    }
 
+    public int getCarbonPlatinumThreshold() {
+        return CARBON_PLATINUM_THRESHOLD;
+    }
+
+    public int getCalorieBronzeThreshold() {
+        return CALORIE_BRONZE_THRESHOLD;
+    }
+
+    public int getCalorieSilverThreshold() {
+        return CALORIE_SILVER_THRESHOLD;
+    }
+
+    public int getCalorieGoldThreshold() {
+        return CALORIE_GOLD_THRESHOLD;
+    }
+
+    public int getCaloriePlatinumThreshold() {
+        return CALORIE_PLATINUM_THRESHOLD;
+    }
 
     // Getters for the frontend to access medal statuses and experience points
     public int getTotalCarbonSavedExp() {
