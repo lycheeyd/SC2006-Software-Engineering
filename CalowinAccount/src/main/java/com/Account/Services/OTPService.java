@@ -1,4 +1,4 @@
-package com.Account;
+package com.Account.Services;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +7,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import com.Account.Entities.OTPEntity;
 import com.Database.CalowinSecureDB.OTPRepository;
 
 import java.time.LocalDateTime;

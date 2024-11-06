@@ -1,10 +1,12 @@
-package com.Account;
+package com.Account.Managers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import com.Account.Entities.ProfileEntity;
+import com.Account.Entities.UserStatusEnum;
 import com.DataTransferObject.ViewProfileResponseDTO;
 import com.Database.CalowinDB.CalowinDBRepository;
 

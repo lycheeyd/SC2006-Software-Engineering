@@ -9,6 +9,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.Account.Entities.ProfileEntity;
+import com.Account.Managers.AccountManagementService;
+import com.Account.Managers.PasswordManagementService;
+import com.Account.Managers.ProfileManagementService;
+import com.Account.Services.OTPService;
 import com.DataTransferObject.ChangePasswordDTO;
 import com.DataTransferObject.DeleteAccountDTO;
 import com.DataTransferObject.EditProfileDTO;

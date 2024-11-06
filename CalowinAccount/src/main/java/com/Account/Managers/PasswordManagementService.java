@@ -1,4 +1,4 @@
-package com.Account;
+package com.Account.Managers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -6,6 +6,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import com.Account.Entities.UserEntity;
 import com.Account.SecurityUtilities.Decryptor;
 import com.Account.SecurityUtilities.PasswordValidator;
 import com.Database.CalowinSecureDB.CalowinSecureDBRepository;

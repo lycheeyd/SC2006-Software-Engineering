@@ -10,8 +10,9 @@ import com.Account.Entities.UserEntity;
 
 @Repository
 @Primary
-public interface CalowinSecureDBRepository extends JpaRepository<UserEntity, String> {
+public interface SecureInfoDBRepository extends JpaRepository<UserEntity, String> {
     Optional<UserEntity> findByEmail(String email);
     Optional<UserEntity> findByUserID(String userID);
     boolean existsByUserID(String userID);
+    void deleteByUserID(String userID);
 }
