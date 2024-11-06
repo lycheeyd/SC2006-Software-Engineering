@@ -12,7 +12,7 @@ class DualbuttonDialog extends StatelessWidget {
     required this.title,
     required this.content,
     required this.onConfirm,
-    required this.onCancel,
+    required this.onCancel, required String subtitle,
   });
 
   @override
