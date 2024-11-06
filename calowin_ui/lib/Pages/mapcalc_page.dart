@@ -507,7 +507,8 @@ List<LatLng> _decodePolyline(String polyline) {
                 child: Stack(
                   children: [
                     GoogleMap(
-                      myLocationButtonEnabled: false,
+                      myLocationEnabled: true,
+                      myLocationButtonEnabled: true,
                       mapType: MapType.terrain,
                       onMapCreated: _onMapCreated,
                       initialCameraPosition: CameraPosition(

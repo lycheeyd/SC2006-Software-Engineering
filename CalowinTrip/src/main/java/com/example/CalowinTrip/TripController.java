@@ -38,27 +38,27 @@ public class TripController {
         return Arrays.asList(TravelMethod.values());
     }
 
-    @PostMapping("/start")
-    public Trip startTrip(@RequestBody Trip trip) {
-        // Calculate the distance, calories burnt, and carbon saved
+            @PostMapping("/start")
+        public Trip startTrip(@RequestBody Trip trip) {
+            double distance = calculateDistance(trip.getCurrentLocation(), trip.getDestination());
 
-        double distance = calculateDistance(trip.getCurrentLocation(), trip.getDestination());
-        int caloriesBurned = calculateCalories(trip.getTravelMethod(), distance);
-        int carbonSaved = calculateCarbon(trip.getTravelMethod(), distance);
+            // Retrieve user weight from the database
+            double weight = getUserWeight(trip.getUserId());
 
-        // Set calculated values
-        trip.setCaloriesBurnt(caloriesBurned);
-        trip.setCarbonSaved(carbonSaved);
-        trip.setDistance(distance);
+            int caloriesBurned = calculateCalories(trip.getTravelMethod(), distance, weight);
+            int carbonSaved = calculateCarbon(trip.getTravelMethod(), distance);
 
-        achievementController.addTripMetrics(carbonSaved, caloriesBurned, trip); // Pass trip with userId
+            trip.setCaloriesBurnt(caloriesBurned);
+            trip.setCarbonSaved(carbonSaved);
+            trip.setDistance(distance);
 
+            achievementController.addTripMetrics(carbonSaved, caloriesBurned, trip);
 
-        // Insert trip data into the database
-        insertTripIntoDatabase(trip);
+            insertTripIntoDatabase(trip);
 
-        return trip;
-    }
+            return trip;
+        }
+
 
     private double calculateDistance(CurrentLocation userLocation, Location destination) {
         double earthRadius = 6371; // Radius of the Earth in kilometers
@@ -74,14 +74,14 @@ public class TripController {
         return earthRadius * c; // Distance in kilometers
     }
 
-    private int calculateCalories(TravelMethod method, double distance) {
+    private int calculateCalories(TravelMethod method, double distance, double weight) {
         switch (method) {
             case WALK:
-                return (int) (distance * 50); 
+                return (int) (distance * weight * 0.5); 
             case CYCLE:
-                return (int) (distance * 30); 
+                return (int) (distance * weight * 0.3); 
             case PUBLIC_TRANSPORT:
-                return (int) (distance * 10); 
+                return (int) (distance * weight * 0.1);
             case CAR:
                 return 0; // No calories burned while driving
             default:
@@ -184,4 +184,20 @@ public class TripController {
         }
         return false;
     }
+
+    private double getUserWeight(String userId) {
+        String query = "SELECT weight FROM UserInfo WHERE user_id = ?";
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, userId);
+            ResultSet rs = preparedStatement.executeQuery();
+            if (rs.next()) {
+                return rs.getDouble("weight"); // Retrieve the weight
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        throw new RuntimeException("User weight not found for userId: " + userId);
+    }
+    
 }
