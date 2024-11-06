@@ -8,8 +8,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.Account.Entities.ActionType;
 import com.Account.Entities.ProfileEntity;
 import com.Account.Entities.UserEntity;
+import com.Account.Services.OTPService;
 import com.Account.Services.PasswordSecurityService;
 import com.DataTransferObject.LoginResponseDTO;
 import com.Database.CalowinDB.UserInfoRepository;
@@ -40,6 +42,9 @@ public class AccountManagementService {
 
     @Autowired
     private PasswordSecurityService passwordSecurityService;
+
+    @Autowired
+    private OTPService otpService;
 
     @Value("${aes.secret-key}")
     private String SECRET_KEY;
@@ -96,11 +101,9 @@ public class AccountManagementService {
     @Transactional // (transactionManager = "CalowinSecureDBTransactionManager")
     public void deleteAccount(String userID, String email, String otpCode) throws Exception {
         // Authenticate OTP
-        /*
-        if (!otpService.verifyOTP(email, otpCode)) {
+        if (!otpService.verifyOTP(email, otpCode, ActionType.DELETE_ACCOUNT)) {
             throw new RuntimeException("Invalid OTP");
         }
-        */
 
         // Delete from CalowinSecureDB
         calowinSecureDBRepository.deleteByUserID(userID); //UserEntity

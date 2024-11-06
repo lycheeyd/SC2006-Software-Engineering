@@ -1,4 +1,5 @@
 import 'package:calowin/Pages/profile/changepassword_page.dart';
+import 'package:calowin/common/ActionType.dart';
 import 'package:calowin/common/custom_scaffold.dart';
 import 'package:calowin/common/input_dialog.dart';
 import 'package:calowin/common/user_profile.dart';
@@ -8,6 +9,8 @@ import 'package:calowin/common/colors_and_fonts.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:calowin/common/input_field.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class EditprofilePage extends StatefulWidget {
   final UserProfile profile;
@@ -21,6 +24,15 @@ class EditprofilePage extends StatefulWidget {
 class _EditprofilePageState extends State<EditprofilePage> {
   late UserProfile _profile;
 
+  @override
+  void initState() {
+    super.initState();
+    _profile = widget.profile;
+    _nameController.text = _profile.getName();
+    _weightController.text = _profile.getWeight().toString();
+    _bioController.text = _profile.getBio();
+  }
+
   //logic to be implemented
   final bool _invalidName = false;
   final bool _invalidWeight = false;
@@ -30,24 +42,178 @@ class _EditprofilePageState extends State<EditprofilePage> {
   final TextEditingController _weightController = TextEditingController();
   final TextEditingController _bioController = TextEditingController();
 
-  @override
-  void initState() {
-    super.initState();
-    _profile = widget.profile;
-    _nameController.text = _profile.getName();
-    _weightController.text = _profile.getWeight().toString();
+  String? _nameError;
+  String? _weightError;
+  String? _bioError;
+
+  void _checkName() {
+    setState(() {
+      if (_nameController.text.isEmpty) {
+        _nameError = "Name is required";
+      } else if (_nameController.text.length > 16) {
+        _nameError = "Name cannot exceed 16 characters";
+      } else {
+        _nameError = null;
+      }
+    });
   }
 
-  void _handleSaveChanges() {
-    Navigator.pop(context, _profile);
+  void _checkWeight() {
+    final weightPattern = r'^\d+(\.\d{1})?$';
+    setState(() {
+      if (_weightController.text.isEmpty) {
+        _weightError = "Weight is required";
+      } else if (!RegExp(weightPattern).hasMatch(_weightController.text)) {
+        _weightError = "Enter weight in kg (e.g., 70 or 70.5)";
+      } else {
+        _weightError = null;
+      }
+    });
+  }
+
+  void _checkBio() {
+    setState(() {
+      if (_bioController.text.isEmpty) {
+        _bioError = "Bio is required";
+      } else if (_bioController.text.length > 100) {
+        _bioError = "Bio cannot exceed 100 characters";
+      } else {
+        _bioError = null;
+      }
+    });
+  }
+
+  Future<void> _handleSaveChanges() async {
+    _checkName();
+    _checkWeight();
+    _checkBio();
+
+    if (_nameError == null &&
+        _weightError == null &&
+        _bioError == null) {
+
+      final String url = "http://172.21.146.188:8080/central/account/edit-profile";
+
+      try {
+        final response = await http.post(
+          Uri.parse(url),
+          headers: {"Content-Type": "application/json"},
+          body: json.encode({
+            "userID": _profile.getUserID(),
+            "name": _nameController.text,
+            "weight": _weightController.text,
+            "bio": _bioController.text,
+          }),
+        );
+
+        final responseMessage = response.body;
+
+        if (response.statusCode == 200) {
+          // Signup successful
+          _showSuccessDialog(responseMessage);
+
+        } else {
+          _showErrorDialog(responseMessage);
+        }
+      } catch (e) {
+        _showErrorDialog("Network error: ${e.toString()}");
+      }
+    }
+    Navigator.pop(context);
   }
 
   void _handleChangePassword() {
     Navigator.push(context,
-        MaterialPageRoute(builder: (context) => const ChangepasswordPage()));
+        MaterialPageRoute(builder: (context) => ChangepasswordPage(userID: _profile.getUserID())));
+  }
+  
+  Future<void> _sendOTP(String email) async {
+    try {
+      final response = await http.post(
+        Uri.parse('http://172.21.146.188:8080/central/account/send-otp'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'email': email, 'type': ActionType.DELETE_ACCOUNT.value}),
+      );
+
+      final responseMessage = response.body;
+
+      if (response.statusCode == 200) {
+        _showSuccessDialog(responseMessage);
+      } else {
+        _showErrorDialog(responseMessage);
+      }
+    } catch (e) {
+        _showErrorDialog('Error: ${e.toString()}');
+    }
   }
 
-  void _handleDeleteAccount(String otp) {}
+  Future<void> _handleDeleteAccount(String otpCode) async {
+    String email = _profile.getEmail() ?? "";
+    String userID = _profile.getUserID();
+
+    try {
+      _sendOTP(email);   
+    } catch (e) {
+      return;
+    }
+    
+    final String url = "http://172.21.146.188:8080/central/account/delete-account";
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'userID': userID, 'email': email, 'otpCode': otpCode}),
+      );
+
+      final responseMessage = response.body;
+
+      if (response.statusCode == 200) {
+        _showSuccessDialog(responseMessage);
+      } else {
+        _showErrorDialog(responseMessage);
+      }
+    } catch (e) {
+        _showErrorDialog('Error: ${e.toString()}');
+    }
+
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(message),
+          //content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showSuccessDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(message),
+        //content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -123,7 +289,7 @@ class _EditprofilePageState extends State<EditprofilePage> {
                           maxLines: 3, // Set the maximum number of lines
                           minLines: 1, // Set the minimum number of lines
                           decoration: const InputDecoration(
-                            labelText: "Maximum 100 characters",
+                            labelText: "Maximum 245 characters",
                             labelStyle: TextStyle(fontSize: 12),
                             border: InputBorder.none,
                           ),
@@ -224,8 +390,7 @@ class _EditprofilePageState extends State<EditprofilePage> {
                                               "An OTP has been sent to your email to confirm your identity",
                                           onConfirm: (inputText) {
                                             Navigator.of(context).pop();
-                                            return _handleDeleteAccount(
-                                                inputText);
+                                            _handleDeleteAccount(inputText);
                                           },
                                           onCancel: () {
                                             Navigator.of(context).pop();
