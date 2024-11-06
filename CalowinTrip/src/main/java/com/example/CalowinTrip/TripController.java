@@ -13,7 +13,9 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -58,6 +60,34 @@ public class TripController {
 
             return trip;
         }
+
+        @PostMapping("/retrieve-metrics")
+    public Map<String, Object> retrieveMetrics(@RequestBody Trip trip) {
+        // Extract the necessary information from the Trip object
+        TravelMethod method = trip.getTravelMethod();  // Get travel method
+        Location destination = trip.getDestination();  // Get destination location
+        CurrentLocation currentLocation = trip.getCurrentLocation();  // Get current location
+        String userId = trip.getUserId();  // Get user ID
+
+        // Calculate the distance (You can modify this as needed)
+        double distance = calculateDistance(currentLocation, destination);
+
+        // Fetch user weight from the database (this can be dynamic or mock for now)
+        double weight = getUserWeight(userId);
+
+        // Calculate calories and carbon saved based on the travel method and distance
+        int caloriesBurned = calculateCalories(method, distance, weight);
+        int carbonSaved = calculateCarbon(method, distance);
+
+        // Create a map to send the metrics back as a response
+        Map<String, Object> metrics = new HashMap<>();
+        metrics.put("caloriesBurnt", caloriesBurned);
+        metrics.put("carbonSaved", carbonSaved);
+        metrics.put("distance", distance);
+
+        return metrics;
+    
+    }
 
 
     private double calculateDistance(CurrentLocation userLocation, Location destination) {

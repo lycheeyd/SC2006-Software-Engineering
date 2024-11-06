@@ -1,5 +1,6 @@
 
 import 'dart:convert';
+import 'package:calowin/control/travelmethod.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'location.dart';
@@ -90,51 +91,27 @@ Future<Map<String, dynamic>> startTrip(
     }
   }
 
-   // Start a trip with a given destination and travel method
-  Future<Map<String, dynamic>> retrieveMetrics(
-    Location destination,
-    String method,
-    String userId,
-    CurrentLocation currentLocation,
-  ) async {
-    final url = Uri.parse('$baseUrl/trips/start');
 
-    // Construct the request body
-    final requestBody = {
-      'userId': userId,
-      'destination': {
-        'name': destination.name,
-        'latitude': destination.latitude,
-        'longitude': destination.longitude,
-      },
-      'travelMethod': method,
-      'currentLocation': {
-        'latitude': currentLocation.latitude,
-        'longitude': currentLocation.longitude,
-        'name': currentLocation.name,
-      },
-    };
-
-    // Print the values being posted to the backend for debugging
-    // print('Posting the following data to the backend at $url:');
-    // print(jsonEncode(requestBody));
-
-    // Make the POST request
+  Future<Map<String, dynamic>?> retrieveMetrics(
+      Location selectedLocation, 
+      String selectedMethod, // Travel method is passed here
+      String userId, 
+      CurrentLocation userCurrentLocation) async {
     final response = await http.post(
-      url,
+      Uri.parse('$baseUrl/trips/retrieve-metrics'),
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(requestBody),
+      body: jsonEncode({
+        'currentLocation': userCurrentLocation.toJson(),
+        'destination': selectedLocation.toJson(),
+        'travelMethod': selectedMethod.toString(),  // Travel method as a string
+        'userId': userId,
+      }),
     );
 
-    // Check for a successful response and handle it
     if (response.statusCode == 200) {
-      print('Trip started successfully. Response data: ${response.body}');
-      return jsonDecode(response.body);
+      return jsonDecode(response.body);  // Return the response as a Map
     } else {
-      // Handle unsuccessful response and log details
-      print('Failed to start trip. Status code: ${response.statusCode}');
-      print('Error response body: ${response.body}');
-      throw Exception('Failed to start trip: ${response.body}');
+      throw Exception('Failed to retrieve metrics');
     }
   }
 
