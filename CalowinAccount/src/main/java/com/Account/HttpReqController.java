@@ -158,6 +158,7 @@ public class HttpReqController {
     public ResponseEntity<?> editProfile(@RequestBody EditProfileDTO editProfileDTO) {
         // Edit account logic
         try {
+            System.out.println(editProfileDTO.getUserID());
             ProfileEntity profile = profileManagementService.editProfile(editProfileDTO.getUserID(), editProfileDTO.getName(), editProfileDTO.getWeight(), editProfileDTO.getBio());
             
             Map<String, Object> response = new HashMap<>();
