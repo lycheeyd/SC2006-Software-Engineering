@@ -42,6 +42,16 @@ class UserProfile {
     );
   }
 
+  UserProfile copyProfile(UserProfile profile) {
+    return UserProfile(
+      userID: _userID = profile._userID,
+      name: _name = profile._name,
+      weight: _weight = profile._weight,
+      bio: _bio = profile._bio,
+    );
+  }
+
+
   // Getters
   String getName() => _name;
   String? getEmail() => _email;
@@ -53,6 +63,10 @@ class UserProfile {
   List<String> getBadges() => _badges ?? [];
 
   // Setters
+  void setName(String name) {
+    _name = name;
+  }
+
   void setBio(String bio) {
     _bio = bio;
   }
