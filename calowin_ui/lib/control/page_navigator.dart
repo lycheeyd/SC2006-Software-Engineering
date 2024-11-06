@@ -57,15 +57,15 @@ class PageNavigatorState extends State<PageNavigator> {
     (params) => MapcalcPage(
       targetName: params?['targetName'], targetLat: params?['targetLat'], targetLong: params?['targetLong'],
     ),
-    (params) => const RankPage(),
+    (params) => RankPage(userID:  _profile.getUserID(),),
     (params) => ProfilePage(profile: _profile),
-    (params) => const FriendsPage(),
+    (params) => FriendsPage(userID:  _profile.getUserID()),
     (params) => const WellnessZonePage(),
     //below are all not available in navigation bar
     (params) => OtheruserPage(
-          userID: params?['userID'], //passing the user's id to redirect
+          otherUserID: params?['otherUserID'], userID: params?['userID'], //passing the user's id to redirect
         ),
-    (params) => const AddfriendsPage(),
+    (params) => AddfriendsPage(userID:  _profile.getUserID()),
   ];
   }
 

@@ -23,7 +23,7 @@ class ApiService {
 
   Future<String> fetchApiKey(String keyName) async {
   final response = await http.get(Uri.parse('$baseUrl/api/keys/$keyName'));
-  print("$baseUrl/api/keys/$keyName");
+  //print("$baseUrl/api/keys/$keyName");
   if (response.statusCode == 200) {
     // Return the API key from the response
     return response.body; // The body contains the API key as a string
@@ -68,8 +68,8 @@ Future<Map<String, dynamic>> startTrip(
     };
 
     // Print the values being posted to the backend for debugging
-    print('Posting the following data to the backend at $url:');
-    print(jsonEncode(requestBody));
+    // print('Posting the following data to the backend at $url:');
+    // print(jsonEncode(requestBody));
 
     // Make the POST request
     final response = await http.post(
@@ -89,6 +89,55 @@ Future<Map<String, dynamic>> startTrip(
       throw Exception('Failed to start trip: ${response.body}');
     }
   }
+
+   // Start a trip with a given destination and travel method
+  Future<Map<String, dynamic>> retrieveMetrics(
+    Location destination,
+    String method,
+    String userId,
+    CurrentLocation currentLocation,
+  ) async {
+    final url = Uri.parse('$baseUrl/trips/start');
+
+    // Construct the request body
+    final requestBody = {
+      'userId': userId,
+      'destination': {
+        'name': destination.name,
+        'latitude': destination.latitude,
+        'longitude': destination.longitude,
+      },
+      'travelMethod': method,
+      'currentLocation': {
+        'latitude': currentLocation.latitude,
+        'longitude': currentLocation.longitude,
+        'name': currentLocation.name,
+      },
+    };
+
+    // Print the values being posted to the backend for debugging
+    // print('Posting the following data to the backend at $url:');
+    // print(jsonEncode(requestBody));
+
+    // Make the POST request
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(requestBody),
+    );
+
+    // Check for a successful response and handle it
+    if (response.statusCode == 200) {
+      print('Trip started successfully. Response data: ${response.body}');
+      return jsonDecode(response.body);
+    } else {
+      // Handle unsuccessful response and log details
+      print('Failed to start trip. Status code: ${response.statusCode}');
+      print('Error response body: ${response.body}');
+      throw Exception('Failed to start trip: ${response.body}');
+    }
+  }
+
 
 
 

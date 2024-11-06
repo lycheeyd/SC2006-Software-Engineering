@@ -60,7 +60,8 @@ class _LoginpageState extends State<Loginpage> {
       if (response.statusCode == 200) {
         // Navigate to the next page
         final Map<String, dynamic> responseData = jsonDecode(response.body);
-        final loginResponse = UserProfile.fromJson(responseData);
+        final loginResponse = UserProfile.fromJson(responseData['UserObject']);
+        //print(loginResponse.getEmail());
         Navigator.of(context).push(
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>

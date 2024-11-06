@@ -26,15 +26,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
   void getUserProfile(UserProfile profile) {
     _profile = profile;
-    // _profile = UserProfile(
-    //     name: "Eric Koh",
-    //     email: "Eric123@gmail.com",
-    //     userID: "#044612",
-    //     bio: "012345678901234567890123456789",
-    //     weight: 80,
-    //     carbonSaved: 4000,
-    //     calorieBurn: 2300,
-    //     badges: ["CalorieGold", "EcoBronze"]);
     for (int i = 0; i < _profile.getBadges().length; i++) {
       if (Words2widgetConverter.convert(_profile.getBadges()[i]) != null) {
         _badges.add(Words2widgetConverter.convert(_profile.getBadges()[i]));
@@ -42,12 +33,20 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  void _handleEditProfile() {
-    Navigator.push(context,
-        MaterialPageRoute(builder: (context) => const EditprofilePage()));
+  Future<void> _handleEditProfile() async {
+    final updatedProfile = await Navigator.push<UserProfile>(context,
+        MaterialPageRoute(builder: (context) => EditprofilePage(profile: _profile)));
+      
+    if (updatedProfile != null) {
+      setState(() {
+        _profile = updatedProfile;
+      });
+    }
   }
 
-  void _handleLogOut() {}
+  void _handleLogOut() {
+    Navigator.pop(context);
+  }
 
   Widget fieldBuilder(String title, String content) {
     return SizedBox(

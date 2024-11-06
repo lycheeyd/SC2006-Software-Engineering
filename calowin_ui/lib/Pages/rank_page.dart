@@ -5,13 +5,15 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:calowin/common/medals.dart';
 
 class RankPage extends StatefulWidget {
-  const RankPage({super.key});
+  final String userID;
+  const RankPage({super.key,required this.userID});
 
   @override
   State<RankPage> createState() => _RankPageState();
 }
 
 class _RankPageState extends State<RankPage> {
+  String userID = "";
   bool _isCalorie = true;
 
   //to be retrieved from backend
@@ -41,6 +43,12 @@ class _RankPageState extends State<RankPage> {
     {"name": "Uma", "medal": null, "points": 42},
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    userID = widget.userID;
+  }
+
   void _toggleLeaderBoard() {
     setState(() {
       _isCalorie = !_isCalorie;
@@ -49,14 +57,14 @@ class _RankPageState extends State<RankPage> {
 
   void _onListItemTap(String name) {
     //first retrieve the user id then pass to the page navigator (logic to be considered)
-    const String userID = "#12345";
+    const String otheruserID = "#12345";
     final pageNavigatorState =
         context.findAncestorStateOfType<PageNavigatorState>();
 
     //change here
     if (pageNavigatorState != null) {
       pageNavigatorState.navigateToPage(5,
-          params: {'userID': userID}); // Navigate to Profile tab
+          params: {'userID': otheruserID,'otherUserID':userID}); // Navigate to Profile tab
     }
   }
 
