@@ -37,6 +37,9 @@ class PageNavigatorState extends State<PageNavigator> {
     (params) => const AddfriendsPage(),
   ];
 
+  
+
+
   Future<void> _loadNotifications() async {
     try {
       String userId = "00000001"; // Replace with dynamic user ID if available
