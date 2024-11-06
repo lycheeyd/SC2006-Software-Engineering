@@ -11,23 +11,26 @@ class MaxLinesInputFormatter extends TextInputFormatter {
     // Split the new text into lines
     final lines = newValue.text.split('\n');
 
-    // Check for length and insert new line character if needed
-    String modifiedText = '';
+    // Initialize a list to accumulate lines
+    final modifiedLines = <String>[];
+
     for (var line in lines) {
+      // While the line exceeds the character limit, split it
       while (line.length > 35) {
-        modifiedText += '${line.substring(0, 35)}\n'; // Add line with newline
-        line = line.substring(35); // Reduce the line
+        modifiedLines.add(line.substring(0, 35));
+        line = line.substring(35);
       }
-      modifiedText += '$line\n'; // Add the remaining part of the line
+      modifiedLines.add(line);
     }
 
-    // Split again to enforce max lines
+    // Combine the lines into a single text with newline characters
+    String modifiedText = modifiedLines.join('\n');
+
+    // Enforce max lines by trimming the text if needed
     final finalLines = modifiedText.split('\n');
 
     if (finalLines.length > maxLines) {
-      // Join the lines that are within the limit
       final trimmedText = finalLines.sublist(0, maxLines).join('\n');
-      // Return the new value with the trimmed text and the cursor at the end
       return TextEditingValue(
         text: trimmedText,
         selection: TextSelection.fromPosition(
@@ -36,11 +39,10 @@ class MaxLinesInputFormatter extends TextInputFormatter {
       );
     }
 
-    // Return the modified value if it's within the limit
     return TextEditingValue(
-      text: modifiedText.trim(), // Remove trailing newline
+      text: modifiedText,
       selection: TextSelection.fromPosition(
-        TextPosition(offset: modifiedText.trim().length),
+        TextPosition(offset: modifiedText.length),
       ),
     );
   }

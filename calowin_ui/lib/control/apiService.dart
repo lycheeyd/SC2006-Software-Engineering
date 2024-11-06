@@ -1,6 +1,5 @@
 
 import 'dart:convert';
-import 'package:calowin/control/travelmethod.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'location.dart';
@@ -131,9 +130,9 @@ Future<Map<String, dynamic>> startTrip(
   }
 
   // Send trip metrics to the backend
-  Future<void> addTripMetrics(int carbonSaved, int caloriesBurnt) async {
+  Future<void> addTripMetrics(int carbonSaved, int caloriesBurnt, String userID) async {
     final response = await http.post(Uri.parse(baseUrl +
-        "/achievements/addTripMetrics?carbonSaved=$carbonSaved&caloriesBurnt=$caloriesBurnt"));
+        "/achievements/addTripMetrics?carbonSaved=$carbonSaved&caloriesBurnt=$caloriesBurnt&userId=$userID"));
 
     if (response.statusCode != 200) {
       throw Exception("Failed to add trip metrics");

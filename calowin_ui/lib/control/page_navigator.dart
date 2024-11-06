@@ -55,7 +55,7 @@ class PageNavigatorState extends State<PageNavigator> {
     _profile = widget.profile;
     _pages = [
     (params) => MapcalcPage(
-      targetName: params?['targetName'], targetLat: params?['targetLat'], targetLong: params?['targetLong'],
+      targetName: params?['targetName'], targetLat: params?['targetLat'], targetLong: params?['targetLong'], profile: _profile,
     ),
     (params) => RankPage(userID:  _profile.getUserID(),),
     (params) => ProfilePage(profile: _profile),

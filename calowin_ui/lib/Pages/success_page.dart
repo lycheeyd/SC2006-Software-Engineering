@@ -26,6 +26,7 @@ class SuccessPage extends StatefulWidget {
 }
 
 class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStateMixin {
+
   int totalCarbonSavedExp = 0;
   int totalCalorieBurntExp = 0;
   String carbonSavedMedal = "No Medal";
@@ -41,6 +42,9 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
   final int pointsToNextCalorieSilver = 5000;
   final int pointsToNextCalorieGold = 10000;
   final int pointsToNextCaloriePlatinum = 15000;
+
+  late final int maxCarbon;
+  late final int maxCalorie;
 
   late AnimationController _controller;
   late Animation<double> _animation;
@@ -65,6 +69,8 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
       totalCalorieBurntExp = achievements['totalCalorieBurntExp'];
       carbonSavedMedal = achievements['carbonSavedMedal'];
       calorieBurntMedal = achievements['calorieBurntMedal'];
+      maxCarbon = _retrieveThreshold(totalCarbonSavedExp, pointsToNextCarbonPlatinum,pointsToNextCarbonGold,pointsToNextCarbonSilver,pointsToNextCarbonBronze);
+      maxCalorie = _retrieveThreshold(totalCalorieBurntExp, pointsToNextCaloriePlatinum,pointsToNextCalorieGold,pointsToNextCalorieSilver,pointsToNextCalorieBronze);
     });
     _controller.forward(); // Start the animation
   }
@@ -101,7 +107,7 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
                   ),
                   SizedBox(height: 10),
                   Text(
-                    "You have traveled ${widget.distance} km to ${widget.destination}.",
+                    "You have traveled ${widget.distance.toStringAsFixed(2)} km to ${widget.destination}.",
                     style: GoogleFonts.openSans(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -111,7 +117,7 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
                   ),
                   SizedBox(height: 20),
                   _buildProgressSection(
-                    title: "Carbon Saved EXP: ${_formatExpDisplay(totalCarbonSavedExp, pointsToNextCarbonPlatinum)}",
+                    title: "Carbon Saved EXP: ${_formatExpDisplay(totalCarbonSavedExp, maxCarbon)}",
                     value: totalCarbonSavedExp,
                     medal: carbonSavedMedal,
                     pointsToNextBronze: pointsToNextCarbonBronze,
@@ -123,7 +129,7 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
                   ),
                   SizedBox(height: 15),
                   _buildProgressSection(
-                    title: "Calories Burnt EXP: ${_formatExpDisplay(totalCalorieBurntExp, pointsToNextCaloriePlatinum)}",
+                    title: "Calories Burnt EXP: ${_formatExpDisplay(totalCalorieBurntExp, maxCalorie)}",
                     value: totalCalorieBurntExp,
                     medal: calorieBurntMedal,
                     pointsToNextBronze: pointsToNextCalorieBronze,
@@ -164,6 +170,22 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
 
   String _formatExpDisplay(int currentExp, int platinumThreshold) {
     return currentExp >= platinumThreshold ? "$platinumThreshold/$platinumThreshold" : "$currentExp/$platinumThreshold";
+  }
+
+  int _retrieveThreshold(int value,int pointsToNextPlatinum, int pointsToNextGold, int pointsToNextSilver, int pointsToNextBronze){
+    int threshold;
+
+    if (value >= pointsToNextGold) {
+      threshold = pointsToNextPlatinum;
+    } else if (value >= pointsToNextSilver) {
+      threshold = pointsToNextGold;
+    } else if (value >= pointsToNextBronze) {
+      threshold = pointsToNextSilver;
+    } else {
+      threshold = pointsToNextGold;
+    }
+
+    return threshold;
   }
 
   Widget _buildProgressSection({
