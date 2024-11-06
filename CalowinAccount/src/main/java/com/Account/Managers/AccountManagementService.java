@@ -81,7 +81,7 @@ public class AccountManagementService {
         UserEntity user = calowinSecureDBRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Invalid email or password"));
 
-        if (!passwordEncoder.matches(decryptedPassword, user.getPassword())) {
+        if (!passwordEncoder.matches(passwordEncoder.encode(decryptedPassword), user.getPassword())) {
             throw new RuntimeException("Invalid email or password");
         }
 

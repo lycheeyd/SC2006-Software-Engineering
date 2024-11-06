@@ -53,7 +53,7 @@ public class PasswordManagementService {
         passwordSecurityService.isPasswordValid(decryptedNewPassword, decryptedConfirmNewPassword);
 
         // Authenticate old password
-        if (!passwordEncoder.matches(decryptedOldPassword, user.getPassword())) {
+        if (!passwordEncoder.matches(passwordEncoder.encode(decryptedOldPassword), user.getPassword())) {
             throw new RuntimeException("Wrong password");
         }
         
