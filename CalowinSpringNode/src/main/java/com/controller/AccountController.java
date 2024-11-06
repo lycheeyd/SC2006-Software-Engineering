@@ -118,7 +118,7 @@ public class AccountController extends HttpReqController{
     }
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<?> forgetPassword(@RequestBody ForgotPasswordDTO DTO) {
+    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordDTO DTO) {
         // Forward forget password request to AccountModule
         try {
             String url = urlPrefix + "/account/forgot-password";

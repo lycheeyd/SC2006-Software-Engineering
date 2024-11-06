@@ -192,7 +192,7 @@ public class HttpReqController {
 
     }
 
-    @GetMapping("/view-profile/{userID}")
+    @GetMapping("/view-profile/{selfID}/{otherID}")
     public ResponseEntity<?> viewProfile(@PathVariable String userID) {
         // View account logic
         try {
