@@ -66,7 +66,6 @@ public class PasswordManagementService {
     // Forgot password method
     public void forgotPassword(String email, String otpCode) throws Exception {
         // Authenticate OTP
-
         if (!otpService.verifyOTP(email, otpCode, ActionType.FORGOT_PASSWORD)) {
             throw new RuntimeException("Invalid OTP");
         }

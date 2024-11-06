@@ -12,11 +12,11 @@ public class ForgotPasswordDTO {
         this.email = email;
     }
 
-    public String getOtCode() {
+    public String getOtpCode() {
         return this.otpCode;
     }
 
-    public void setOtCode(String otpCode) {
+    public void setOtpCode(String otpCode) {
         this.otpCode = otpCode;
     }
 

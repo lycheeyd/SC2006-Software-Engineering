@@ -97,7 +97,7 @@ class _LoginpageState extends State<Loginpage> {
       final responseMessage = response.body;
 
       if (response.statusCode == 200) {
-        _showSuccessDialog(responseMessage);
+        _handleOTPWindow(email);
       } else {
         _showErrorDialog(responseMessage);
       }
@@ -106,8 +106,6 @@ class _LoginpageState extends State<Loginpage> {
         _showErrorDialog('Error: ${e.toString()}');
       });
     }
-
-    _handleOTPWindow(email);
   }
 
   void _handleOTPWindow(String email) {
@@ -137,7 +135,7 @@ class _LoginpageState extends State<Loginpage> {
       final response = await http.post(
         Uri.parse(url),
         headers: {"Content-Type": "application/json"},
-        body: json.encode({"email": email, "otpCode": otpCode, 'type': ActionType.FORGOT_PASSWORD.value}),
+        body: json.encode({"email": email, "otpCode": otpCode}),
       );
 
       final responseMessage = response.body;
