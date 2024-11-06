@@ -1,6 +1,5 @@
 
 import 'dart:convert';
-import 'package:calowin/control/travelmethod.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'location.dart';
@@ -81,7 +80,7 @@ Future<Map<String, dynamic>> startTrip(
 
     // Check for a successful response and handle it
     if (response.statusCode == 200) {
-      print('Trip started successfully. Response data: ${response.body}');
+      //print('Trip started successfully. Response data: ${response.body}');
       return jsonDecode(response.body);
     } else {
       // Handle unsuccessful response and log details
@@ -111,7 +110,7 @@ Future<Map<String, dynamic>> startTrip(
     if (response.statusCode == 200) {
       return jsonDecode(response.body);  // Return the response as a Map
     } else {
-      throw Exception('Failed to retrieve metrics');
+      throw Exception('Failed to retrieve metrics ${response.statusCode}');
     }
   }
 
@@ -131,9 +130,9 @@ Future<Map<String, dynamic>> startTrip(
   }
 
   // Send trip metrics to the backend
-  Future<void> addTripMetrics(int carbonSaved, int caloriesBurnt) async {
+  Future<void> addTripMetrics(int carbonSaved, int caloriesBurnt, String userID) async {
     final response = await http.post(Uri.parse(baseUrl +
-        "/achievements/addTripMetrics?carbonSaved=$carbonSaved&caloriesBurnt=$caloriesBurnt"));
+        "/achievements/addTripMetrics?carbonSaved=$carbonSaved&caloriesBurnt=$caloriesBurnt&userId=$userID"));
 
     if (response.statusCode != 200) {
       throw Exception("Failed to add trip metrics");

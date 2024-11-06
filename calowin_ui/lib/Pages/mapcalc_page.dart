@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:calowin/Pages/success_page.dart';
 import 'package:calowin/common/dualbutton_dialog.dart';
 import 'package:calowin/common/singlebutton_dialog.dart';
+import 'package:calowin/common/user_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:calowin/common/colors_and_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -12,15 +13,18 @@ import '../control/apiService.dart';
 import '../control/autocomplate_prediction.dart';
 import '../control/place_auto_complate_response.dart';
 
+// ignore: must_be_immutable
 class MapcalcPage extends StatefulWidget {
+  final UserProfile profile;
   final double? targetLat;
   final double? targetLong;
-  final String? targetName;
-  const MapcalcPage({
+  String? targetName;
+  MapcalcPage({
     super.key,
     this.targetLat,
     this.targetLong,
     this.targetName,
+    required this.profile,
   });
 
   @override
@@ -28,6 +32,7 @@ class MapcalcPage extends StatefulWidget {
 }
 
 class _MapcalcPageState extends State<MapcalcPage> {
+  late UserProfile profile;
   final ApiService apiService = ApiService();
   List<Location> locations = [];
   List<String> travelMethods = [];
@@ -60,23 +65,20 @@ class _MapcalcPageState extends State<MapcalcPage> {
   @override
   void initState() {
     super.initState();
-    _initializeLocation();
+    profile = widget.profile;
     _fetchTravelMethods();
     _retrievePlacesKey();
     _retrieveMapKey();
     _retrieveDirectionsKey();
+    _initializeLocation();
     //this is the directing from wellness zone
-    setState(() {
-      _searchController.text = widget.targetName ?? "";
-      if(widget.targetName!=null) _handleSearch(_searchController.text);
-      targetLocation = Location(name: widget.targetName ?? "", latitude: widget.targetLat ?? 1.3521, longitude: widget.targetLong ?? 103.8198);
-    });
    }
 
   @override
   void didUpdateWidget(MapcalcPage oldWidget){
       super.didUpdateWidget(oldWidget);
       if(oldWidget.targetName != widget.targetName && widget.targetName != "" && widget.targetName != null){
+      _initializeLocation();
       setState(() {
         _searchController.text = widget.targetName ?? "";
         if(widget.targetName!=null) _handleSearch(_searchController.text);
@@ -137,13 +139,14 @@ class _MapcalcPageState extends State<MapcalcPage> {
           icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen), // Set the color
         );
       });
-      print("Initial location: ${userCurrentLocation.name}");
+      //print("Initial location: ${userCurrentLocation.name}");
       mapController.animateCamera(
         CameraUpdate.newLatLngZoom(
           LatLng(userCurrentLocation.latitude ?? 1.3521, userCurrentLocation.longitude ?? 103.8198),
           15,
         ),
       );
+      
     } catch (e) {
       print('Error initializing location: $e');
     }
@@ -306,7 +309,6 @@ List<LatLng> _decodePolyline(String polyline) {
   }
 
   void _retrieveMerics() async {
-    String userId = "user1234";
     // setState(() {
     //   metrics = {};
     //   metrics!['caloriesBurnt'] = 300;
@@ -316,8 +318,8 @@ List<LatLng> _decodePolyline(String polyline) {
     //call and retrive metrics from backend
     if(selectedLocation != null && selectedMethod != null){
       try {
-        metrics = await apiService.retrieveMetrics(selectedLocation!, selectedMethod!, userId, userCurrentLocation);
-       print('Metrics received: $metrics');
+        metrics = await apiService.retrieveMetrics(selectedLocation!, selectedMethod!, profile.getUserID(), userCurrentLocation);
+       //print('Metrics received: $metrics');
         setState(() {
           resultMessage =
               'Calories burned: ${metrics!['caloriesBurnt']}, Carbon saved: ${metrics!['carbonSaved']} kg, Distance: ${metrics!['distance'].toStringAsFixed(2)} km';
@@ -332,18 +334,17 @@ List<LatLng> _decodePolyline(String polyline) {
   }
 
   Future<void> _startTrip() async {
-    String userId = "user1234"; 
     
     if(selectedLocation != null && selectedMethod != null){
       try {
-        metrics = await apiService.startTrip(selectedLocation!, selectedMethod!, userId, userCurrentLocation);
-        print('Metrics received: $metrics');
+        metrics = await apiService.startTrip(selectedLocation!, selectedMethod!, profile.getUserID(), userCurrentLocation);
+        //print('Metrics received: $metrics');
       
       if(metrics == null) {throw("Metrics not retrieved");}
       else {
         setState(() {
           resultMessage =
-              'Calories burned: ${metrics!['caloriesBurnt']}, Carbon saved: ${metrics!['carbonSaved']} kg, Distance: ${metrics!['distance'].toStringAsFixed(2)} km';
+              'Calories burned: ${metrics!['caloriesBurnt']}, Carbon saved: ${metrics!['carbonSaved']} g, Distance: ${metrics!['distance'].toStringAsFixed(2)} km';
           _tripStarted = true; 
         });
         }
@@ -356,8 +357,7 @@ List<LatLng> _decodePolyline(String polyline) {
   }
 
   // This method will be called when the user selects a travel method
-Future<void> _retrieveMetrics() async {
-  String userId = "user1234"; // Update with the actual user ID
+Future<void> _retrieveMetrics() async {// Update with the actual user ID
 
   // Ensure both location and method are selected
   if (selectedLocation != null && selectedMethod != null) {
@@ -366,7 +366,7 @@ Future<void> _retrieveMetrics() async {
        metrics = await apiService.retrieveMetrics(
         selectedLocation!, 
         selectedMethod!,  // The travel method being selected
-        userId, 
+        profile.getUserID(),
         userCurrentLocation
       );
 
@@ -418,15 +418,14 @@ Future<void> _retrieveMetrics() async {
     if (selectedLocation != null &&
         selectedMethod != null &&
         userCurrentLocation != null) {
-      final metrics = resultMessage!.split(',');
-      final distance = double.parse(metrics[2].split(': ')[1].split(' ')[0]);
-      final caloriesBurnt = int.parse(metrics[0].split(': ')[1]);
-      final carbonSaved = int.parse(metrics[1].split(': ')[1].split(' ')[0]);
+      final distance = metrics?['distance'];
+      final caloriesBurnt = metrics?['caloriesBurnt'];
+      final carbonSaved = metrics?['carbonSaved'];
 
       try {
         // Send trip metrics to the backend
-        await apiService.addTripMetrics(carbonSaved, caloriesBurnt);
-        print('Trip metrics sent successfully.');
+        await apiService.addTripMetrics(carbonSaved, caloriesBurnt,profile.getUserID());
+        //print('Trip metrics sent successfully.');
 
         // Navigate to AchievementScreen and pass metrics
         Navigator.push(
@@ -461,6 +460,8 @@ Future<void> _retrieveMetrics() async {
 //default address 1.3521,103.8198
   void _resetState() {
   setState(() {
+    widget.targetName = null;
+    metrics = null;
     _tripStarted = false; // Reset trip state
     selectedLocation = null; // Reset location
     selectedMethod = null; // Reset method
@@ -558,6 +559,10 @@ Future<void> _retrieveMetrics() async {
                       if (routePolylineMain != null) routePolylineMain!,
                     },
                     ),
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: IconButton(onPressed: _initializeLocation, icon: Icon(Icons.refresh),iconSize: 30,)
+                      ),
                     if(metrics != null) Align(
                       alignment: Alignment.bottomLeft,
                       child: Padding(
@@ -573,10 +578,10 @@ Future<void> _retrieveMetrics() async {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text('Calories burned:',style: TextStyle(fontSize: 15,fontWeight: FontWeight.w500)),
-                              Text("${metrics!['caloriesBurnt']}",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 15)),
+                              Text("${metrics!['caloriesBurnt']} kcal",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 15)),
                               const SizedBox(height: 7),
                               Text("Carbon saved:",style: TextStyle(fontSize: 15,fontWeight: FontWeight.w500)),
-                              Text("${metrics!['carbonSaved']} kg",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 15)),
+                              Text("${metrics!['carbonSaved']} g",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 15)),
                               const SizedBox(height: 7),
                               Text("Distance:",style: TextStyle(fontSize: 15,fontWeight: FontWeight.w500)),
                               Text("${metrics!['distance'].toStringAsFixed(2)} km",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 15))
