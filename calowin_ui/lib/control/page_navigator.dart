@@ -9,15 +9,7 @@ import 'package:calowin/Pages/wellness_page.dart';
 import 'package:calowin/Pages/rank_page.dart';
 import 'package:calowin/common/colors_and_fonts.dart';
 import 'package:google_fonts/google_fonts.dart';
-<<<<<<< Updated upstream
 import 'package:calowin/control/notification_service.dart';
-import 'package:logger/logger.dart';
-
-final logger = Logger();
-
-=======
-import 'package:calowin/control/notification_service.dart'; // Import NotificationService
->>>>>>> Stashed changes
 
 class PageNavigator extends StatefulWidget {
   const PageNavigator({super.key});
@@ -27,89 +19,47 @@ class PageNavigator extends StatefulWidget {
 }
 
 class PageNavigatorState extends State<PageNavigator> {
-  // Set the page index
   int _currentIndex = 0;
-
-  // Set parameters to pass to the pages
   Map<String, dynamic>? _currentParams;
   bool _showNotifications = false;
   List<String> listOfNotifications = [];
-  //final NotificationService notificationService = NotificationService();
+  final NotificationService notificationService = NotificationService();
+
   final List<Widget Function(Map<String, dynamic>?)> _pages = [
     (params) => const MapcalcPage(),
     (params) => const RankPage(),
     (params) => const ProfilePage(),
     (params) => const FriendsPage(),
     (params) => const WellnessZonePage(),
-    // Below are all not available in the navigation bar
     (params) => OtheruserPage(
-          userID: params?['userID'], // Passing the user's id to redirect
+          userID: params?['userID'],
         ),
     (params) => const AddfriendsPage(),
   ];
 
-<<<<<<< Updated upstream
-  /*List<String> listOfNotifications = <String>[
-    "John sent a Friend Request",
-    "Notification 2",
-    "Notification 3",
-    "Notification 4",
-    "Notification 4",
-    "Notification 4",
-    "Notification 4",
-    "Notification 4",
-    "Notification 4",
-    "Notification 4",
-    "Notification 4",
-  ];*/
-  Future<void> _loadNotifications() async {
-  try {
-    String userId = "00000001";
-    NotificationService notificationService = NotificationService(); // Create an instance
-    List<String> notifications = await notificationService.fetchFriendRequests(userId);
-    setState(() {
-      listOfNotifications = notifications;
-    });
-  } catch (e, stackTrace) {
-    logger.e("Error loading notifications", e, stackTrace);
-  }
-}
-
-
-  
-=======
-  List<String> listOfNotifications = [];
-  bool _showNotifications = false; // Track if notifications are visible
-
-  @override
-  void initState() {
-    super.initState();
-    _loadNotifications(); // Load notifications when the widget is initialized
-  }
-
   Future<void> _loadNotifications() async {
     try {
-      String userId = "0000001"; // Example user ID; replace with actual user ID if needed
-      NotificationService notificationService = NotificationService();
+      String userId = "00000001"; // Replace with dynamic user ID if available
       List<String> notifications = await notificationService.fetchFriendRequests(userId);
       setState(() {
         listOfNotifications = notifications;
       });
-    } catch (e) {
-      print("Error loading notifications: $e");
+    } catch (e, stackTrace) {
+      print("Error loading notifications: $e\n$stackTrace"); // Use logger if available
     }
   }
->>>>>>> Stashed changes
+
+  @override
+  void initState() {
+    super.initState();
+    _loadNotifications();
+  }
 
   void navigateToPage(int index, {Map<String, dynamic>? params}) {
     setState(() {
       _currentIndex = index;
       _currentParams = params;
     });
-<<<<<<< Updated upstream
-    print("Navigating to page $_currentIndex");
-=======
->>>>>>> Stashed changes
   }
 
   void _toggleNotifications() {
@@ -117,7 +67,7 @@ class PageNavigatorState extends State<PageNavigator> {
       _showNotifications = !_showNotifications;
     });
     if (_showNotifications) {
-      _loadNotifications(); // Load notifications when opened
+      _loadNotifications();
     }
   }
 
@@ -128,20 +78,10 @@ class PageNavigatorState extends State<PageNavigator> {
   }
 
   void _handleNotificationTap(int index) {
-<<<<<<< Updated upstream
-    setState(() {
-      navigateToPage(5, params: {"userID": "00000001"});
-      _toggleNotifications();
-      //index should be passed to the profile page to be able to open the profile page of the person
-      //alternately can just open the friend request page
-    });
-=======
-    navigateToPage(5, params: {"userID": "888888"}); // Example user ID; modify as needed
+    navigateToPage(5, params: {"userID": "00000001"}); // Example user ID
     _toggleNotifications();
->>>>>>> Stashed changes
   }
 
-  // Build custom navigation button decorations
   Widget _buildBottomNavItem(IconData icon, int index, String label) {
     Color lightgreen = const Color.fromARGB(255, 197, 251, 196);
     double bottomNavFontSize = 8;
