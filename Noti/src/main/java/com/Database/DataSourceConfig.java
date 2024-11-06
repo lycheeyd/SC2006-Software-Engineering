@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import com.Database.CalowinDB.CalowinDBProperties;
-import com.Database.CalowinSecureDB.CalowinSecureDBProperties;
+//import com.Database.CalowinSecureDB.CalowinSecureDBProperties;
 
 import javax.sql.DataSource;
 
