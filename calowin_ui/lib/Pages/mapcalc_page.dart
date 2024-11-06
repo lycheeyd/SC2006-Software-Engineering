@@ -319,7 +319,7 @@ List<LatLng> _decodePolyline(String polyline) {
     if(selectedLocation != null && selectedMethod != null){
       try {
         metrics = await apiService.retrieveMetrics(selectedLocation!, selectedMethod!, profile.getUserID(), userCurrentLocation);
-       print('Metrics received: $metrics');
+       //print('Metrics received: $metrics');
         setState(() {
           resultMessage =
               'Calories burned: ${metrics!['caloriesBurnt']}, Carbon saved: ${metrics!['carbonSaved']} kg, Distance: ${metrics!['distance'].toStringAsFixed(2)} km';
@@ -338,7 +338,7 @@ List<LatLng> _decodePolyline(String polyline) {
     if(selectedLocation != null && selectedMethod != null){
       try {
         metrics = await apiService.startTrip(selectedLocation!, selectedMethod!, profile.getUserID(), userCurrentLocation);
-        print('Metrics received: $metrics');
+        //print('Metrics received: $metrics');
       
       if(metrics == null) {throw("Metrics not retrieved");}
       else {
@@ -425,7 +425,7 @@ Future<void> _retrieveMetrics() async {// Update with the actual user ID
       try {
         // Send trip metrics to the backend
         await apiService.addTripMetrics(carbonSaved, caloriesBurnt,profile.getUserID());
-        print('Trip metrics sent successfully.');
+        //print('Trip metrics sent successfully.');
 
         // Navigate to AchievementScreen and pass metrics
         Navigator.push(

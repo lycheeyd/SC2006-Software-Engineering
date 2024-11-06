@@ -280,6 +280,7 @@ class _EditprofilePageState extends State<EditprofilePage> {
                         padding: const EdgeInsets.symmetric(
                             vertical: 5, horizontal: 10),
                         child: TextField(
+                          onChanged: (value){ print(_bioController.text); },
                           inputFormatters: [
                             MaxLinesInputFormatter(maxLines: 3),
                             LengthLimitingTextInputFormatter(100)

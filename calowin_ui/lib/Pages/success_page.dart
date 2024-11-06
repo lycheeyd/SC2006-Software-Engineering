@@ -43,8 +43,8 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
   final int pointsToNextCalorieGold = 10000;
   final int pointsToNextCaloriePlatinum = 15000;
 
-  late final int maxCarbon;
-  late final int maxCalorie;
+  int maxCarbon = 0;
+  int maxCalorie = 0;
 
   late AnimationController _controller;
   late Animation<double> _animation;
@@ -57,7 +57,12 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
       vsync: this,
     );
     _animation = Tween<double>(begin: 0.0, end: 1.0).animate(_controller);
+    fetchAchievements();
+  }
 
+  @override 
+  void didUpdateWidget(SuccessPage oldWidget){
+    super.didUpdateWidget(oldWidget);
     fetchAchievements();
   }
 
@@ -69,10 +74,10 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
       totalCalorieBurntExp = achievements['totalCalorieBurntExp'];
       carbonSavedMedal = achievements['carbonSavedMedal'];
       calorieBurntMedal = achievements['calorieBurntMedal'];
-      maxCarbon = _retrieveThreshold(totalCarbonSavedExp, pointsToNextCarbonPlatinum,pointsToNextCarbonGold,pointsToNextCarbonSilver,pointsToNextCarbonBronze);
-      maxCalorie = _retrieveThreshold(totalCalorieBurntExp, pointsToNextCaloriePlatinum,pointsToNextCalorieGold,pointsToNextCalorieSilver,pointsToNextCalorieBronze);
     });
     _controller.forward(); // Start the animation
+    maxCarbon = _retrieveThreshold(totalCarbonSavedExp, pointsToNextCarbonPlatinum,pointsToNextCarbonGold,pointsToNextCarbonSilver,pointsToNextCarbonBronze);
+    maxCalorie = _retrieveThreshold(totalCalorieBurntExp, pointsToNextCaloriePlatinum,pointsToNextCalorieGold,pointsToNextCalorieSilver,pointsToNextCalorieBronze);
   }
 
   @override
@@ -182,7 +187,7 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
     } else if (value >= pointsToNextBronze) {
       threshold = pointsToNextSilver;
     } else {
-      threshold = pointsToNextGold;
+      threshold = pointsToNextBronze;
     }
 
     return threshold;

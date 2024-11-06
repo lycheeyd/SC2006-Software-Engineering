@@ -80,7 +80,7 @@ Future<Map<String, dynamic>> startTrip(
 
     // Check for a successful response and handle it
     if (response.statusCode == 200) {
-      print('Trip started successfully. Response data: ${response.body}');
+      //print('Trip started successfully. Response data: ${response.body}');
       return jsonDecode(response.body);
     } else {
       // Handle unsuccessful response and log details
@@ -110,7 +110,7 @@ Future<Map<String, dynamic>> startTrip(
     if (response.statusCode == 200) {
       return jsonDecode(response.body);  // Return the response as a Map
     } else {
-      throw Exception('Failed to retrieve metrics');
+      throw Exception('Failed to retrieve metrics ${response.statusCode}');
     }
   }
 
