@@ -1,5 +1,7 @@
 package com.controller;
 
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,6 +21,9 @@ public class TripController extends HttpReqController{
         super(restTemplate);
     }
 
+    @Value("${trips.module.urlPrefix}")
+    private String urlPrefix;
+
     // Implemenet you own mapping below
 
     @PostMapping("/addTripMetrics")
@@ -35,6 +40,24 @@ public class TripController extends HttpReqController{
         return restTemplate.postForEntity(url, user, String.class);
     }
 
+    @GetMapping("/api/keys/{keyName}")
+    public ResponseEntity<?> getApiKey(@PathVariable String keyName) {
+        // Forward view profile request to AccountModule
+        try {
+            String url = urlPrefix + "/api/keys/" + keyName;
+            return restTemplate.getForEntity(url, String.class);
+        } catch (HttpClientErrorException ex) {
+            HttpStatusCode statusCode = ex.getStatusCode();
+            if (statusCode == HttpStatus.NOT_FOUND) {
+                return ResponseEntity.status(statusCode).body(ex.getMessage());
+            } else {
+                return ResponseEntity.status(statusCode).body(statusCode + ex.getMessage());
+            }
+        } catch (Exception ex)  {
+            System.out.println(ex);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + ex.getMessage());
+        }
+    }
 
 }
 

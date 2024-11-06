@@ -110,11 +110,11 @@ public class AccountController extends HttpReqController{
         }
     }
 
-    @PostMapping("/forget-password")
+    @PostMapping("/forgot-password")
     public ResponseEntity<?> forgetPassword(@RequestBody ForgotPasswordDTO DTO) {
         // Forward forget password request to AccountModule
         try {
-            String url = urlPrefix + "/account/forget-password";
+            String url = urlPrefix + "/account/forgot-password";
             return restTemplate.postForEntity(url, DTO, String.class);
         } catch (Exception ex)  {
             System.out.println(ex);

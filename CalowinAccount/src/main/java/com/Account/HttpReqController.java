@@ -133,7 +133,7 @@ public class HttpReqController {
 
     }
 
-    @PostMapping("/forget-password")
+    @PostMapping("/forgot-password")
     public ResponseEntity<?> forgetPassword(@RequestBody ForgotPasswordDTO forgotPasswordDTO) {
         // Forget password logic
         try {
