@@ -40,28 +40,27 @@ public class TripController {
         return Arrays.asList(TravelMethod.values());
     }
 
-            @PostMapping("/start")
-        public Trip startTrip(@RequestBody Trip trip) {
-            double distance = calculateDistance(trip.getCurrentLocation(), trip.getDestination());
+    @PostMapping("/start")
+    public Trip startTrip(@RequestBody Trip trip) {
+        double distance = calculateDistance(trip.getCurrentLocation(), trip.getDestination());
 
             // Retrieve user weight from the database
-            double weight = getUserWeight(trip.getUserId());
+        double weight = getUserWeight(trip.getUserId());
 
-            int caloriesBurned = calculateCalories(trip.getTravelMethod(), distance, weight);
-            int carbonSaved = calculateCarbon(trip.getTravelMethod(), distance);
+        int caloriesBurned = calculateCalories(trip.getTravelMethod(), distance, weight);
+        int carbonSaved = calculateCarbon(trip.getTravelMethod(), distance);
 
-            trip.setCaloriesBurnt(caloriesBurned);
-            trip.setCarbonSaved(carbonSaved);
-            trip.setDistance(distance);
+        trip.setCaloriesBurnt(caloriesBurned);
+        trip.setCarbonSaved(carbonSaved);
+        trip.setDistance(distance);
 
-            achievementController.addTripMetrics(carbonSaved, caloriesBurned, trip);
+        achievementController.addTripMetrics(carbonSaved, caloriesBurned, trip);
 
-            insertTripIntoDatabase(trip);
+        insertTripIntoDatabase(trip);
 
-            return trip;
-        }
+        return trip;
+    }
 
-        @PostMapping("/retrieve-metrics")
     public Map<String, Object> retrieveMetrics(@RequestBody Trip trip) {
         // Extract the necessary information from the Trip object
         TravelMethod method = trip.getTravelMethod();  // Get travel method
@@ -86,7 +85,6 @@ public class TripController {
         metrics.put("distance", distance);
 
         return metrics;
-    
     }
 
 

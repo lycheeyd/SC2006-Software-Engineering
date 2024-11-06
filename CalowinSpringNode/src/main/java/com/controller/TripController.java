@@ -38,11 +38,12 @@ public class TripController extends HttpReqController{
         super(restTemplate);
     }
 
-        @GetMapping("/methods")
-    public List<Map<String, Object>> getTravelMethods() {
+    @GetMapping("/methods")
+    public ResponseEntity<?> getTravelMethods() {
         // Construct the URL for the backend trip controller
         String url = "http://localhost:8082/trips/methods";
-        
+        return restTemplate.getForEntity(url, Object.class);
+        /* 
         // Make the request and return the result
         ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(
                 url, 
@@ -50,7 +51,7 @@ public class TripController extends HttpReqController{
                 null, 
                 new ParameterizedTypeReference<List<Map<String, Object>>>() {}
         );
-        return response.getBody();
+        return response.getBody();*/
     }
 
 
