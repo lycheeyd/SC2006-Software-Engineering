@@ -2,7 +2,7 @@ package com.DataTransferObject;
 
 public class ForgotPasswordDTO {
     private String email;
-    private String otCode;
+    private String otpCode;
 
     public String getEmail() {
         return this.email;
@@ -13,11 +13,11 @@ public class ForgotPasswordDTO {
     }
 
     public String getOtCode() {
-        return this.otCode;
+        return this.otpCode;
     }
 
-    public void setOtCode(String otCode) {
-        this.otCode = otCode;
+    public void setOtCode(String otpCode) {
+        this.otpCode = otpCode;
     }
 
 }
