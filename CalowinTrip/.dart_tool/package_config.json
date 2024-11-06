@@ -14,6 +14,15 @@
       "languageVersion": "3.3"
     },
     {
+<<<<<<< Updated upstream
+=======
+      "name": "asn1lib",
+      "rootUri": "file:///C:/Users/rache/AppData/Local/Pub/Cache/hosted/pub.dev/asn1lib-1.5.8",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
+>>>>>>> Stashed changes
       "name": "async",
       "rootUri": "file:///C:/Users/rache/AppData/Local/Pub/Cache/hosted/pub.dev/async-2.11.0",
       "packageUri": "lib/",
@@ -56,6 +65,15 @@
       "languageVersion": "2.18"
     },
     {
+<<<<<<< Updated upstream
+=======
+      "name": "convert",
+      "rootUri": "file:///C:/Users/rache/AppData/Local/Pub/Cache/hosted/pub.dev/convert-3.1.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
+>>>>>>> Stashed changes
       "name": "crypto",
       "rootUri": "file:///C:/Users/rache/AppData/Local/Pub/Cache/hosted/pub.dev/crypto-3.0.6",
       "packageUri": "lib/",
@@ -74,6 +92,15 @@
       "languageVersion": "3.1"
     },
     {
+<<<<<<< Updated upstream
+=======
+      "name": "encrypt",
+      "rootUri": "file:///C:/Users/rache/AppData/Local/Pub/Cache/hosted/pub.dev/encrypt-5.0.3",
+      "packageUri": "lib/",
+      "languageVersion": "2.18"
+    },
+    {
+>>>>>>> Stashed changes
       "name": "fake_async",
       "rootUri": "file:///C:/Users/rache/AppData/Local/Pub/Cache/hosted/pub.dev/fake_async-1.3.1",
       "packageUri": "lib/",
@@ -122,6 +149,51 @@
       "languageVersion": "3.5"
     },
     {
+<<<<<<< Updated upstream
+=======
+      "name": "flutter_secure_storage",
+      "rootUri": "file:///C:/Users/rache/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_secure_storage-9.2.2",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "flutter_secure_storage_linux",
+      "rootUri": "file:///C:/Users/rache/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_secure_storage_linux-1.2.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "flutter_secure_storage_macos",
+      "rootUri": "file:///C:/Users/rache/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_secure_storage_macos-3.1.2",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "flutter_secure_storage_platform_interface",
+      "rootUri": "file:///C:/Users/rache/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_secure_storage_platform_interface-1.1.2",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "flutter_secure_storage_web",
+      "rootUri": "file:///C:/Users/rache/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_secure_storage_web-1.2.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "flutter_secure_storage_windows",
+      "rootUri": "file:///C:/Users/rache/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_secure_storage_windows-3.1.2",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "flutter_svg",
+      "rootUri": "file:///C:/Users/rache/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_svg-1.1.6",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
+    },
+    {
+>>>>>>> Stashed changes
       "name": "flutter_test",
       "rootUri": "file:///D:/flutter_windows_3.24.4-stable/flutter/packages/flutter_test",
       "packageUri": "lib/",
@@ -134,6 +206,33 @@
       "languageVersion": "3.2"
     },
     {
+<<<<<<< Updated upstream
+=======
+      "name": "geocoding",
+      "rootUri": "file:///C:/Users/rache/AppData/Local/Pub/Cache/hosted/pub.dev/geocoding-3.0.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
+    },
+    {
+      "name": "geocoding_android",
+      "rootUri": "file:///C:/Users/rache/AppData/Local/Pub/Cache/hosted/pub.dev/geocoding_android-3.3.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
+    },
+    {
+      "name": "geocoding_ios",
+      "rootUri": "file:///C:/Users/rache/AppData/Local/Pub/Cache/hosted/pub.dev/geocoding_ios-3.0.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
+    },
+    {
+      "name": "geocoding_platform_interface",
+      "rootUri": "file:///C:/Users/rache/AppData/Local/Pub/Cache/hosted/pub.dev/geocoding_platform_interface-3.2.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+>>>>>>> Stashed changes
       "name": "geolocator",
       "rootUri": "file:///C:/Users/rache/AppData/Local/Pub/Cache/hosted/pub.dev/geolocator-10.1.1",
       "packageUri": "lib/",
@@ -236,6 +335,21 @@
       "languageVersion": "2.15"
     },
     {
+<<<<<<< Updated upstream
+=======
+      "name": "intl",
+      "rootUri": "file:///C:/Users/rache/AppData/Local/Pub/Cache/hosted/pub.dev/intl-0.19.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "js",
+      "rootUri": "file:///C:/Users/rache/AppData/Local/Pub/Cache/hosted/pub.dev/js-0.6.7",
+      "packageUri": "lib/",
+      "languageVersion": "2.19"
+    },
+    {
+>>>>>>> Stashed changes
       "name": "json_annotation",
       "rootUri": "file:///C:/Users/rache/AppData/Local/Pub/Cache/hosted/pub.dev/json_annotation-4.9.0",
       "packageUri": "lib/",
@@ -266,6 +380,15 @@
       "languageVersion": "3.0"
     },
     {
+<<<<<<< Updated upstream
+=======
+      "name": "loading_animation_widget",
+      "rootUri": "file:///C:/Users/rache/AppData/Local/Pub/Cache/hosted/pub.dev/loading_animation_widget-1.3.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.16"
+    },
+    {
+>>>>>>> Stashed changes
       "name": "matcher",
       "rootUri": "file:///C:/Users/rache/AppData/Local/Pub/Cache/hosted/pub.dev/matcher-0.12.16+1",
       "packageUri": "lib/",
@@ -290,6 +413,21 @@
       "languageVersion": "3.0"
     },
     {
+<<<<<<< Updated upstream
+=======
+      "name": "path_drawing",
+      "rootUri": "file:///C:/Users/rache/AppData/Local/Pub/Cache/hosted/pub.dev/path_drawing-1.0.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "path_parsing",
+      "rootUri": "file:///C:/Users/rache/AppData/Local/Pub/Cache/hosted/pub.dev/path_parsing-1.0.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
+    },
+    {
+>>>>>>> Stashed changes
       "name": "path_provider",
       "rootUri": "file:///C:/Users/rache/AppData/Local/Pub/Cache/hosted/pub.dev/path_provider-2.1.4",
       "packageUri": "lib/",
@@ -374,6 +512,15 @@
       "languageVersion": "3.0"
     },
     {
+<<<<<<< Updated upstream
+=======
+      "name": "pointycastle",
+      "rootUri": "file:///C:/Users/rache/AppData/Local/Pub/Cache/hosted/pub.dev/pointycastle-3.9.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
+    },
+    {
+>>>>>>> Stashed changes
       "name": "sanitize_html",
       "rootUri": "file:///C:/Users/rache/AppData/Local/Pub/Cache/hosted/pub.dev/sanitize_html-2.1.0",
       "packageUri": "lib/",
@@ -506,6 +653,15 @@
       "languageVersion": "3.4"
     },
     {
+<<<<<<< Updated upstream
+=======
+      "name": "win32",
+      "rootUri": "file:///C:/Users/rache/AppData/Local/Pub/Cache/hosted/pub.dev/win32-5.8.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.5"
+    },
+    {
+>>>>>>> Stashed changes
       "name": "xdg_directories",
       "rootUri": "file:///C:/Users/rache/AppData/Local/Pub/Cache/hosted/pub.dev/xdg_directories-1.1.0",
       "packageUri": "lib/",
@@ -530,7 +686,11 @@
       "languageVersion": "3.4"
     }
   ],
+<<<<<<< Updated upstream
   "generated": "2024-10-26T05:39:07.790842Z",
+=======
+  "generated": "2024-11-06T11:24:10.190161Z",
+>>>>>>> Stashed changes
   "generator": "pub",
   "generatorVersion": "3.5.4",
   "flutterRoot": "file:///D:/flutter_windows_3.24.4-stable/flutter",

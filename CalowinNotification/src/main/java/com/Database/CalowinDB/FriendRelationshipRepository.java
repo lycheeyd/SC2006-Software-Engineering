@@ -16,5 +16,6 @@ public interface FriendRelationshipRepository extends JpaRepository<FriendRelati
 
     // List<FriendRelationship> findPendingFriendRequests(@Param("userId") String userId);
 
-    List<FriendRelationship> findAllRecords();
+    //List<FriendRelationship> findAllRecords();
 }
+
