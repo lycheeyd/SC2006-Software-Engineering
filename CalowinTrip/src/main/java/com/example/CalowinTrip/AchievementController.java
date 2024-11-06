@@ -35,8 +35,11 @@ public class AchievementController {
 
     // Endpoint to get current achievement progress (EXP and medals)
     @GetMapping("/progress")
-    public AchievementResponse getAchievementProgress() {
+    public AchievementResponse getAchievementProgress(String userId) {
+        Achievement userAchievement = loadUserAchievement(userId);
+
         return new AchievementResponse(
+
             achievement.getTotalCarbonSavedExp(),
             achievement.getTotalCalorieBurntExp(),
             achievement.getCarbonSavedMedal(),
@@ -51,6 +54,36 @@ public class AchievementController {
             achievement.pointsToNextCaloriePlatinum()
         );
     }
+
+    // Method to load user-specific achievement data from the database
+private Achievement loadUserAchievement(String userId) {
+    String query = "SELECT total_carbon_saved, total_calorie_burnt, carbon_medal, calorie_medal FROM achievement WHERE user_id = ?";
+    Achievement achievement = new Achievement();
+
+    try (Connection conn = DatabaseConnection.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(query)) {
+
+        stmt.setString(1, userId);
+        ResultSet rs = stmt.executeQuery();
+
+        if (rs.next()) {
+            // Retrieve and set achievement data for the user
+            achievement.setTotalCarbonSavedExp(rs.getInt("total_carbon_saved"));
+            achievement.setTotalCalorieBurntExp(rs.getInt("total_calorie_burnt"));
+            achievement.setCarbonSavedMedal(rs.getString("carbon_medal"));
+            achievement.setCalorieBurntMedal(rs.getString("calorie_medal"));
+            
+        } else {
+            // Handle the case where no record exists for the user (optional)
+            System.out.println("No achievement record found for user " + userId);
+        }
+    } catch (SQLException e) {
+        System.out.println("Error while loading achievement data for user " + userId);
+        e.printStackTrace();
+    }
+
+    return achievement;
+}
 
     private void saveOrUpdateAchievement(Trip trip) throws SQLException {
         
@@ -81,6 +114,7 @@ public class AchievementController {
             } else {
                 // Insert new record
                 try (PreparedStatement insertStmt = conn.prepareStatement(insertQuery)) {
+                    
                     insertStmt.setString(1, trip.getUserId());
                     insertStmt.setInt(2, achievement.getTotalCarbonSavedExp());
                     insertStmt.setInt(3, achievement.getTotalCalorieBurntExp());
