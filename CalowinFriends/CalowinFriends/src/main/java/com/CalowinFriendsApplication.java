@@ -1,20 +1,19 @@
 package com;
 
-import com.models.Achievement;
-import com.models.FriendRelationship;
-import com.service.LeaderboardService;
-import com.service.FriendRelationshipService;
-import com.ENUM.*;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.List;
+import com.models.Achievement;
+import com.service.FriendRelationshipService;
+import com.service.LeaderboardService;
 
 @SpringBootApplication
 public class CalowinFriendsApplication implements CommandLineRunner {
@@ -36,7 +35,7 @@ public class CalowinFriendsApplication implements CommandLineRunner {
     public void run(String... args) {
         testDatabaseConnection();
         testLeaderboardFunctionality();
-        testFriendFunctionality();
+        // testFriendFunctionality();
     }
 
     private void testDatabaseConnection() {
@@ -53,44 +52,44 @@ public class CalowinFriendsApplication implements CommandLineRunner {
 
     private void testLeaderboardFunctionality() {
         System.out.println("Carbon Leaderboard:");
-        List<Achievement> carbonLeaderboard = leaderboardService.getCarbonLeaderboard();
+        List<Achievement> carbonLeaderboard = leaderboardService.getCarbonLeaderboard("00000001");
         carbonLeaderboard.forEach(a -> System.out.println(a.getUserId() + ": " + a.getTotalCarbonSaved()));
 
         System.out.println("\nCalories Leaderboard:");
-        List<Achievement> caloriesLeaderboard = leaderboardService.getCaloriesLeaderboard();
+        List<Achievement> caloriesLeaderboard = leaderboardService.getCaloriesLeaderboard("00000001");
         caloriesLeaderboard.forEach(a -> System.out.println(a.getUserId() + ": " + a.getTotalCalorieBurnt()));
     }
 
-private void testFriendFunctionality() {
-    // Test sending a friend request
-    try {
-        friendRelationshipService.sendFriendRequest("user1", "user2");
-        System.out.println("Friend request sent from user1 to user2.");
-    } catch (IllegalArgumentException e) {
-        System.out.println("Failed to send friend request: " + e.getMessage());
-    }
+    // private void testFriendFunctionality() {
+    //     // Test sending a friend request
+    //     try {
+    //         friendRelationshipService.sendFriendRequest("user1", "user2");
+    //         System.out.println("Friend request sent from user1 to user2.");
+    //     } catch (IllegalArgumentException e) {
+    //         System.out.println("Failed to send friend request: " + e.getMessage());
+    //     }
 
-    // Test sending a duplicate friend request
-    try {
-        friendRelationshipService.sendFriendRequest("user1", "user2");
-    } catch (IllegalArgumentException e) {
-        System.out.println("Expected duplicate error: " + e.getMessage());
-    }
+    //     // Test sending a duplicate friend request
+    //     try {
+    //         friendRelationshipService.sendFriendRequest("user1", "user2");
+    //     } catch (IllegalArgumentException e) {
+    //         System.out.println("Expected duplicate error: " + e.getMessage());
+    //     }
 
-    // Test responding to a friend request
-    try {
-        friendRelationshipService.respondToRequest("user1", "user2", FriendRequestStatus.ACCEPTED);
-        System.out.println("Friend request accepted.");
-    } catch (Exception e) {
-        System.out.println("Failed to respond to friend request: " + e.getMessage());
-    }
+    //     // Test responding to a friend request
+    //     try {
+    //         friendRelationshipService.respondToRequest("user1", "user2", FriendRequestStatus.ACCEPTED);
+    //         System.out.println("Friend request accepted.");
+    //     } catch (Exception e) {
+    //         System.out.println("Failed to respond to friend request: " + e.getMessage());
+    //     }
 
-    // Test fetching pending requests
-    try {
-        List<FriendRelationship> pendingRequests = friendRelationshipService.getPendingRequests("user2");
-        System.out.println("Pending requests for user2: " + pendingRequests.size());
-    } catch (Exception e) {
-        System.out.println("Failed to fetch pending requests: " + e.getMessage());
-    }
-}
+    //     // Test fetching pending requests
+    //     try {
+    //         List<FriendRelationship> pendingRequests = friendRelationshipService.getPendingRequests("user2");
+    //         System.out.println("Pending requests for user2: " + pendingRequests.size());
+    //     } catch (Exception e) {
+    //         System.out.println("Failed to fetch pending requests: " + e.getMessage());
+    //     }
+    // }
 }

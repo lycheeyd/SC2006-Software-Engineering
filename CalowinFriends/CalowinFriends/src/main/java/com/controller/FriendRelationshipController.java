@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ENUM.FriendRequestStatus;
 import com.models.FriendRelationship;
 import com.service.FriendRelationshipService;
 
@@ -44,7 +43,7 @@ public class FriendRelationshipController {
     }
 
     @PostMapping("/respond")
-    public ResponseEntity<FriendRelationship> respondToRequest(@RequestParam String senderId, @RequestParam String receiverId, @RequestParam FriendRequestStatus status) {
+    public ResponseEntity<FriendRelationship> respondToRequest(@RequestParam String senderId, @RequestParam String receiverId, @RequestParam String status) {
         try {
             FriendRelationship result = service.respondToRequest(senderId, receiverId, status);
             return ResponseEntity.ok(result);

@@ -10,7 +10,7 @@ import jakarta.persistence.Table;
 public class Achievement {
 
     @Id
-    @Column(name = "user_id")
+    @Column(name = "user_id", columnDefinition = "nchar(255)")
     private String userId;
 
     @Column(name = "total_carbon_saved")
@@ -18,6 +18,12 @@ public class Achievement {
 
     @Column(name = "total_calorie_burnt")
     private int totalCalorieBurnt;
+
+    @Column(name = "carbon_medal")
+    private String carbonMedal;
+
+    @Column(name = "calorie_medal")
+    private String calorieMedal;
 
     // Getters and Setters
 
@@ -43,5 +49,21 @@ public class Achievement {
 
     public void setTotalCalorieBurnt(int totalCalorieBurnt) {
         this.totalCalorieBurnt = totalCalorieBurnt;
+    }
+
+    public String getCarbonMedal() {
+        return carbonMedal;
+    }
+
+    public void setCarbonMedal(String carbonMedal) {
+        this.carbonMedal = carbonMedal;
+    }
+
+    public String getCalorieMedal() {
+        return calorieMedal;
+    }
+
+    public void setCalorieMedal(String calorieMedal) {
+        this.calorieMedal = calorieMedal;
     }
 }

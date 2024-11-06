@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
-import com.ENUM.FriendRequestStatus;
 import com.models.FriendRelationship;
 import com.repository.FriendRelationshipRepository;
 
@@ -31,7 +30,7 @@ public class FriendRelationshipService {
             relationship.setUniqueId(senderId);
             relationship.setFriendUniqueId(receiverId);
             relationship.setFriendedOn(LocalDateTime.now());
-            relationship.setStatus(FriendRequestStatus.PENDING);
+            relationship.setStatus("PENDING");
             
             // Save the request to the database
             return repository.save(relationship);
@@ -51,16 +50,16 @@ public class FriendRelationshipService {
         return repository.findByFriendUniqueId(userId);
     }
 
-    public FriendRelationship updateStatus(String uniqueId, FriendRequestStatus status) {
+    public FriendRelationship updateStatus(String uniqueId, String status) {
         FriendRelationship relationship = repository.findById(uniqueId).orElseThrow();
         relationship.setStatus(status);
         return repository.save(relationship);
     }
     public List<FriendRelationship> getPendingRequests(String receiverId) {
-        return repository.findByFriendUniqueIdAndStatus(receiverId, FriendRequestStatus.PENDING);
+        return repository.findByFriendUniqueIdAndStatus(receiverId, "PENDING");
     }
 
-    public FriendRelationship respondToRequest(String senderId, String receiverId, FriendRequestStatus status) {
+    public FriendRelationship respondToRequest(String senderId, String receiverId, String status) {
         FriendRelationship relationship = repository.findByUniqueIdAndFriendUniqueId(senderId, receiverId)
                 .orElseThrow(() -> new IllegalArgumentException("Request not found"));
 

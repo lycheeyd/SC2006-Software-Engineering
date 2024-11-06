@@ -38,11 +38,12 @@ public class TripController extends HttpReqController{
         super(restTemplate);
     }
 
-        @GetMapping("/methods")
-    public List<Map<String, Object>> getTravelMethods() {
+    @GetMapping("/methods")
+    public ResponseEntity<?> getTravelMethods() {
         // Construct the URL for the backend trip controller
         String url = "http://localhost:8082/trips/methods";
-        
+        return restTemplate.getForEntity(url, Object.class);
+        /* 
         // Make the request and return the result
         ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(
                 url, 
@@ -50,7 +51,7 @@ public class TripController extends HttpReqController{
                 null, 
                 new ParameterizedTypeReference<List<Map<String, Object>>>() {}
         );
-        return response.getBody();
+        return response.getBody();*/
     }
 
 
@@ -58,7 +59,8 @@ public class TripController extends HttpReqController{
     public ResponseEntity<String> startTrip(@RequestBody TripInfoDTO tripInfo) {
         // Define the backend URL for starting the trip
         String url = "http://localhost:8082/trips/start"; // URL for backend /start endpoint
-
+        return restTemplate.postForEntity(url, tripInfo, String.class);
+        /* 
         // Send the request to the backend with the trip data
         ResponseEntity<String> response = restTemplate.exchange(
                 url, 
@@ -67,7 +69,7 @@ public class TripController extends HttpReqController{
                 String.class
         );
         // Return the response from the backend
-        return response;
+        return response;*/
     }   
 
     @PostMapping("/addTripMetrics")
@@ -87,16 +89,17 @@ public class TripController extends HttpReqController{
     }   
 
     @GetMapping("/progress")
-    public ResponseEntity<Achievement> getAchievementProgress() {
+    public ResponseEntity<?> getAchievementProgress() {
         // Construct the URL to call the external achievement service
         String url = "http://localhost:8082/achievements/progress";
-
+        return restTemplate.getForEntity(url, Object.class);
+        /* 
         // Use RestTemplate to make the GET request to the external service
         ResponseEntity<Achievement> response = restTemplate.exchange(
             url, 
             HttpMethod.GET, 
             null, 
-            Achievement.class);
+            Object.class);
 
         // Check if the response is successful
         if (response.getStatusCode().is2xxSuccessful()) {
@@ -105,7 +108,8 @@ public class TripController extends HttpReqController{
         } else {
             // Handle failure (e.g., service unavailable, invalid response)
             return ResponseEntity.status(500).body(null);
-        }
+        }*/
+    
     }
 
     @GetMapping("/api/keys/{keyName}")
@@ -127,7 +131,11 @@ public class TripController extends HttpReqController{
         }
     }
 
-
+    @PostMapping("/retrieve-metrics")
+    public ResponseEntity<?> retrieveMetrics(@RequestBody TripInfoDTO trip) {
+        String url = "http://localhost:8082/trips/retrieve-metrics";
+        return restTemplate.postForEntity(url, trip,Map.class);
+    }
 }
 
 
