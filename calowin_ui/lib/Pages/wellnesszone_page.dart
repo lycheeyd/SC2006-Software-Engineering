@@ -51,7 +51,7 @@ class _WellnessZonePageState extends State<WellnessZonePage> {
   Future<void> _setUserLocation() async {
     try {
       await _userCurrentLocation.getCurrentLocation();
-      print("User location: ${_userCurrentLocation.name} Lat: ${_userCurrentLocation.latitude} Long: ${_userCurrentLocation.longitude}");
+      //print("User location: ${_userCurrentLocation.name} Lat: ${_userCurrentLocation.latitude} Long: ${_userCurrentLocation.longitude}");
       setState(() {
         _currentLocationMarker = Marker(
           markerId: MarkerId('currentLocation'),

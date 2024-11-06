@@ -2,6 +2,7 @@ import 'package:calowin/Pages/profile/changepassword_page.dart';
 import 'package:calowin/common/ActionType.dart';
 import 'package:calowin/common/custom_scaffold.dart';
 import 'package:calowin/common/input_dialog.dart';
+import 'package:calowin/common/user_profile.dart';
 import 'package:calowin/control/maxline_inputformatter.dart';
 import 'package:flutter/material.dart';
 import 'package:calowin/common/colors_and_fonts.dart';
@@ -12,13 +13,17 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class EditprofilePage extends StatefulWidget {
-  const EditprofilePage({super.key});
+  final UserProfile profile;
+  const EditprofilePage({super.key, required this.profile});
+  
 
   @override
   State<EditprofilePage> createState() => _EditprofilePageState();
 }
 
 class _EditprofilePageState extends State<EditprofilePage> {
+  late UserProfile _profile;
+
 
   final String name;
   final String userID;
@@ -35,6 +40,94 @@ class _EditprofilePageState extends State<EditprofilePage> {
   final TextEditingController _weightController = TextEditingController();
   final TextEditingController _bioController = TextEditingController();
 
+  String? _nameError;
+  String? _weightError;
+  String? _bioError;
+
+  void _checkName() {
+    setState(() {
+      if (_nameController.text.isEmpty) {
+        _nameError = "Name is required";
+      } else if (_nameController.text.length > 16) {
+        _nameError = "Name cannot exceed 16 characters";
+      } else {
+        _nameError = null;
+      }
+    });
+  }
+
+  void _checkWeight() {
+    final weightPattern = r'^\d+(\.\d{1})?$';
+    setState(() {
+      if (_weightController.text.isEmpty) {
+        _weightError = "Weight is required";
+      } else if (!RegExp(weightPattern).hasMatch(_weightController.text)) {
+        _weightError = "Enter weight in kg (e.g., 70 or 70.5)";
+      } else {
+        _weightError = null;
+      }
+    });
+  }
+
+  void _checkBio() {
+    setState(() {
+      if (_bioController.text.isEmpty) {
+        _bioError = "Bio is required";
+      } else if (_bioController.text.length > 245) {
+        _bioError = "Bio cannot exceed 245 characters";
+      } else {
+        _bioError = null;
+      }
+    });
+  }
+
+  Future<void> _handleSaveChanges() async {
+    _checkName();
+    _checkWeight();
+    _checkBio();
+
+    if (_nameError == null &&
+        _weightError == null &&
+        _bioError == null) {
+
+      final String url = "http://172.21.146.188:8080/central/account/edit-profile";
+
+      try {
+        final response = await http.post(
+          Uri.parse(url),
+          headers: {"Content-Type": "application/json"},
+          body: json.encode({
+            "userID": userID,
+            "name": _nameController.text,
+            "weight": _weightController.text,
+            "bio": _bioController.text,
+          }),
+        );
+
+        final responseMessage = response.body;
+
+        if (response.statusCode == 200) {
+          // Signup successful
+          _showSuccessDialog(responseMessage);
+
+        } else {
+          _showErrorDialog(responseMessage);
+        }
+      } catch (e) {
+        _showErrorDialog("Network error: ${e.toString()}");
+      }
+    }
+    Navigator.pop(context);
+  @override
+  void initState() {
+    super.initState();
+    _profile = widget.profile;
+    _nameController.text = _profile.getName();
+    _weightController.text = _profile.getWeight().toString();
+  }
+
+  void _handleSaveChanges() {
+    Navigator.pop(context, _profile);
   String? _nameError;
   String? _weightError;
   String? _bioError;
