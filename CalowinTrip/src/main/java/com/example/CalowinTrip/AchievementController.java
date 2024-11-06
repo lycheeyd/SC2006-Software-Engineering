@@ -98,8 +98,7 @@ public class AchievementController {
         }
     }
     
-
-
+    
     // Response class to encapsulate achievement data
     public static class AchievementResponse {
         private int totalCarbonSavedExp;
