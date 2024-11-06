@@ -1,8 +1,12 @@
 package com.models;
 
-import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import com.ENUM.FriendRequestStatus;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+// import com.ENUM.FriendRequestStatus;
 
 @Entity
 @Table(name = "FriendRelationship", schema = "dbo")
@@ -19,7 +23,7 @@ public class FriendRelationship {
     private LocalDateTime friendedOn;
 
     @Column(name = "status")
-    private FriendRequestStatus status; // e.g., "PENDING", "ACCEPTED", "DECLINED"
+    private String status; // e.g., "PENDING", "ACCEPTED", "DECLINED"
 
     // Getters and Setters
 
@@ -47,11 +51,11 @@ public class FriendRelationship {
         this.friendedOn = friendedOn;
     }
 
-    public FriendRequestStatus getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(FriendRequestStatus status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 }
