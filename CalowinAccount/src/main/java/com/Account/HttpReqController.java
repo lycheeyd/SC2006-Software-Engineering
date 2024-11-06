@@ -134,10 +134,10 @@ public class HttpReqController {
     }
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<?> forgetPassword(@RequestBody ForgotPasswordDTO forgotPasswordDTO) {
+    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordDTO forgotPasswordDTO) {
         // Forget password logic
         try {
-            passwordManagementService.forgotPassword(forgotPasswordDTO.getEmail(), forgotPasswordDTO.getOtCode());
+            passwordManagementService.forgotPassword(forgotPasswordDTO.getEmail(), forgotPasswordDTO.getOtpCode());
 
             return ResponseEntity.ok("New password is sent to your email");
 

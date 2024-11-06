@@ -65,13 +65,20 @@ public class PasswordManagementService {
 
     // Forgot password method
     public void forgotPassword(String email, String otpCode) throws Exception {
+        UserEntity user = calowinSecureDBRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Invalid user"));
+        
         // Authenticate OTP
         if (!otpService.verifyOTP(email, otpCode, ActionType.FORGOT_PASSWORD)) {
             throw new RuntimeException("Invalid OTP");
         }
 
+        // Generate new password and save to database
         String newPassword = passwordSecurityService.generateRandomPassword();
-        
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        calowinSecureDBRepository.save(user);
+
         // Send new password to email
         ActionType type = ActionType.SEND_NEW_PASSWORD;
         emailService.sendEmail(email, type.getSubject(), type.getMessageBody(newPassword));

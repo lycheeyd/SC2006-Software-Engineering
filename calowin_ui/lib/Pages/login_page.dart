@@ -31,8 +31,8 @@ class _LoginpageState extends State<Loginpage> {
       _invalidEmail = false;
     });
 
-    final email = _inputEmail.text.trim();
-    final password = _inputPassword.text.trim();
+    final email = _inputEmail.text;
+    final password = _inputPassword.text;
 
     if (email.isEmpty || !email.contains('@')) {
       setState(() => _invalidEmail = true);
@@ -86,6 +86,24 @@ class _LoginpageState extends State<Loginpage> {
   Future<void> _handleForgetPW(String emailText) async{
 
     final email = emailText.trim();
+  
+    if (email.isEmpty || !email.contains('@')) {
+      Align(
+        alignment: Alignment.centerLeft,
+        child: Padding(
+          padding: const EdgeInsets.only(left: 20.0), // Adjust padding as needed
+          child: Text(
+            "Invalid email format.",
+            style: GoogleFonts.roboto(
+              fontSize: 11,
+              color: Colors.redAccent.shade400,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      );
+      return;
+    }
 
     try {
       final response = await http.post(
