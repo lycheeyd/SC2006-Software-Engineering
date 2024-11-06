@@ -49,7 +49,7 @@ class _WellnessZonePageState extends State<WellnessZonePage> {
   Future<void> _setUserLocation() async {
     try {
       await _userCurrentLocation.getCurrentLocation();
-      //print("User location: ${_userCurrentLocation.name} Lat: ${_userCurrentLocation.latitude} Long: ${_userCurrentLocation.longitude}");
+      print("User location: ${_userCurrentLocation.name} Lat: ${_userCurrentLocation.latitude} Long: ${_userCurrentLocation.longitude}");
       setState(() {
         _currentLocationMarker = Marker(
           markerId: MarkerId('currentLocation'),
@@ -69,13 +69,6 @@ class _WellnessZonePageState extends State<WellnessZonePage> {
       print('Error initializing location: $e');
     }
   }
-
-
-
-
-
-
-
 
   void _retrieveWellnessZones() async {
     //enable loading screen
@@ -296,12 +289,12 @@ class _WellnessZonePageState extends State<WellnessZonePage> {
     }
   }
 
-  void _handleGO() {
+  void _handleGO(Park zone) {
     final pageNavigatorState =
         context.findAncestorStateOfType<PageNavigatorState>();
     //change here
     if (pageNavigatorState != null) {
-      pageNavigatorState.navigateToPage(0); // Navigate to AddFriendsPage
+      pageNavigatorState.navigateToPage(0,params: {'targetName': zone.name , 'targetLat':zone.closestPoint['Lat'], 'targetLong':zone.closestPoint['Lon']}); // Navigate to AddFriendsPage
     }
   }
 
@@ -346,7 +339,7 @@ class _WellnessZonePageState extends State<WellnessZonePage> {
                   width: 60,
                   height: 30,
                   child: ElevatedButton(
-                      onPressed: _handleGO,
+                      onPressed: () => _handleGO(zone),
                       style: ElevatedButton.styleFrom(
                         elevation: 0,
                         backgroundColor: Colors.purple,
@@ -390,10 +383,6 @@ class _WellnessZonePageState extends State<WellnessZonePage> {
             height: 400,
             child: Stack(
               children: [
-                // Container(
-                //   color: const Color.fromARGB(255, 138, 218, 255),
-                //   height: 400,
-                //   child: 
                   GoogleMap(
                       onMapCreated: _onMapCreated,
                       initialCameraPosition: CameraPosition(
@@ -407,17 +396,7 @@ class _WellnessZonePageState extends State<WellnessZonePage> {
                         if (_currentLocationMarker != null) _currentLocationMarker!,
                         if (_selectedLocationMarker != null) _selectedLocationMarker!,
                       },
-                    //   polylines: {
-                    //   if (routePolylineBorder != null) routePolylineBorder!,
-                    //   if (routePolylineMain != null) routePolylineMain!,
-                    // },
                     ),
-                  //   if (_tripStarted)
-                  //     const Center(
-                  //       child: CircularProgressIndicator(),
-                  //     ),
-                  // const Center(child: Text("<Insert Map Here>")),
-                //),
                 if (!_showWeather)
                   Padding(
                     padding:

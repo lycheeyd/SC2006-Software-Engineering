@@ -24,7 +24,9 @@ class PageNavigatorState extends State<PageNavigator> {
   Map<String, dynamic>? _currentParams;
 
   final List<Widget Function(Map<String, dynamic>?)> _pages = [
-    (params) => const MapcalcPage(),
+    (params) => MapcalcPage(
+      targetName: params?['targetName'], targetLat: params?['targetLat'], targetLong: params?['targetLong'],
+    ),
     (params) => const RankPage(),
     (params) => const ProfilePage(),
     (params) => const FriendsPage(),

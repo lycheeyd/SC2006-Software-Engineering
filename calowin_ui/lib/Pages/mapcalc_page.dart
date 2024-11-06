@@ -12,7 +12,15 @@ import '../control/autocomplate_prediction.dart';
 import '../control/place_auto_complate_response.dart';
 
 class MapcalcPage extends StatefulWidget {
-  const MapcalcPage({super.key});
+  final double? targetLat;
+  final double? targetLong;
+  final String? targetName;
+  const MapcalcPage({
+    super.key,
+    this.targetLat,
+    this.targetLong,
+    this.targetName,
+  });
 
   @override
   State<MapcalcPage> createState() => _MapcalcPageState();
@@ -38,6 +46,9 @@ class _MapcalcPageState extends State<MapcalcPage> {
   String? selectedLocationName; // Added to hold the name of the selected location
   final TextEditingController _searchController = TextEditingController(); // Added controller for TextField
 
+  // to set the location passed from wellness zone
+  Location? targetLocation;
+
   bool _tripStarted = false;
   late int _currentIndex = 99;
 
@@ -48,11 +59,31 @@ class _MapcalcPageState extends State<MapcalcPage> {
   void initState() {
     super.initState();
     _initializeLocation();
-    _fetchTravelMethods();
-    _retrievePlacesKey();
-    _retrieveMapKey();
-    _retrieveDirectionsKey();
+    // _fetchTravelMethods();
+    // _retrievePlacesKey();
+    // _retrieveMapKey();
+    // _retrieveDirectionsKey();
+
+    //this is the directing from wellness zone
+    setState(() {
+      _searchController.text = widget.targetName ?? "";
+      if(widget.targetName!=null) _handleSearch(_searchController.text);
+      targetLocation = Location(name: widget.targetName ?? "", latitude: widget.targetLat ?? 1.3521, longitude: widget.targetLong ?? 103.8198);
+    });
    }
+
+  @override
+  void didUpdateWidget(MapcalcPage oldWidget){
+      super.didUpdateWidget(oldWidget);
+      if(oldWidget.targetName != widget.targetName && widget.targetName != "" && widget.targetName != null){
+      setState(() {
+        _searchController.text = widget.targetName ?? "";
+        if(widget.targetName!=null) _handleSearch(_searchController.text);
+        targetLocation = Location(name: widget.targetName ?? "", latitude: widget.targetLat ?? 1.3521, longitude:widget.targetLong ?? 103.8198);
+      });
+      }
+  }
+
 
   Future<void> _retrieveDirectionsKey() async {
     try {
@@ -102,18 +133,16 @@ class _MapcalcPageState extends State<MapcalcPage> {
           position: LatLng(userCurrentLocation.latitude ?? 0, userCurrentLocation.longitude ?? 0),
           infoWindow: InfoWindow(title: 'Current Location'),
           icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen), // Set the color
-
         );
+        print("${userCurrentLocation.name}");
       });
 
-      if (mapController != null) {
-        mapController!.animateCamera(
+        mapController.animateCamera(
           CameraUpdate.newLatLngZoom(
             LatLng(userCurrentLocation.latitude ?? 0, userCurrentLocation.longitude ?? 0),
             15,
           ),
         );
-      }
     } catch (e) {
       print('Error initializing location: $e');
     }
@@ -283,7 +312,8 @@ List<LatLng> _decodePolyline(String polyline) {
   }
 
   void _handleSearch(String query) {
-    placeAutocomplete(query);
+    //placeAutocomplete(query);
+    print("Now searching for: $query");
   }
 
   Future<void> _startTrip() async {
@@ -463,10 +493,12 @@ List<LatLng> _decodePolyline(String polyline) {
                 child: Stack(
                   children: [
                     GoogleMap(
+                      myLocationButtonEnabled: false,
+                      mapType: MapType.terrain,
                       onMapCreated: _onMapCreated,
                       initialCameraPosition: CameraPosition(
-                        target: LatLng(userCurrentLocation.latitude ?? 0, userCurrentLocation.longitude ?? 0),
-                        zoom: 15,
+                        target: LatLng(userCurrentLocation.latitude ?? 1.3521, userCurrentLocation.longitude ?? 103.8198),
+                        zoom: 10,
                       ),
                       markers: {
                         if (currentLocationMarker != null) currentLocationMarker!,
