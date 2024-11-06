@@ -10,10 +10,10 @@ class UserProfile {
 
   // Constructor
   UserProfile({
-    String? name,
+    required String name,
     String? email,
-    String? userID,
-    String? bio,
+    required String userID,
+    required String bio,
     int? weight,
     int? carbonSaved,
     int? calorieBurn,
@@ -32,10 +32,10 @@ class UserProfile {
   // Factory constructor for deserialization from LoginResponseDTO
   factory UserProfile.fromLoginResponse(Map<String, dynamic> json) {
     return UserProfile(
-      name: json['name'] as String?,
+      name: json['name'] as String,
       email: json['email'] as String?,
-      userID: json['userID'] as String?,
-      bio: json['bio'] as String?,
+      userID: json['userID'] as String,
+      bio: json['bio'] as String,
       weight: (json['weight'] as num?)?.toInt(),  // Convert to int if available
       // Other fields like _carbonSaved, _calorieBurn, and _badges can remain null
       // or be set later as they are not part of LoginResponseDTO
