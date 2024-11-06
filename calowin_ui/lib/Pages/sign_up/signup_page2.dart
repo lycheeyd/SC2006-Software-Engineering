@@ -88,6 +88,7 @@ class _SignupPage2State extends State<SignupPage2> {
         if (response.statusCode == 201) {
           // Signup successful
           _showSuccessDialog("Signup successful! Welcome to CaloWin!");
+          print(response.body);
 
           // Navigate to the next page
           Navigator.of(context).push(

@@ -10,6 +10,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import com.Account.Entities.ActionType;
 import com.Account.Entities.UserEntity;
 import com.Account.Services.EmailService;
+import com.Account.Services.OTPService;
 import com.Account.Services.PasswordSecurityService;
 import com.Database.CalowinSecureDB.SecureInfoDBRepository;
 
@@ -31,6 +32,9 @@ public class PasswordManagementService {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private OTPService otpService;
 
     @Value("${aes.secret-key}")
     private String SECRET_KEY;
@@ -62,11 +66,10 @@ public class PasswordManagementService {
     // Forgot password method
     public void forgotPassword(String email, String otpCode) throws Exception {
         // Authenticate OTP
-        /*
-        if (!otpService.verifyOTP(email, otpCode)) {
+
+        if (!otpService.verifyOTP(email, otpCode, ActionType.FORGOT_PASSWORD)) {
             throw new RuntimeException("Invalid OTP");
         }
-        */
 
         String newPassword = passwordSecurityService.generateRandomPassword();
         

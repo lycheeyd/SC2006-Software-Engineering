@@ -62,6 +62,13 @@ public class AccountController extends HttpReqController{
         try {
             String url = urlPrefix + "/account/login";
             return restTemplate.postForEntity(url, DTO, Map.class);
+        } catch (HttpClientErrorException ex) {
+            HttpStatusCode statusCode = ex.getStatusCode();
+            if (statusCode == HttpStatus.UNAUTHORIZED) {
+                return ResponseEntity.status(statusCode).body("Invalid email or password");
+            } else {
+                return ResponseEntity.status(statusCode).body(statusCode + ex.getMessage());
+            }
         } catch (Exception ex)  {
             System.out.println(ex);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + ex.getMessage());
@@ -116,6 +123,13 @@ public class AccountController extends HttpReqController{
         try {
             String url = urlPrefix + "/account/forgot-password";
             return restTemplate.postForEntity(url, DTO, String.class);
+        } catch (HttpClientErrorException ex) {
+            HttpStatusCode statusCode = ex.getStatusCode();
+            if (statusCode == HttpStatus.UNAUTHORIZED) {
+                return ResponseEntity.status(statusCode).body("Invalid OTP");
+            } else {
+                return ResponseEntity.status(statusCode).body(statusCode + ex.getMessage());
+            }
         } catch (Exception ex)  {
             System.out.println(ex);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + ex.getMessage());
