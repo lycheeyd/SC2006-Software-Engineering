@@ -34,7 +34,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(responseBody, headers, statusCode);
     }
 
-    // Handled by above. Kept for reference.
+    // Handled by above. Kept for reference. Might be re-activated. Do Not Delete.
 /* 
     // Handle 400 Bad Request - Typically for validation errors or missing parameters
     @ExceptionHandler({HttpClientErrorException.BadRequest.class, MethodArgumentNotValidException.class, MissingServletRequestParameterException.class})
@@ -107,6 +107,6 @@ public class GlobalExceptionHandler {
             //.body("An unexpected error occurred: " + ex.getMessage());
             .body(ex.getMessage());
     }
-    
+
 }
 

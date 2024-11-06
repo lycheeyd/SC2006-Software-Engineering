@@ -3,6 +3,7 @@ import 'package:calowin/Pages/friends/friends_page.dart';
 import 'package:calowin/Pages/otheruser_page.dart';
 import 'package:calowin/Pages/profile/profile_page.dart';
 import 'package:calowin/Pages/wellnesszone_page.dart';
+import 'package:calowin/common/user_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:calowin/Pages/mapcalc_page.dart';
 import 'package:calowin/Pages/rank_page.dart';
@@ -10,7 +11,12 @@ import 'package:calowin/common/colors_and_fonts.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class PageNavigator extends StatefulWidget {
-  const PageNavigator({super.key});
+  final UserProfile profile;
+
+  const PageNavigator({
+    super.key,
+    required this.profile,
+    });
 
   @override
   State<PageNavigator> createState() => PageNavigatorState();
@@ -19,22 +25,12 @@ class PageNavigator extends StatefulWidget {
 class PageNavigatorState extends State<PageNavigator> {
   //this is to set the page index
   int _currentIndex = 0;
+  late UserProfile _profile;
 
   //this is to set parameters to pass to the pages
   Map<String, dynamic>? _currentParams;
 
-  final List<Widget Function(Map<String, dynamic>?)> _pages = [
-    (params) => const MapcalcPage(),
-    (params) => const RankPage(),
-    (params) => const ProfilePage(),
-    (params) => const FriendsPage(),
-    (params) => const WellnessZonePage(),
-    //below are all not available in navigation bar
-    (params) => OtheruserPage(
-          userID: params?['userID'], //passing the user's id to redirect
-        ),
-    (params) => const AddfriendsPage(),
-  ];
+  late List<Widget Function(Map<String, dynamic>?)> _pages;
 
   List<String> listOfNotifications = <String>[
     "John sent a Friend Request",
@@ -52,6 +48,26 @@ class PageNavigatorState extends State<PageNavigator> {
 
   bool _showNotifications =
       false; // State to track if notifications are visible
+
+  @override
+  void initState() {
+    super.initState();
+    _profile = widget.profile;
+    _pages = [
+    (params) => MapcalcPage(
+      targetName: params?['targetName'], targetLat: params?['targetLat'], targetLong: params?['targetLong'],
+    ),
+    (params) => const RankPage(),
+    (params) => ProfilePage(profile: _profile),
+    (params) => const FriendsPage(),
+    (params) => const WellnessZonePage(),
+    //below are all not available in navigation bar
+    (params) => OtheruserPage(
+          userID: params?['userID'], //passing the user's id to redirect
+        ),
+    (params) => const AddfriendsPage(),
+  ];
+  }
 
   void navigateToPage(int index, {Map<String, dynamic>? params}) {
     setState(() {

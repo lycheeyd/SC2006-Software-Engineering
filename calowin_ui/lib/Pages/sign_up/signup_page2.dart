@@ -1,6 +1,7 @@
 import 'package:calowin/common/custom_scaffold.dart';
 import 'package:calowin/common/input_field.dart';
 import 'package:calowin/common/colors_and_fonts.dart';
+import 'package:calowin/common/user_profile.dart';
 import 'package:calowin/control/page_navigator.dart';
 import 'package:calowin/common/AES_Encryptor.dart';
 import 'package:flutter/material.dart';
@@ -83,51 +84,68 @@ class _SignupPage2State extends State<SignupPage2> {
           }),
         );
 
+        final errorMessage = response.body;
+
         if (response.statusCode == 201) {
           // Signup successful
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Signup successful! Welcome to CaloWin!")),
-          );
-
+          _showSuccessDialog("Signup successful! Welcome to CaloWin!");
+          print(response.body);
+          final Map<String, dynamic> responseData = jsonDecode(response.body);
+          final loginResponse = UserProfile.fromJson(responseData);
           // Navigate to the next page
           Navigator.of(context).push(
             PageRouteBuilder(
               pageBuilder: (context, animation, secondaryAnimation) =>
-                  const PageNavigator(),
+                  PageNavigator(profile: loginResponse),
               transitionsBuilder: (context, animation, secondaryAnimation, child) {
                 return child; // No custom transition
               },
               settings: const RouteSettings(arguments: 'disableSwipe'),
             ),
           );
-        } else if (response.statusCode == 400) {
-          // Bad request - likely due to invalid input
-          final errorMessage = response.body;
-          if (errorMessage.contains("Password")) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Signup failed: Password is invalid")),
-            );
-          } else if (errorMessage.contains("Email")) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Signup failed: Email is already registered")),
-            );
-          }
         } else {
-          // Other errors
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Error: ${response.body}")),
-          );
+          _showErrorDialog(errorMessage);
         }
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Network error: ${e.toString()}")),
-        );
+        _showErrorDialog("Network error: ${e.toString()}");
       }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please correct errors before proceeding.")),
-      );
     }
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(message),
+          //content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showSuccessDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(message),
+        //content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -171,9 +189,24 @@ class _SignupPage2State extends State<SignupPage2> {
                   inputController: _inputName,
                   title: "Name",
                   inputHint: "This name is what others will see!",
-                  errorText: _nameError ?? "",
-                  hasError: _nameError != null,
+                  errorText: '',
+                  hasError: false,
               ),
+                if(_nameError != null)
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 20.0), // Adjust padding as needed
+                      child: Text(
+                        _nameError!,
+                        style: GoogleFonts.roboto(
+                          fontSize: 11,
+                          color: Colors.redAccent.shade400,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                ),
               const SizedBox(height: 30),
 
               InputField(
@@ -186,9 +219,24 @@ class _SignupPage2State extends State<SignupPage2> {
                 title: "Weight",
                 inputHint: "Enter your weight in KG",
                 bottomHint: "You can give up to the first decimal place!",
-                errorText: _weightError ?? "",
-                hasError: _weightError != null,
+                errorText: '',
+                hasError: false,
               ),
+                if(_weightError != null)
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 20.0), // Adjust padding as needed
+                      child: Text(
+                        _weightError!,
+                        style: GoogleFonts.roboto(
+                          fontSize: 11,
+                          color: Colors.redAccent.shade400,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                ),
               const SizedBox(height: 30),
 
               Padding(

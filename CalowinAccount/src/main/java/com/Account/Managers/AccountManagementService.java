@@ -62,7 +62,7 @@ public class AccountManagementService {
         String userID = generateUniqueUserId();
 
         // Create and store user credentials in database (CALOWIN_SECURE)
-        UserEntity user = new UserEntity(userID, email, passwordEncoder.encode(encryptedConfirmPassword));
+        UserEntity user = new UserEntity(userID, email, passwordEncoder.encode(decryptedConfirmPassword));
         calowinSecureDBRepository.save(user);
 
         // Create and store user info in database (CALOWIN)
@@ -86,7 +86,7 @@ public class AccountManagementService {
         }
 
         ProfileEntity profile = calowinDBRepository.findByUserID(user.getUserID())
-        .orElseThrow(() -> new RuntimeException("Failed to retrieve userdata"));;
+        .orElseThrow(() -> new Exception("Failed to retrieve userdata"));
 
         return new LoginResponseDTO(user.getUserID(), user.getEmail(), profile.getName(), profile.getWeight(), profile.getBio());
     

@@ -1,10 +1,16 @@
 import 'package:calowin/Pages/sign_up/signup_page.dart';
+import 'package:calowin/common/ActionType.dart';
 import 'package:calowin/common/colors_and_fonts.dart';
 import 'package:calowin/common/custom_scaffold.dart';
 import 'package:calowin/common/input_dialog.dart';
+import 'package:calowin/common/user_profile.dart';
 import 'package:calowin/control/page_navigator.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:calowin/common/AES_Encryptor.dart';
+
 
 class Loginpage extends StatefulWidget {
   const Loginpage({super.key});
@@ -14,54 +20,116 @@ class Loginpage extends StatefulWidget {
 }
 
 class _LoginpageState extends State<Loginpage> {
-  bool _wrongPW = false;
-  bool _invalidEmail = false;
   final TextEditingController _inputPassword = TextEditingController();
   final TextEditingController _inputEmail = TextEditingController();
-  final String _password =
-      "12345"; //should be retrived from database according to email
-  void _handleLogin() {
-    if (_password != _inputPassword.text ||
-        _inputEmail.text != "test@gmail.com") {
-      setState(() {
-        {
-          _wrongPW = true;
-          _invalidEmail = true;
-          _inputPassword.clear();
-        }
-      });
-    } else {
-      Navigator.of(context).push(
-        PageRouteBuilder(
-          pageBuilder: (context, animation, secondaryAnimation) =>
-              const PageNavigator(),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return child; // No custom transition
-          },
-          // This will disable the swipe back gesture
-          settings: const RouteSettings(arguments: 'disableSwipe'),
-        ),
+
+  bool _wrongPassword = false;
+  bool _invalidEmail = false;
+
+  Future<void> _handleLogin() async {
+    setState(() {
+      _wrongPassword = false;
+      _invalidEmail = false;
+    });
+
+    final email = _inputEmail.text;
+    final password = _inputPassword.text;
+
+    if (email.isEmpty || !email.contains('@')) {
+      setState(() => _invalidEmail = true);
+      return;
+    }
+    if (password.isEmpty) {
+      setState(() => _wrongPassword = true);
+      return;
+    }
+
+    final String encryptedPassword = AES_Encryptor.encrypt(password);
+
+    final String url = "http://172.21.146.188:8080/central/account/login";
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {"Content-Type": "application/json"},
+        body: json.encode({"email": email, "password": encryptedPassword}),
       );
 
-      _inputPassword.clear();
+      final responseMessage = response.body;
+
+      if (response.statusCode == 200) {
+        // Navigate to the next page
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        final loginResponse = UserProfile.fromJson(responseData);
+        Navigator.of(context).push(
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                PageNavigator(profile: loginResponse),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return child; // No custom transition
+            },
+            settings: const RouteSettings(arguments: 'disableSwipe'),
+          ),
+        );
+      } else {
+        _showErrorDialog(responseMessage);
+        setState(() {
+          _wrongPassword = false;
+          _invalidEmail = false;
+          _inputPassword.clear();
+          _inputEmail.clear();
+          }
+        );
+      }
+    } catch (e) {
+      _showErrorDialog("Network error: ${e.toString()}");
+    }
+  }
+
+  Future<void> _handleForgetPW(String emailText) async{
+
+    final email = emailText.trim();
+  
+    if (email.isEmpty || !email.contains('@')) {
+      Align(
+        alignment: Alignment.centerLeft,
+        child: Padding(
+          padding: const EdgeInsets.only(left: 20.0), // Adjust padding as needed
+          child: Text(
+            "Invalid email format.",
+            style: GoogleFonts.roboto(
+              fontSize: 11,
+              color: Colors.redAccent.shade400,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      );
+      return;
+    }
+
+    try {
+      final response = await http.post(
+        Uri.parse('http://172.21.146.188:8080/central/account/send-otp'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'email': email, 'type': ActionType.FORGOT_PASSWORD.value}),
+      );
+
+      final responseMessage = response.body;
+
+      if (response.statusCode == 200) {
+        _handleOTPWindow(email);
+      } else {
+        _showErrorDialog(responseMessage);
+      }
+    } catch (e) {
       setState(() {
-        _wrongPW = false;
-        _invalidEmail = false;
-        _inputPassword.clear();
-        _inputEmail.clear();
+        _showErrorDialog('Error: ${e.toString()}');
       });
     }
   }
 
-  void _handleForgetPW(String email) {
-    _handleOTPWindow();
-  }
-
-  void _handlePwdSending(String inputText) {
-    //verifying otp and send email
-  }
-
-  void _handleOTPWindow() {
+  void _handleOTPWindow(String email) {
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -69,10 +137,10 @@ class _LoginpageState extends State<Loginpage> {
               hintText: "OTP",
               title: "An OTP has been sent to your email",
               content:
-                  "A temporary password would be sent to your email after the OTP is verified",
-              onConfirm: (inputText) {
+                  "A new password would be sent to your email after the OTP is verified",
+              onConfirm: (otpCode) {
+                _handlePwdSending(email, otpCode);
                 Navigator.of(context).pop();
-                return _handlePwdSending(inputText);
               },
               onCancel: () {
                 Navigator.of(context).pop();
@@ -80,10 +148,71 @@ class _LoginpageState extends State<Loginpage> {
         });
   }
 
+  Future<void> _handlePwdSending(String email, String otpCode) async {
+    //verifying otp and send email
+    final String url = "http://172.21.146.188:8080/central/account/forgot-password";
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {"Content-Type": "application/json"},
+        body: json.encode({"email": email, "otpCode": otpCode}),
+      );
+
+      final responseMessage = response.body;
+
+      if (response.statusCode == 200) {
+        // Navigate to the next page
+        _showSuccessDialog(responseMessage);
+
+      } else {
+        _showErrorDialog(responseMessage);
+      }
+    } catch (e) {
+      _showErrorDialog("Network error: ${e.toString()}");
+    }
+  }
+
 //hello
   void _handleSignUp() {
     Navigator.push(
         context, MaterialPageRoute(builder: (context) => const SignupPage()));
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(message),
+          //content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showSuccessDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(message),
+        //content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -213,7 +342,7 @@ class _LoginpageState extends State<Loginpage> {
                                       focusedBorder: inputBorder,
                                     )),
                               ),
-                              if (_wrongPW)
+                              if (_wrongPassword)
                                 Align(
                                   alignment: Alignment.topLeft,
                                   child: Text(
@@ -254,7 +383,7 @@ class _LoginpageState extends State<Loginpage> {
                             child: TextButton(
                                 onPressed: () {
                                   setState(() {
-                                    _wrongPW = false;
+                                    _wrongPassword = false;
                                   });
                                   showDialog(
                                       context: context,
@@ -264,9 +393,9 @@ class _LoginpageState extends State<Loginpage> {
                                             title: "Please key in your email",
                                             content:
                                                 "A temporary password would be sent to your email",
-                                            onConfirm: (inputText) {
+                                            onConfirm: (emailText) {
                                               Navigator.of(context).pop();
-                                              return _handleForgetPW(inputText);
+                                              _handleForgetPW(emailText);
                                             },
                                             onCancel: () {
                                               Navigator.of(context).pop();
