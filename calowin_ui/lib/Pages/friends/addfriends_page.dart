@@ -4,15 +4,23 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AddfriendsPage extends StatefulWidget {
-  const AddfriendsPage({super.key});
+  final String userID;
+  const AddfriendsPage({super.key,required this.userID});
 
   @override
   State<AddfriendsPage> createState() => _AddfriendsPageState();
 }
 
 class _AddfriendsPageState extends State<AddfriendsPage> {
+  late String? _userID;
   List<String> _searchList = [];
   final List<String> _friendRequests = ['Mia', 'Khalifa', 'Cody'];
+
+  @override
+  void initState() {
+    super.initState();
+    _userID = widget.userID;
+  }
 
   void _handleBack() {
     final pageNavigatorState =

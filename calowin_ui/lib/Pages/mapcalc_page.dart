@@ -3,7 +3,6 @@ import 'package:calowin/Pages/success_page.dart';
 import 'package:calowin/common/dualbutton_dialog.dart';
 import 'package:calowin/common/singlebutton_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:calowin/common/colors_and_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../control/location.dart';
@@ -14,10 +13,10 @@ import '../control/autocomplate_prediction.dart';
 import '../control/place_auto_complate_response.dart';
 
 class MapcalcPage extends StatefulWidget {
-  double? targetLat;
-  double? targetLong;
-  String? targetName;
-  MapcalcPage({
+  final double? targetLat;
+  final double? targetLong;
+  final String? targetName;
+  const MapcalcPage({
     super.key,
     this.targetLat,
     this.targetLong,
@@ -66,7 +65,6 @@ class _MapcalcPageState extends State<MapcalcPage> {
     _retrievePlacesKey();
     _retrieveMapKey();
     _retrieveDirectionsKey();
-
     //this is the directing from wellness zone
     setState(() {
       _searchController.text = widget.targetName ?? "";
@@ -92,9 +90,9 @@ class _MapcalcPageState extends State<MapcalcPage> {
     try {
       apiDirectionKey = await apiService.fetchApiKey('Directions API');
       setState(() {}); 
-      print('API Key retrieved: $apiDirectionKey');
+      //print('API Key retrieved: $apiDirectionKey');
     } catch (e) {
-      print("Error retrieving API Key: $e");
+      //print("Error retrieving API Key: $e");
     }
   }
 
@@ -102,9 +100,9 @@ class _MapcalcPageState extends State<MapcalcPage> {
     try {
       apiKey = await apiService.fetchApiKey('Places API');
       setState(() {}); 
-      print('API Key retrieved: $apiKey');
+      //print('API Key retrieved: $apiKey');
     } catch (e) {
-      print("Error retrieving API Key: $e");
+      //print("Error retrieving API Key: $e");
     }
   }
 
@@ -112,9 +110,9 @@ class _MapcalcPageState extends State<MapcalcPage> {
     try {
       apiMapKey = await apiService.fetchApiKey('Maps SDK Android API');
       setState(() {}); 
-      print('API Key retrieved: $apiMapKey');
+      //print('API Key retrieved: $apiMapKey');
     } catch (e) {
-      print("Error retrieving API Key: $e");
+      //print("Error retrieving API Key: $e");
     }
   }
 
@@ -123,7 +121,7 @@ class _MapcalcPageState extends State<MapcalcPage> {
       travelMethods = await apiService.fetchTravelMethods();
       setState(() {});
     } catch (e) {
-      print('Error fetching travel methods: $e');
+      //print('Error fetching travel methods: $e');
     }
   }
 
@@ -131,21 +129,21 @@ class _MapcalcPageState extends State<MapcalcPage> {
     try {
       await userCurrentLocation.getCurrentLocation();
       setState(() {
+        //default address 1.3521,103.8198
         currentLocationMarker = Marker(
           markerId: MarkerId('currentLocation'),
-          position: LatLng(userCurrentLocation.latitude ?? 0, userCurrentLocation.longitude ?? 0),
+          position: LatLng(userCurrentLocation.latitude ?? 1.3521, userCurrentLocation.longitude ?? 103.8198),
           infoWindow: InfoWindow(title: 'Current Location'),
           icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen), // Set the color
         );
-        print("${userCurrentLocation.name}");
       });
-
-        mapController.animateCamera(
-          CameraUpdate.newLatLngZoom(
-            LatLng(userCurrentLocation.latitude ?? 0, userCurrentLocation.longitude ?? 0),
-            15,
-          ),
-        );
+      print("Initial location: ${userCurrentLocation.name}");
+      mapController.animateCamera(
+        CameraUpdate.newLatLngZoom(
+          LatLng(userCurrentLocation.latitude ?? 1.3521, userCurrentLocation.longitude ?? 103.8198),
+          15,
+        ),
+      );
     } catch (e) {
       print('Error initializing location: $e');
     }
@@ -211,7 +209,8 @@ class _MapcalcPageState extends State<MapcalcPage> {
       });
           FocusScope.of(context).unfocus();
           _getDirections(
-          LatLng(userCurrentLocation.latitude ?? 0, userCurrentLocation.longitude ?? 0),
+            //default address 1.3521,103.8198
+          LatLng(userCurrentLocation.latitude ?? 1.3521, userCurrentLocation.longitude ?? 103.8198),
               destination,
     );
     }
@@ -306,29 +305,30 @@ List<LatLng> _decodePolyline(String polyline) {
     //print("Now searching for: $query");
   }
 
-  void _retrieveMerics() {
-    setState(() {
-      metrics = {};
-      metrics!['caloriesBurnt'] = 300;
-      metrics!['carbonSaved'] = 20;
-      metrics!['distance'] = 3.2;
-    });
+  void _retrieveMerics() async {
+    String userId = "user1234";
+    // setState(() {
+    //   metrics = {};
+    //   metrics!['caloriesBurnt'] = 300;
+    //   metrics!['carbonSaved'] = 20;
+    //   metrics!['distance'] = 3.2;
+    // });
     //call and retrive metrics from backend
-    // if(selectedLocation != null && selectedMethod != null){
-    //   try {
-    //     metrics = await apiService.startTrip(selectedLocation!, selectedMethod!, userId, userCurrentLocation);
-    //    print('Metrics received: $metrics');
-    //     setState(() {
-    //       resultMessage =
-    //           'Calories burned: ${metrics['caloriesBurnt']}, Carbon saved: ${metrics['carbonSaved']} kg, Distance: ${metrics['distance'].toStringAsFixed(2)} km';
-    //       _tripStarted = true; 
-    //     });
-    //   } catch (e) {
-    //     print('Error starting trip: $e');
-    //   }
-    // } else {
-    //     _showSelectionWarning();
-    // }
+    if(selectedLocation != null && selectedMethod != null){
+      try {
+        metrics = await apiService.retrieveMetrics(selectedLocation!, selectedMethod!, userId, userCurrentLocation);
+       print('Metrics received: $metrics');
+        setState(() {
+          resultMessage =
+              'Calories burned: ${metrics!['caloriesBurnt']}, Carbon saved: ${metrics!['carbonSaved']} kg, Distance: ${metrics!['distance'].toStringAsFixed(2)} km';
+          _tripStarted = true; 
+        });
+      } catch (e) {
+        print('Error starting trip: $e');
+      }
+    } else {
+        _showSelectionWarning();
+    }
   }
 
   Future<void> _startTrip() async {
@@ -337,7 +337,7 @@ List<LatLng> _decodePolyline(String polyline) {
     if(selectedLocation != null && selectedMethod != null){
       try {
         metrics = await apiService.startTrip(selectedLocation!, selectedMethod!, userId, userCurrentLocation);
-       print('Metrics received: $metrics');
+        print('Metrics received: $metrics');
       
       if(metrics == null) {throw("Metrics not retrieved");}
       else {
@@ -461,7 +461,6 @@ Future<void> _retrieveMetrics() async {
 //default address 1.3521,103.8198
   void _resetState() {
   setState(() {
-    widget.targetName = null;
     _tripStarted = false; // Reset trip state
     selectedLocation = null; // Reset location
     selectedMethod = null; // Reset method
@@ -548,7 +547,7 @@ Future<void> _retrieveMetrics() async {
                       onMapCreated: _onMapCreated,
                       initialCameraPosition: CameraPosition(
                         target: LatLng(userCurrentLocation.latitude ?? 1.3521, userCurrentLocation.longitude ?? 103.8198),
-                        zoom: 10,
+                        zoom: 15,
                       ),
                       markers: {
                         if (currentLocationMarker != null) currentLocationMarker!,

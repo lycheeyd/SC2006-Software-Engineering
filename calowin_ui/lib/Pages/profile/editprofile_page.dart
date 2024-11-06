@@ -1,6 +1,7 @@
 import 'package:calowin/Pages/profile/changepassword_page.dart';
 import 'package:calowin/common/custom_scaffold.dart';
 import 'package:calowin/common/input_dialog.dart';
+import 'package:calowin/common/user_profile.dart';
 import 'package:calowin/control/maxline_inputformatter.dart';
 import 'package:flutter/material.dart';
 import 'package:calowin/common/colors_and_fonts.dart';
@@ -9,13 +10,17 @@ import 'package:calowin/common/input_field.dart';
 import 'package:flutter/services.dart';
 
 class EditprofilePage extends StatefulWidget {
-  const EditprofilePage({super.key});
+  final UserProfile profile;
+  const EditprofilePage({super.key, required this.profile});
+  
 
   @override
   State<EditprofilePage> createState() => _EditprofilePageState();
 }
 
 class _EditprofilePageState extends State<EditprofilePage> {
+  late UserProfile _profile;
+
   //logic to be implemented
   final bool _invalidName = false;
   final bool _invalidWeight = false;
@@ -25,8 +30,16 @@ class _EditprofilePageState extends State<EditprofilePage> {
   final TextEditingController _weightController = TextEditingController();
   final TextEditingController _bioController = TextEditingController();
 
+  @override
+  void initState() {
+    super.initState();
+    _profile = widget.profile;
+    _nameController.text = _profile.getName();
+    _weightController.text = _profile.getWeight().toString();
+  }
+
   void _handleSaveChanges() {
-    Navigator.pop(context);
+    Navigator.pop(context, _profile);
   }
 
   void _handleChangePassword() {

@@ -24,7 +24,7 @@ class ApiService {
 
   Future<String> fetchApiKey(String keyName) async {
   final response = await http.get(Uri.parse('$baseUrl/api/keys/$keyName'));
-  print("$baseUrl/api/keys/$keyName");
+  //print("$baseUrl/api/keys/$keyName");
   if (response.statusCode == 200) {
     // Return the API key from the response
     return response.body; // The body contains the API key as a string
@@ -69,8 +69,8 @@ Future<Map<String, dynamic>> startTrip(
     };
 
     // Print the values being posted to the backend for debugging
-    print('Posting the following data to the backend at $url:');
-    print(jsonEncode(requestBody));
+    // print('Posting the following data to the backend at $url:');
+    // print(jsonEncode(requestBody));
 
     // Make the POST request
     final response = await http.post(
@@ -90,6 +90,7 @@ Future<Map<String, dynamic>> startTrip(
       throw Exception('Failed to start trip: ${response.body}');
     }
   }
+
 
   Future<Map<String, dynamic>?> retrieveMetrics(
       Location selectedLocation, 

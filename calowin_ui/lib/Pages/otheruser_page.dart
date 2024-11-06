@@ -10,9 +10,10 @@ import 'package:flutter/material.dart';
 enum UserStatus { friend, requested, stranger, friendrequest }
 
 class OtheruserPage extends StatefulWidget {
+  final String? otherUserID;
   final String? userID;
 
-  const OtheruserPage({super.key, this.userID});
+  const OtheruserPage({super.key, this.userID, this.otherUserID});
 
   @override
   State<OtheruserPage> createState() => _OtheruserPageState();
@@ -21,6 +22,7 @@ class OtheruserPage extends StatefulWidget {
 class _OtheruserPageState extends State<OtheruserPage> {
   //define retrieve logic here
   late String? _userID;
+  late String? _otherUserID;
   late UserProfile? _profile;
   late final List<Image?> _badges = [];
   late UserStatus _userStatus;
@@ -31,8 +33,9 @@ class _OtheruserPageState extends State<OtheruserPage> {
   @override
   void initState() {
     super.initState();
-    _userStatus = UserStatus.friend;
+    _userStatus = UserStatus.friend; //change this to retrieve from database
     _userID = widget.userID;
+    _otherUserID = widget.otherUserID;
     getUserProfile(_userID);
   }
 
