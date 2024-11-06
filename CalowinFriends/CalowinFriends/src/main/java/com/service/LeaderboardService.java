@@ -53,7 +53,7 @@ public class LeaderboardService {
         
         // Log the relationships fetched from the repository
         // System.out.println("Fetched relationships for user " + userId + ":");
-        relationships.forEach(r -> System.out.println("Unique_ID: " + r.getUniqueId() + ", Friend_Unique_ID: " + r.getFriendUniqueId() + ", Status: " + r.getStatus()));
+        // relationships.forEach(r -> System.out.println("Unique_ID: " + r.getUniqueId() + ", Friend_Unique_ID: " + r.getFriendUniqueId() + ", Status: " + r.getStatus()));
     
         // Collect friend IDs based on which side the user appears in the relationship
         List<String> friendsIds = relationships.stream()
@@ -74,22 +74,24 @@ public class LeaderboardService {
     }
     public List<Achievement> getCarbonLeaderboard(String userId) {
         List<String> friendsIds = getFriendsIds(userId);
-        System.out.println("Friends' IDs for user " + userId + ": " + friendsIds);
-    
-        return jdbcTemplate.query(
-            "SELECT * FROM Achievement WHERE user_id IN (" +
-            friendsIds.stream().map(id -> "?").collect(Collectors.joining(", ")) + ")",
+        
+        String sql = "SELECT * FROM Achievement WHERE user_id IN (" +
+                     friendsIds.stream().map(id -> "?").collect(Collectors.joining(", ")) + ")";
+        
+        List<Achievement> achievements = jdbcTemplate.query(
+            sql,
             friendsIds.toArray(),
             achievementRowMapper
-        ).stream()
-         .sorted((a, b) -> Integer.compare(b.getTotalCarbonSaved(), a.getTotalCarbonSaved()))
-         .peek(a -> System.out.println(a.getUserId() + ": " + a.getTotalCarbonSaved() + ", Carbon Medal: " + a.getCarbonMedal() + ", Calorie Medal: " + a.getCalorieMedal()))
-         .collect(Collectors.toList());
+        );
+        
+        return achievements.stream()
+            .sorted((a, b) -> Integer.compare(b.getTotalCarbonSaved(), a.getTotalCarbonSaved()))
+            .collect(Collectors.toList());
     }
     
     public List<Achievement> getCaloriesLeaderboard(String userId) {
         List<String> friendsIds = getFriendsIds(userId);
-        System.out.println("Friends' IDs for user " + userId + ": " + friendsIds);
+        // System.out.println("Friends' IDs for user " + userId + ": " + friendsIds);
     
         return jdbcTemplate.query(
             "SELECT * FROM Achievement WHERE user_id IN (" +
