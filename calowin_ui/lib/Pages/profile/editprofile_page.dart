@@ -24,12 +24,14 @@ class EditprofilePage extends StatefulWidget {
 class _EditprofilePageState extends State<EditprofilePage> {
   late UserProfile _profile;
 
-
-  final String name;
-  final String userID;
-  final String bio;
-
-  final UserProfile profile = UserProfile(name, userID, bio);
+  @override
+  void initState() {
+    super.initState();
+    _profile = widget.profile;
+    _nameController.text = _profile.getName();
+    _weightController.text = _profile.getWeight().toString();
+    _bioController.text = _profile.getBio();
+  }
 
   //logic to be implemented
   final bool _invalidName = false;
@@ -73,8 +75,8 @@ class _EditprofilePageState extends State<EditprofilePage> {
     setState(() {
       if (_bioController.text.isEmpty) {
         _bioError = "Bio is required";
-      } else if (_bioController.text.length > 245) {
-        _bioError = "Bio cannot exceed 245 characters";
+      } else if (_bioController.text.length > 100) {
+        _bioError = "Bio cannot exceed 100 characters";
       } else {
         _bioError = null;
       }
@@ -97,95 +99,7 @@ class _EditprofilePageState extends State<EditprofilePage> {
           Uri.parse(url),
           headers: {"Content-Type": "application/json"},
           body: json.encode({
-            "userID": userID,
-            "name": _nameController.text,
-            "weight": _weightController.text,
-            "bio": _bioController.text,
-          }),
-        );
-
-        final responseMessage = response.body;
-
-        if (response.statusCode == 200) {
-          // Signup successful
-          _showSuccessDialog(responseMessage);
-
-        } else {
-          _showErrorDialog(responseMessage);
-        }
-      } catch (e) {
-        _showErrorDialog("Network error: ${e.toString()}");
-      }
-    }
-    Navigator.pop(context);
-  @override
-  void initState() {
-    super.initState();
-    _profile = widget.profile;
-    _nameController.text = _profile.getName();
-    _weightController.text = _profile.getWeight().toString();
-  }
-
-  void _handleSaveChanges() {
-    Navigator.pop(context, _profile);
-  String? _nameError;
-  String? _weightError;
-  String? _bioError;
-
-  void _checkName() {
-    setState(() {
-      if (_nameController.text.isEmpty) {
-        _nameError = "Name is required";
-      } else if (_nameController.text.length > 16) {
-        _nameError = "Name cannot exceed 16 characters";
-      } else {
-        _nameError = null;
-      }
-    });
-  }
-
-  void _checkWeight() {
-    final weightPattern = r'^\d+(\.\d{1})?$';
-    setState(() {
-      if (_weightController.text.isEmpty) {
-        _weightError = "Weight is required";
-      } else if (!RegExp(weightPattern).hasMatch(_weightController.text)) {
-        _weightError = "Enter weight in kg (e.g., 70 or 70.5)";
-      } else {
-        _weightError = null;
-      }
-    });
-  }
-
-  void _checkBio() {
-    setState(() {
-      if (_bioController.text.isEmpty) {
-        _bioError = "Bio is required";
-      } else if (_bioController.text.length > 245) {
-        _bioError = "Bio cannot exceed 245 characters";
-      } else {
-        _bioError = null;
-      }
-    });
-  }
-
-  Future<void> _handleSaveChanges() async {
-    _checkName();
-    _checkWeight();
-    _checkBio();
-
-    if (_nameError == null &&
-        _weightError == null &&
-        _bioError == null) {
-
-      final String url = "http://172.21.146.188:8080/central/account/edit-profile";
-
-      try {
-        final response = await http.post(
-          Uri.parse(url),
-          headers: {"Content-Type": "application/json"},
-          body: json.encode({
-            "userID": userID,
+            "userID": _profile.getUserID(),
             "name": _nameController.text,
             "weight": _weightController.text,
             "bio": _bioController.text,
@@ -210,7 +124,7 @@ class _EditprofilePageState extends State<EditprofilePage> {
 
   void _handleChangePassword() {
     Navigator.push(context,
-        MaterialPageRoute(builder: (context) => const ChangepasswordPage()));
+        MaterialPageRoute(builder: (context) => ChangepasswordPage(userID: _profile.getUserID())));
   }
   
   Future<void> _sendOTP(String email) async {
@@ -233,7 +147,10 @@ class _EditprofilePageState extends State<EditprofilePage> {
     }
   }
 
-  Future<void> _handleDeleteAccount(String userID, String email, String otpCode) async {
+  Future<void> _handleDeleteAccount(String otpCode) async {
+    String email = _profile.getEmail() ?? "";
+    String userID = _profile.getUserID();
+
     try {
       _sendOTP(email);   
     } catch (e) {
@@ -372,7 +289,7 @@ class _EditprofilePageState extends State<EditprofilePage> {
                           maxLines: 3, // Set the maximum number of lines
                           minLines: 1, // Set the minimum number of lines
                           decoration: const InputDecoration(
-                            labelText: "Maximum 100 characters",
+                            labelText: "Maximum 245 characters",
                             labelStyle: TextStyle(fontSize: 12),
                             border: InputBorder.none,
                           ),
@@ -473,8 +390,7 @@ class _EditprofilePageState extends State<EditprofilePage> {
                                               "An OTP has been sent to your email to confirm your identity",
                                           onConfirm: (inputText) {
                                             Navigator.of(context).pop();
-                                            return _handleDeleteAccount(
-                                                inputText);
+                                            _handleDeleteAccount(inputText);
                                           },
                                           onCancel: () {
                                             Navigator.of(context).pop();

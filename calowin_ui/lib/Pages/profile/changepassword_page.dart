@@ -2,21 +2,21 @@ import 'package:calowin/common/AES_Encryptor.dart';
 import 'package:calowin/common/colors_and_fonts.dart';
 import 'package:calowin/common/custom_scaffold.dart';
 import 'package:calowin/common/input_field.dart';
-import 'package:calowin/common/user_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class ChangepasswordPage extends StatefulWidget {
-  const ChangepasswordPage({super.key});
+  final String userID;
+  const ChangepasswordPage({super.key, required this.userID});
 
   @override
   State<ChangepasswordPage> createState() => _ChangepasswordPageState();
 }
 
 class _ChangepasswordPageState extends State<ChangepasswordPage> {
-
+  late final String userID;
 
   bool _wrongPW = false;
   bool _wrongNewPW = false;
@@ -29,6 +29,12 @@ class _ChangepasswordPageState extends State<ChangepasswordPage> {
   String? _currentPasswordError;
   String? _passwordError;
   String? _confirmPasswordError;
+
+  @override
+  void initState() {
+    super.initState();
+    userID = widget.userID;
+  }
 
     void _checkCurrentPassword() {     
     setState(() {
