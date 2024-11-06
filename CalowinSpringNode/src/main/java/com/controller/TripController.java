@@ -43,7 +43,12 @@ public class TripController extends HttpReqController{
         // Construct the URL for the backend trip controller
         String url = "http://localhost:8082/trips/methods";
         return restTemplate.getForEntity(url, Object.class);
+<<<<<<< Updated upstream
         /* 
+=======
+    
+        /*
+>>>>>>> Stashed changes
         // Make the request and return the result
         ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(
                 url, 
@@ -51,7 +56,11 @@ public class TripController extends HttpReqController{
                 null, 
                 new ParameterizedTypeReference<List<Map<String, Object>>>() {}
         );
+<<<<<<< Updated upstream
         return response.getBody();*/
+=======
+        return response.getBody(); */
+>>>>>>> Stashed changes
     }
 
 
