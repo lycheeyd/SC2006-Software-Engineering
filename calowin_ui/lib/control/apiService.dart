@@ -6,7 +6,7 @@ import 'location.dart';
 import 'current_location.dart';
 
 class ApiService {
-  final String baseUrl = "http://172.21.146.188:8080"; // VM URL
+  final String baseUrl = "http://172.21.146.188:8082"; // VM URL
   ApiService();
 
   static Future<String?> fetchUrl(Uri uri, {Map<String, String>? headers}) async {
@@ -23,7 +23,7 @@ class ApiService {
 
   Future<String> fetchApiKey(String keyName) async {
   final response = await http.get(Uri.parse('$baseUrl/api/keys/$keyName'));
-
+  print("$baseUrl/api/keys/$keyName");
   if (response.statusCode == 200) {
     // Return the API key from the response
     return response.body; // The body contains the API key as a string

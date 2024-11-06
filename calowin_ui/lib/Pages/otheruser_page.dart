@@ -36,7 +36,7 @@ class _OtheruserPageState extends State<OtheruserPage> {
     getUserProfile(_userID);
   }
 
-  //to check for any change in the userid passed into this page
+  // to check for any change in the userid passed into this page
   @override
   void didUpdateWidget(OtheruserPage oldWidget) {
     super.didUpdateWidget(oldWidget);

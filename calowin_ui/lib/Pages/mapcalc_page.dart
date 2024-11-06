@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'package:calowin/Pages/success_page.dart';
+import 'package:calowin/common/dualbutton_dialog.dart';
+import 'package:calowin/common/singlebutton_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:calowin/common/colors_and_fonts.dart';
@@ -12,7 +14,15 @@ import '../control/autocomplate_prediction.dart';
 import '../control/place_auto_complate_response.dart';
 
 class MapcalcPage extends StatefulWidget {
-  const MapcalcPage({super.key});
+  double? targetLat;
+  double? targetLong;
+  String? targetName;
+  MapcalcPage({
+    super.key,
+    this.targetLat,
+    this.targetLong,
+    this.targetName,
+  });
 
   @override
   State<MapcalcPage> createState() => _MapcalcPageState();
@@ -37,6 +47,10 @@ class _MapcalcPageState extends State<MapcalcPage> {
   String? resultMessage;
   String? selectedLocationName; // Added to hold the name of the selected location
   final TextEditingController _searchController = TextEditingController(); // Added controller for TextField
+  Map<String,dynamic>? metrics;
+
+  // to set the location passed from wellness zone
+  Location? targetLocation;
 
   bool _tripStarted = false;
   late int _currentIndex = 99;
@@ -52,7 +66,27 @@ class _MapcalcPageState extends State<MapcalcPage> {
     _retrievePlacesKey();
     _retrieveMapKey();
     _retrieveDirectionsKey();
+
+    //this is the directing from wellness zone
+    setState(() {
+      _searchController.text = widget.targetName ?? "";
+      if(widget.targetName!=null) _handleSearch(_searchController.text);
+      targetLocation = Location(name: widget.targetName ?? "", latitude: widget.targetLat ?? 1.3521, longitude: widget.targetLong ?? 103.8198);
+    });
    }
+
+  @override
+  void didUpdateWidget(MapcalcPage oldWidget){
+      super.didUpdateWidget(oldWidget);
+      if(oldWidget.targetName != widget.targetName && widget.targetName != "" && widget.targetName != null){
+      setState(() {
+        _searchController.text = widget.targetName ?? "";
+        if(widget.targetName!=null) _handleSearch(_searchController.text);
+        targetLocation = Location(name: widget.targetName ?? "", latitude: widget.targetLat ?? 1.3521, longitude:widget.targetLong ?? 103.8198);
+      });
+      }
+  }
+
 
   Future<void> _retrieveDirectionsKey() async {
     try {
@@ -102,18 +136,16 @@ class _MapcalcPageState extends State<MapcalcPage> {
           position: LatLng(userCurrentLocation.latitude ?? 0, userCurrentLocation.longitude ?? 0),
           infoWindow: InfoWindow(title: 'Current Location'),
           icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen), // Set the color
-
         );
+        print("${userCurrentLocation.name}");
       });
 
-      if (mapController != null) {
-        mapController!.animateCamera(
+        mapController.animateCamera(
           CameraUpdate.newLatLngZoom(
             LatLng(userCurrentLocation.latitude ?? 0, userCurrentLocation.longitude ?? 0),
             15,
           ),
         );
-      }
     } catch (e) {
       print('Error initializing location: $e');
     }
@@ -190,24 +222,11 @@ class _MapcalcPageState extends State<MapcalcPage> {
   showDialog(
     context: context,
     builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text(
-          'Select Location and Travel Method',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-        content: Text(
-          'Please select both a location and a travel method before starting the trip.',
-          style: TextStyle(fontSize: 16),
-        ),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(); // Close the dialog
-            },
-            child: Text('OK'),
-          ),
-        ],
-      );
+      return SinglebuttonDialog(
+        title: "Select Location and Travel Method", 
+        content: "Please select both a location and a travel method before starting the trip.", 
+        onConfirm: Navigator.of(context).pop,
+        );
     },
   );
 }
@@ -284,6 +303,32 @@ List<LatLng> _decodePolyline(String polyline) {
 
   void _handleSearch(String query) {
     placeAutocomplete(query);
+    //print("Now searching for: $query");
+  }
+
+  void _retrieveMerics() {
+    setState(() {
+      metrics = {};
+      metrics!['caloriesBurnt'] = 300;
+      metrics!['carbonSaved'] = 20;
+      metrics!['distance'] = 3.2;
+    });
+    //call and retrive metrics from backend
+    // if(selectedLocation != null && selectedMethod != null){
+    //   try {
+    //     metrics = await apiService.startTrip(selectedLocation!, selectedMethod!, userId, userCurrentLocation);
+    //    print('Metrics received: $metrics');
+    //     setState(() {
+    //       resultMessage =
+    //           'Calories burned: ${metrics['caloriesBurnt']}, Carbon saved: ${metrics['carbonSaved']} kg, Distance: ${metrics['distance'].toStringAsFixed(2)} km';
+    //       _tripStarted = true; 
+    //     });
+    //   } catch (e) {
+    //     print('Error starting trip: $e');
+    //   }
+    // } else {
+    //     _showSelectionWarning();
+    // }
   }
 
   Future<void> _startTrip() async {
@@ -291,15 +336,17 @@ List<LatLng> _decodePolyline(String polyline) {
     
     if(selectedLocation != null && selectedMethod != null){
       try {
-        final metrics = await apiService.startTrip(selectedLocation!, selectedMethod!, userId, userCurrentLocation);
+        metrics = await apiService.startTrip(selectedLocation!, selectedMethod!, userId, userCurrentLocation);
        print('Metrics received: $metrics');
       
-    
+      if(metrics == null) {throw("Metrics not retrieved");}
+      else {
         setState(() {
           resultMessage =
-              'Calories burned: ${metrics['caloriesBurnt']}, Carbon saved: ${metrics['carbonSaved']} kg, Distance: ${metrics['distance'].toStringAsFixed(2)} km';
+              'Calories burned: ${metrics!['caloriesBurnt']}, Carbon saved: ${metrics!['carbonSaved']} kg, Distance: ${metrics!['distance'].toStringAsFixed(2)} km';
           _tripStarted = true; 
         });
+        }
       } catch (e) {
         print('Error starting trip: $e');
       }
@@ -319,31 +366,15 @@ List<LatLng> _decodePolyline(String polyline) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            'End the trip and earn your rewards?',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          content: Text(
-            'We don\'t encourage cheating!',
-            style: TextStyle(fontSize: 16),
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the pop-up
-              },
-              child: Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
+        return DualbuttonDialog(
+          title: 'End the trip and earn your rewards?', 
+          content: "We don't encourage cheating!", 
+          onConfirm: () {
                 Navigator.of(context).pop(); // Close the pop-up
                 _navigateToAchievement(); // Go to achievement screen
-              },
-              child: Text('Yes'),
-            ),
-          ],
-        );
+              }, 
+          onCancel: Navigator.of(context).pop
+          );
       },
     );
   }
@@ -388,17 +419,30 @@ List<LatLng> _decodePolyline(String polyline) {
     setState(() {
       _currentIndex = index;
       selectedMethod = travelMethods[index];
+      _retrieveMerics();
     });
   }
 
+//default address 1.3521,103.8198
   void _resetState() {
   setState(() {
+    widget.targetName = null;
     _tripStarted = false; // Reset trip state
     selectedLocation = null; // Reset location
     selectedMethod = null; // Reset method
-    _currentIndex = 99; // Reset transport method selection
+    _currentIndex = -1; // Reset transport method selection
     resultMessage = null; // Clear result message
     _searchController.clear(); // Clear the search field
+    selectedLocationMarker = null;
+    polylineCoordinates = [];
+    routePolylineBorder = null;
+    routePolylineMain = null;
+     mapController.animateCamera(
+          CameraUpdate.newLatLngZoom(
+            LatLng(userCurrentLocation.latitude ?? 1.3521, userCurrentLocation.longitude ?? 103.8198),
+            15,
+          ),
+        );
   });
 
   FocusScope.of(context).unfocus(); // Unfocus the search field
@@ -463,10 +507,12 @@ List<LatLng> _decodePolyline(String polyline) {
                 child: Stack(
                   children: [
                     GoogleMap(
+                      myLocationButtonEnabled: false,
+                      mapType: MapType.terrain,
                       onMapCreated: _onMapCreated,
                       initialCameraPosition: CameraPosition(
-                        target: LatLng(userCurrentLocation.latitude ?? 0, userCurrentLocation.longitude ?? 0),
-                        zoom: 15,
+                        target: LatLng(userCurrentLocation.latitude ?? 1.3521, userCurrentLocation.longitude ?? 103.8198),
+                        zoom: 10,
                       ),
                       markers: {
                         if (currentLocationMarker != null) currentLocationMarker!,
@@ -477,10 +523,33 @@ List<LatLng> _decodePolyline(String polyline) {
                       if (routePolylineMain != null) routePolylineMain!,
                     },
                     ),
-                    if (_tripStarted)
-                      const Center(
-                        child: CircularProgressIndicator(),
-                      ),
+                    if(metrics != null) Align(
+                      alignment: Alignment.bottomLeft,
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Color.fromARGB(149, 90, 232, 125),
+                            border: Border.all()
+                          ),
+                          height: 150,
+                          width: 140,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Calories burned:',style: TextStyle(fontSize: 15,fontWeight: FontWeight.w500)),
+                              Text("${metrics!['caloriesBurnt']}",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 15)),
+                              const SizedBox(height: 7),
+                              Text("Carbon saved:",style: TextStyle(fontSize: 15,fontWeight: FontWeight.w500)),
+                              Text("${metrics!['carbonSaved']} kg",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 15)),
+                              const SizedBox(height: 7),
+                              Text("Distance:",style: TextStyle(fontSize: 15,fontWeight: FontWeight.w500)),
+                              Text("${metrics!['distance'].toStringAsFixed(2)} km",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 15))
+                            ],
+                          ),
+                        ),
+                      )
+                      )
                   ],
                 ),
               ),
@@ -489,20 +558,59 @@ List<LatLng> _decodePolyline(String polyline) {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    ElevatedButton(
-                      onPressed: _endTrip,
-                      child: Text('End Trip', style: GoogleFonts.poppins(fontSize: 16)),
+                  SizedBox(
+                  height: 40,
+                  width: 150,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      elevation: 0,
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.red,
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(10), // Rounded corners
+                      ),
                     ),
-                    ElevatedButton(
-                      onPressed: _handleCancel,
-                      child: Text('Cancel', style: GoogleFonts.poppins(fontSize: 16)),
+                    onPressed: _handleCancel,
+                    child: const Text("Cancel Trip"),
+                  ),
+                ),
+                    SizedBox(
+                  height: 40,
+                  width: 150,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      elevation: 0,
+                      foregroundColor: Colors.white,
+                      backgroundColor: PrimaryColors.brightGreen,
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(10), // Rounded corners
+                      ),
                     ),
+                    onPressed: _endTrip,
+                    child: const Text("End Trip"),
+                  ),
+                ),
                   ],
                 )
               else
-                ElevatedButton(
-                  onPressed: _startTrip, // Enable only if both are selected
-                  child: Text('Start Trip', style: GoogleFonts.poppins(fontSize: 16)),
+                SizedBox(
+                  height: 40,
+                  width: 170,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      elevation: 0,
+                      foregroundColor: Colors.white,
+                      backgroundColor: PrimaryColors.darkGreen,
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(10), // Rounded corners
+                      ),
+                    ),
+                    onPressed: _startTrip,
+                    child: const Text("Start"),
+                  ),
                 ),
             ],
           ),
