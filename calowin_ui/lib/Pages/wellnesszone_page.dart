@@ -393,6 +393,7 @@ class _WellnessZonePageState extends State<WellnessZonePage> {
                         zoom: 10,
                       ),
                       myLocationButtonEnabled: false,
+                      myLocationEnabled: true,
                       liteModeEnabled: false,
                       mapType: MapType.terrain,
                       markers: {
