@@ -61,6 +61,7 @@ public class TripController {
         return trip;
     }
 
+    @PostMapping("/retrieve-metrics")
     public Map<String, Object> retrieveMetrics(@RequestBody Trip trip) {
         // Extract the necessary information from the Trip object
         TravelMethod method = trip.getTravelMethod();  // Get travel method
