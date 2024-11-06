@@ -30,7 +30,7 @@ class UserProfile {
   }
 
   // Factory constructor for deserialization from LoginResponseDTO
-  factory UserProfile.fromLoginResponse(Map<String, dynamic> json) {
+  factory UserProfile.fromJson(Map<String, dynamic> json) {
     return UserProfile(
       name: json['name'] as String,
       email: json['email'] as String?,
