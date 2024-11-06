@@ -1,5 +1,6 @@
 
 import 'dart:convert';
+import 'package:calowin/control/travelmethod.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'location.dart';
@@ -89,6 +90,30 @@ Future<Map<String, dynamic>> startTrip(
       throw Exception('Failed to start trip: ${response.body}');
     }
   }
+
+  Future<Map<String, dynamic>?> retrieveMetrics(
+      Location selectedLocation, 
+      String selectedMethod, // Travel method is passed here
+      String userId, 
+      CurrentLocation userCurrentLocation) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/trips/retrieve-metrics'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'currentLocation': userCurrentLocation.toJson(),
+        'destination': selectedLocation.toJson(),
+        'travelMethod': selectedMethod.toString(),  // Travel method as a string
+        'userId': userId,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);  // Return the response as a Map
+    } else {
+      throw Exception('Failed to retrieve metrics');
+    }
+  }
+
 
 
 

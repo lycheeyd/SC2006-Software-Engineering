@@ -355,6 +355,41 @@ List<LatLng> _decodePolyline(String polyline) {
     }
   }
 
+  // This method will be called when the user selects a travel method
+Future<void> _retrieveMetrics() async {
+  String userId = "user1234"; // Update with the actual user ID
+
+  // Ensure both location and method are selected
+  if (selectedLocation != null && selectedMethod != null) {
+    try {
+      // Call the API service to send data to the backend
+       metrics = await apiService.retrieveMetrics(
+        selectedLocation!, 
+        selectedMethod!,  // The travel method being selected
+        userId, 
+        userCurrentLocation
+      );
+
+      // Handle the response and display metrics
+      if (metrics != null) {
+        setState(() {
+          resultMessage =
+              'Calories burned: ${metrics?['caloriesBurnt']}, Carbon saved: ${metrics?['carbonSaved']} kg, Distance: ${metrics?['distance'].toStringAsFixed(2)} km';
+          _tripStarted = false; // No need to start a trip for this calculation
+        });
+      } else {
+        // Handle case if no metrics were returned
+        throw Exception('Failed to retrieve metrics');
+      }
+    } catch (e) {
+      print('Error retrieving metrics: $e');
+    }
+  } else {
+    _showSelectionWarning(); // Show a warning if no location or method is selected
+  }
+}
+
+
   void _handleCancel() {
     setState(() {
       _resetState(); // Reset state when coming back to home screen
@@ -419,7 +454,7 @@ List<LatLng> _decodePolyline(String polyline) {
     setState(() {
       _currentIndex = index;
       selectedMethod = travelMethods[index];
-      _retrieveMerics();
+      _retrieveMetrics();
     });
   }
 
