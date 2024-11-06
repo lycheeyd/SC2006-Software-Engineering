@@ -12,7 +12,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import com.models.Achievement;
-import com.service.FriendRelationshipService;
 import com.service.LeaderboardService;
 
 @SpringBootApplication
@@ -24,8 +23,8 @@ public class CalowinFriendsApplication implements CommandLineRunner {
     @Autowired
     private LeaderboardService leaderboardService;
 
-    @Autowired
-    private FriendRelationshipService friendRelationshipService;
+    // @Autowired
+    // private FriendRelationshipService friendRelationshipService;
 
     public static void main(String[] args) {
         SpringApplication.run(CalowinFriendsApplication.class, args);
@@ -63,26 +62,21 @@ public class CalowinFriendsApplication implements CommandLineRunner {
     // private void testFriendFunctionality() {
     //     // Test sending a friend request
     //     try {
-    //         friendRelationshipService.sendFriendRequest("user1", "user2");
+    //         friendRelationshipService.sendFriendRequest("user4", "user2");
     //         System.out.println("Friend request sent from user1 to user2.");
     //     } catch (IllegalArgumentException e) {
     //         System.out.println("Failed to send friend request: " + e.getMessage());
     //     }
-
-    //     // Test sending a duplicate friend request
-    //     try {
-    //         friendRelationshipService.sendFriendRequest("user1", "user2");
-    //     } catch (IllegalArgumentException e) {
-    //         System.out.println("Expected duplicate error: " + e.getMessage());
-    //     }
-
-    //     // Test responding to a friend request
-    //     try {
-    //         friendRelationshipService.respondToRequest("user1", "user2", FriendRequestStatus.ACCEPTED);
-    //         System.out.println("Friend request accepted.");
-    //     } catch (Exception e) {
-    //         System.out.println("Failed to respond to friend request: " + e.getMessage());
-    //     }
+    
+    
+        // Test responding to a friend request
+        // try {
+        //     friendRelationshipService.respondToRequest("user1", "user2","ACCEPTED");
+        //     System.out.println("Friend request accepted.");
+        // } catch (Exception e) {
+        //     System.out.println("Failed to respond to friend request: " + e.getMessage());
+        // }
+    
 
     //     // Test fetching pending requests
     //     try {

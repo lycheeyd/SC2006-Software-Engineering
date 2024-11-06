@@ -59,11 +59,74 @@ public class FriendRelationshipService {
         return repository.findByFriendUniqueIdAndStatus(receiverId, "PENDING");
     }
 
+
+    public void cancelFriendRequest(String senderId, String receiverId) {
+        FriendRelationship relationship = repository.findByUniqueIdAndFriendUniqueId(senderId, receiverId)
+                .orElseThrow(() -> new IllegalArgumentException("Friend request not found."));
+        
+        if (!"PENDING".equals(relationship.getStatus())) {
+            throw new IllegalArgumentException("Cannot cancel a non-pending request.");
+        }
+        
+        repository.delete(relationship);
+    }
+
+    public FriendRelationship acceptFriendRequest(String senderId, String receiverId) {
+        FriendRelationship relationship = repository.findByUniqueIdAndFriendUniqueId(senderId, receiverId)
+                .orElseThrow(() -> new IllegalArgumentException("Friend request not found."));
+        
+        if (!"PENDING".equals(relationship.getStatus())) {
+            throw new IllegalArgumentException("Request is not pending.");
+        }
+        
+        relationship.setStatus("ACCEPTED");
+        return repository.save(relationship);
+    }
+
+    public FriendRelationship rejectFriendRequest(String senderId, String receiverId) {
+        FriendRelationship relationship = repository.findByUniqueIdAndFriendUniqueId(senderId, receiverId)
+                .orElseThrow(() -> new IllegalArgumentException("Friend request not found."));
+        
+        if (!"PENDING".equals(relationship.getStatus())) {
+            throw new IllegalArgumentException("Request is not pending.");
+        }
+
+        relationship.setStatus("REJECTED");
+        return repository.save(relationship);
+    }
+
+    public void removeFriend(String userId, String friendId) {
+        Optional<FriendRelationship> relationship = repository.findByUniqueIdAndFriendUniqueId(userId, friendId);
+        
+        if (relationship.isEmpty()) {
+            relationship = repository.findByUniqueIdAndFriendUniqueId(friendId, userId);
+        }
+
+        if (relationship.isPresent() && "ACCEPTED".equals(relationship.get().getStatus())) {
+            repository.delete(relationship.get());
+        } else {
+            throw new IllegalArgumentException("No friendship found to remove.");
+        }
+    }
+    public List<FriendRelationship> getFriendList(String userId) {
+        return repository.findAllFriendRelationships(userId, "ACCEPTED");
+    }
+
     public FriendRelationship respondToRequest(String senderId, String receiverId, String status) {
         FriendRelationship relationship = repository.findByUniqueIdAndFriendUniqueId(senderId, receiverId)
                 .orElseThrow(() -> new IllegalArgumentException("Request not found"));
 
+        if (!"PENDING".equals(relationship.getStatus())) {
+            throw new IllegalArgumentException("Request is not pending.");
+        }
+
+        if (!"ACCEPTED".equals(status) && !"REJECTED".equals(status)) {
+            throw new IllegalArgumentException("Invalid status. Use 'ACCEPTED' or 'REJECTED'.");
+        }
+
         relationship.setStatus(status);
         return repository.save(relationship);
     }
+
+
 }

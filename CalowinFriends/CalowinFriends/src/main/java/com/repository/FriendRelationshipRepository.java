@@ -20,4 +20,6 @@ public interface FriendRelationshipRepository extends JpaRepository<FriendRelati
     @Query("SELECT f FROM FriendRelationship f WHERE (f.uniqueId = :userId OR f.friendUniqueId = :userId) AND f.status = :status")
     List<FriendRelationship> findByUserIdInEitherColumnAndStatus(@Param("userId") String userId, @Param("status") String status);
     
+    @Query("SELECT f FROM FriendRelationship f WHERE (f.uniqueId = :userId OR f.friendUniqueId = :userId) AND f.status = :status")
+    List<FriendRelationship> findAllFriendRelationships(@Param("userId") String userId, @Param("status") String status);
 }

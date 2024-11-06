@@ -66,7 +66,9 @@ public class LeaderboardService {
                 })
                 .distinct() // Ensure unique friend IDs
                 .collect(Collectors.toList());
-    
+                
+        friendsIds.add(userId);
+
         // System.out.println("Friends' IDs for user " + userId + ": " + friendsIds);
         return friendsIds;
     }
