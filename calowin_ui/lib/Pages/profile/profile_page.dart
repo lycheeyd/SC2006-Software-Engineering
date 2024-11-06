@@ -39,7 +39,8 @@ class _ProfilePageState extends State<ProfilePage> {
       
     if (updatedProfile != null) {
       setState(() {
-        _profile = updatedProfile;
+        //_profile = updatedProfile;
+        _profile.copyProfile(updatedProfile);
       });
     }
   }
