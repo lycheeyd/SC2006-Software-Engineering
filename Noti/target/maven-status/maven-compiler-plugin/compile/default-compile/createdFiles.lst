@@ -1,9 +1,0 @@
-com\Database\CalowinDB\CalowinDBProperties.class
-com\Relationship\NotificationController.class
-com\Database\CalowinDB\FriendRelationshipRepository.class
-com\Database\CalowinDB\CalowinDBConfig.class
-com\Database\DBProperties.class
-com\Relationship\Managers\FriendRelationshipService.class
-com\Database\DataSourceConfig.class
-com\Noti.class
-com\Relationship\Entity\FriendRelationship.class

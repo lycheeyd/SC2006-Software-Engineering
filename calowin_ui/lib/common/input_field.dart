@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:calowin/common/colors_and_fonts.dart';
 
 class InputField extends StatefulWidget {
+  final ValueChanged<String>? onChange;
   final TextEditingController inputController;
   final String title;
   final String inputHint;
@@ -16,6 +17,7 @@ class InputField extends StatefulWidget {
 
   const InputField(
       {super.key,
+      this.onChange,
       required this.hasError,
       required this.errorText,
       required this.inputController,
@@ -41,10 +43,12 @@ class _InputFieldState extends State<InputField> {
   late TextInputType? _keyboardType;
   late List<TextInputFormatter>? _inputFormatter;
   late bool _obscureText;
+  late ValueChanged<String>? _onChange;
 
   @override
   void initState() {
     super.initState();
+    _onChange = widget.onChange;
     _keyboardType = widget.keyboardType;
     _inputFormatter = widget.inputFormatter;
     _hasError = widget.hasError;
@@ -83,6 +87,7 @@ class _InputFieldState extends State<InputField> {
           SizedBox(
             height: 50,
             child: TextField(
+                onChanged: _onChange,
                 obscureText: _obscureText,
                 textInputAction: TextInputAction.done,
                 keyboardType: _keyboardType,
