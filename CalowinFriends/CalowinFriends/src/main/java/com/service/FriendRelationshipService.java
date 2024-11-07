@@ -123,36 +123,33 @@ public class FriendRelationshipService {
 
         repository.delete(relationship);
     }
+    
     public FriendStatus getRelationshipStatus(String userId1, String userId2) {
-        // Check for a direct relationship from userId1 to userId2
         Optional<FriendRelationship> directRelationship = repository.findById(new FriendRelationshipId(userId1, userId2));
-        if (directRelationship.isPresent()) {
-            String status = directRelationship.get().getStatus();
-            switch (status) {
-                case "ACCEPTED":
-                    return FriendStatus.FRIEND;
-                case "PENDING":
-                    return FriendStatus.REQUESTSENT;
-                case "REJECTED":
-                    return FriendStatus.STRANGER;
-            }
-        }
-    
-        // Check for a reverse relationship from userId2 to userId1
         Optional<FriendRelationship> reverseRelationship = repository.findById(new FriendRelationshipId(userId2, userId1));
-        if (reverseRelationship.isPresent()) {
-            String status = reverseRelationship.get().getStatus();
-            if ("PENDING".equals(status)) {
-                return FriendStatus.REQUESTRECIEVED;
-            } else if ("REJECTED".equals(status)) {
-                return FriendStatus.STRANGER;
-            }
+    
+        // If there's an "ACCEPTED" relationship in either direction, they're friends
+        if (directRelationship.isPresent() && "ACCEPTED".equals(directRelationship.get().getStatus()) ||
+            reverseRelationship.isPresent() && "ACCEPTED".equals(reverseRelationship.get().getStatus())) {
+            return FriendStatus.FRIEND;
         }
     
-        // If no relationship exists, default to STRANGER
+        // Check for pending requests in both directions
+        if (directRelationship.isPresent() && "PENDING".equals(directRelationship.get().getStatus())) {
+            return FriendStatus.REQUESTSENT;
+        } else if (reverseRelationship.isPresent() && "PENDING".equals(reverseRelationship.get().getStatus())) {
+            return FriendStatus.REQUESTRECIEVED;
+        }
+    
+        // If there's a "REJECTED" relationship in either direction, they're strangers
+        if (directRelationship.isPresent() && "REJECTED".equals(directRelationship.get().getStatus()) ||
+            reverseRelationship.isPresent() && "REJECTED".equals(reverseRelationship.get().getStatus())) {
+            return FriendStatus.STRANGER;
+        }
+    
+        // Default to STRANGER if no relationship exists
         return FriendStatus.STRANGER;
     }
-    
     
 
     public void removeFriend(String userId, String friendId) {
