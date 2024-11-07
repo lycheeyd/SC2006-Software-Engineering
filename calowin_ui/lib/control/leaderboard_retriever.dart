@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:calowin/control/words2widget_converter.dart';
 
 class LeaderboardItem {
+  final String _name;
   final String _userId;
   final int _carbonPoint;
   final int _caloriePoint;
@@ -11,18 +12,21 @@ class LeaderboardItem {
   final Image? _calorieMedal;
 
   LeaderboardItem({
+    required String name,
     required String userId,
     required int caloriePoint,
     required int carbonPoint,
     required Image? calorieMedal,
     required Image? carbonMedal,
-  })  : _userId = userId,
+  })  : _name = name,
+        _userId = userId,
         _carbonPoint = carbonPoint,
         _caloriePoint = caloriePoint,
         _calorieMedal = calorieMedal,
         _carbonMedal = carbonMedal;
 
   // Getters
+  String get name => _name;
   String get userId => _userId;
   int get carbonPoint => _carbonPoint;
   int get caloriePoint => _caloriePoint;
@@ -38,6 +42,7 @@ class LeaderboardItem {
       caloriePoint: json['totalCalorieBurnt'],
       carbonMedal: Words2widgetConverter.convert(json['carbonMedal']),
       calorieMedal: Words2widgetConverter.convert(json['calorieMedal']),
+      name: json['userName'],
     );
   }
 }
@@ -49,7 +54,7 @@ class LeaderboardRetriever {
   // Function to retrieve LeaderboardItems based on user's coordinates
   Future<List<LeaderboardItem>> retrieveCarbonLeaderboard(String userId) async {
     final url = Uri.parse('$_baseUrl/carbon?userId=$userId');
-    print(url);
+    //print(url);
 
     try {
       final response = await http.get(url);
@@ -77,7 +82,7 @@ class LeaderboardRetriever {
 
   Future<List<LeaderboardItem>> retrieveCalorieLeaderboard(String userId) async {
     final url = Uri.parse('$_baseUrl/calories?userId=$userId');
-    print(url);
+    //print(url);
 
     try {
       final response = await http.get(url);

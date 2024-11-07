@@ -26,7 +26,7 @@ class PageNavigator extends StatefulWidget {
 class PageNavigatorState extends State<PageNavigator> {
   //this is to set the page index
   int _currentIndex = 0;
-  late UserProfile _profile;
+  UserProfile _profile = UserProfile(name: "Error loading user", userID: "Error loading user");
   final NotificationService notificationService = NotificationService();
 
   //this is to set parameters to pass to the pages
@@ -74,6 +74,7 @@ class PageNavigatorState extends State<PageNavigator> {
   }
 
   void _toggleNotifications() {
+    _getNotifications();
     setState(() {
       _showNotifications = !_showNotifications;
     });

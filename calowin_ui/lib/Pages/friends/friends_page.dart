@@ -1,4 +1,5 @@
 import 'package:calowin/common/colors_and_fonts.dart';
+import 'package:calowin/control/leaderboard_retriever.dart';
 import 'package:calowin/control/page_navigator.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -12,39 +13,21 @@ class FriendsPage extends StatefulWidget {
 }
 
 class _FriendsPageState extends State<FriendsPage> {
+  final LeaderboardRetriever friendListRetriever = LeaderboardRetriever();
   late String _userID;
-  final List<String> _friendlist = [
-    'Alex',
-    'Derick',
-    'Caleb',
-    'Gray',
-    'Bob',
-    'Tom',
-    'Alan',
-    'Joyce'
-  ];
+  List<LeaderboardItem> _friendlist = [];
 
   @override
   void initState() {
     super.initState();
     _userID = widget.userID;
+    _getFriends();
   }
 
   //handle the loading of friend list
-  void _getFriends() {}
-
-  //handle the redirection from notification and list
-  void _redirectToFriend() {
-    final pageNavigatorState =
-        context.findAncestorStateOfType<PageNavigatorState>();
-    //change here
-    if (pageNavigatorState != null) {
-      pageNavigatorState.navigateToPage(5,
-          params: {'userID': "334455"}); // Navigate to AddFriendsPage
-    }
+  Future<void> _getFriends() async {
+    _friendlist = await friendListRetriever.retrieveCalorieLeaderboard(_userID);
   }
-
-  void _redirectToUser() {}
 
   //handle redirection to add friends page
   void _redirectToAddFriendsPage() {
@@ -57,17 +40,17 @@ class _FriendsPageState extends State<FriendsPage> {
   }
 
   //handle when friend is tapped
-  void _onListItemTap() {
+  void _onListItemTap(LeaderboardItem friend) {
     final pageNavigatorState =
         context.findAncestorStateOfType<PageNavigatorState>();
     //change here
     if (pageNavigatorState != null) {
       pageNavigatorState.navigateToPage(5,
-          params: {'userID': "334455"}); // Navigate to AddFriendsPage
+          params: {'userID': _userID,'otherUserID': friend.userId}); // Navigate to OtheruserPage
     }
   }
 
-  Widget _buildListItem(int index, String name) {
+  Widget _buildListItem(int index, LeaderboardItem friend) {
     Color tileColor = const Color.fromARGB(255, 214, 241, 214);
     TextStyle fontStyle =
         GoogleFonts.aBeeZee(fontSize: 16, fontWeight: FontWeight.bold);
@@ -85,20 +68,20 @@ class _FriendsPageState extends State<FriendsPage> {
           ],
         ),
         child: ListTile(
-          onTap: () => _onListItemTap(),
+          onTap: () => _onListItemTap(friend),
           leading: const Icon(
             Icons.person,
             size: 25,
           ),
           title: Text(
-            name,
+            friend.name,
             style: fontStyle,
           ),
           trailing: SizedBox(
             width: 80,
             height: 35,
             child: ElevatedButton(
-                onPressed: _onListItemTap,
+                onPressed: () => _onListItemTap(friend),
                 style: ElevatedButton.styleFrom(
                   elevation: 0,
                   backgroundColor: PrimaryColors.darkGreen,

@@ -116,9 +116,11 @@ class _ChangepasswordPageState extends State<ChangepasswordPage> {
         _showErrorDialog("Network error: ${e.toString()}");
       }
     }
-  
-    Navigator.pop(context);
-    Navigator.pop(context);
+    if(mounted)
+    {
+      Navigator.pop(context);
+      Navigator.pop(context);
+    }
   }
 
   void _showErrorDialog(String message) {

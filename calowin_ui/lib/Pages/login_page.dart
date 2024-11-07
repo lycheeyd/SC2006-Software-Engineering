@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:calowin/Pages/sign_up/signup_page.dart';
 import 'package:calowin/common/ActionType.dart';
 import 'package:calowin/common/colors_and_fonts.dart';
@@ -26,7 +28,7 @@ class _LoginpageState extends State<Loginpage> {
   bool _wrongPassword = false;
   bool _invalidEmail = false;
 
-  Future<void> _handleLogin() async {
+  Future<void> _handleLogin(BuildContext context) async {
     setState(() {
       _wrongPassword = false;
       _invalidEmail = false;
@@ -62,7 +64,9 @@ class _LoginpageState extends State<Loginpage> {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         final loginResponse = UserProfile.fromJson(responseData['UserObject']);
         //print(loginResponse.getEmail());
-        Navigator.of(context).push(
+        if(mounted && loginResponse!=null)
+        {
+          Navigator.of(context).push(
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
                 PageNavigator(profile: loginResponse),
@@ -72,6 +76,8 @@ class _LoginpageState extends State<Loginpage> {
             settings: const RouteSettings(arguments: 'disableSwipe'),
           ),
         );
+        }
+        else print("Login response is null");
       } else {
         _showErrorDialog(responseMessage);
         setState(() {
@@ -359,7 +365,7 @@ class _LoginpageState extends State<Loginpage> {
                             width: 272,
                             height: 45,
                             child: ElevatedButton(
-                                onPressed: _handleLogin,
+                                onPressed: ()=>_handleLogin(context),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor:
                                       const Color.fromARGB(255, 48, 93, 48),

@@ -73,8 +73,6 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
       totalCalorieBurntExp = achievements['totalCalorieBurntExp'];
       carbonSavedMedal = achievements['carbonSavedMedal'];
       calorieBurntMedal = achievements['calorieBurntMedal'];
-      print(carbonSavedMedal);
-      print(calorieBurntMedal);
     });
     _controller.forward();
     maxCarbon = _retrieveThreshold(totalCarbonSavedExp, pointsToNextPlatinum, pointsToNextGold, pointsToNextSilver, pointsToNextBronze);

@@ -2,12 +2,10 @@ import 'dart:convert';
 import 'package:calowin/common/user_profile.dart';
 import 'package:http/http.dart' as http;
 
-class FriendRetriever {
-  final String _baseUrl =
-      'http://172.21.146.188:8080/central/account'; // Replace with your backend URL
-
+class UserRetriever {
   Future<UserProfile> retrieveFriend(String userId, String otherId) async {
-    // /selfid/otherid
+    final String _baseUrl = 'http://172.21.146.188:8080/central/account/view-profile'; // Replace with your backend URL
+    // Endpoint format: /selfid/otherid
     final url = Uri.parse('$_baseUrl/$userId/$otherId');
     print(url);
 
@@ -17,21 +15,19 @@ class FriendRetriever {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
 
-        // Convert the JSON response to a list of FriendRetrieverItem objects
-        UserProfile user = data.fromJson(data);
-        
+        // Parse JSON response into a UserProfile object
+        UserProfile user = UserProfile.fromJson(data);
+
         return user;
       } else {
         // Handle error responses
-        print('Failed to retrieve user: ${response.statusCode}');
-        return UserProfile(name: "User not found", userID: "User not found");
+        print('Failed to retrieve user: ${response.statusCode}, ${response.body}');
+        return UserProfile(name: "Error retrieving user", userID: "Error retrieving user");
       }
     } catch (e) {
       // Handle network or parsing errors
       print('Error occurred while retrieving user: $e');
-      return UserProfile(name: "User not found", userID: "User not found");
+      return UserProfile(name: "Unable to connect to server", userID: "Unable to connect to server");
     }
   }
-
-  
 }

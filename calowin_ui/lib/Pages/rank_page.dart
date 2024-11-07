@@ -53,7 +53,7 @@ class _RankPageState extends State<RankPage> {
       caloriesleaderBoard = caloriesleaderBoard;
       carbonleaderBoard = carbonleaderBoard;
     });
-    print("Leaderboards retrieved");
+    //print("Leaderboards retrieved");
   }
 
   @override
@@ -64,26 +64,25 @@ class _RankPageState extends State<RankPage> {
   }
 
   void _toggleLeaderBoard() {
-    _retrieveLeaderboards();
     setState(() {
       _isCalorie = !_isCalorie;
     });
   }
 
-  void _onListItemTap(String name) {
+  void _onListItemTap(LeaderboardItem user) {
     //first retrieve the user id then pass to the page navigator (logic to be considered)
-    const String otheruserID = "#12345";
     final pageNavigatorState =
         context.findAncestorStateOfType<PageNavigatorState>();
 
     //change here
     if (pageNavigatorState != null) {
+      print("otherID: ${user.userId}, userID: $userID");
       pageNavigatorState.navigateToPage(5,
-          params: {'userID': otheruserID,'otherUserID':userID}); // Navigate to Profile tab
+          params: {'otherUserID': user.userId,'userID':userID}); // Navigate to Profile tab
     }
   }
 
-  Widget _buildListItem(int index, String name, int points, Image? medal) {
+  Widget _buildListItem(int index, LeaderboardItem user, Image? medal, int points) {
     Color tileColor;
     double fontsize = 18;
     double medalsize = 45;
@@ -122,14 +121,14 @@ class _RankPageState extends State<RankPage> {
           ],
         ),
         child: ListTile(
-          onTap: () => _onListItemTap(name),
+          onTap: () => _onListItemTap(user),
           leading: Text("${index + 1}",
               style: fontStyle.copyWith(fontWeight: FontWeight.bold)),
           title: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                name,
+                user.name,
                 style: fontStyle,
               ),
               const SizedBox(
@@ -185,9 +184,9 @@ class _RankPageState extends State<RankPage> {
               ? caloriesleaderBoard.length
               : carbonleaderBoard.length,
           itemBuilder: (context, index) {
-            final currentItem;
-            final points;
-            final medal;
+            final LeaderboardItem currentItem;
+            final int points;
+            final Image? medal;
             if(_isCalorie){
                 currentItem = caloriesleaderBoard[index];
                 points = currentItem.caloriePoint;
@@ -198,8 +197,8 @@ class _RankPageState extends State<RankPage> {
                 points = currentItem.carbonPoint;
                 medal = currentItem.carbonMedal;
             }
-            return _buildListItem(index, currentItem.userId,
-                points, medal);
+            return _buildListItem(index, currentItem,
+                medal, points);
           },
         ),
       ),
