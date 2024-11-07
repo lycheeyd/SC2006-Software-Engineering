@@ -40,13 +40,13 @@ public class Achievement {
      // Helper method to calculate carbon medal based on experience
      private String calculateCarbonMedal(int exp) {
         if (exp >= CARBON_PLATINUM_THRESHOLD) {
-            return "CarbonPlatinum";
+            return "EcoPlatinum";
         } else if (exp >= CARBON_GOLD_THRESHOLD) {
-            return "CarbonGold";
+            return "EcoGold";
         } else if (exp >= CARBON_SILVER_THRESHOLD) {
-            return "CarbonSilver";
+            return "EcoSilver";
         } else if (exp >= CARBON_BRONZE_THRESHOLD) {
-            return "CarbonBronze";
+            return "EcoBronze";
         } else {
             return "No Medal";
         }

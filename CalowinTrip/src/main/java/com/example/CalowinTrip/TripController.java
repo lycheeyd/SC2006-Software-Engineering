@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/trips")
 public class TripController {
 
-    private final AchievementController achievementController = new AchievementController();
+    // private final AchievementController achievementController = new AchievementController();
 
 
     public static Timestamp getCurrentSqlTimestamp() {
@@ -56,7 +56,7 @@ public class TripController {
         trip.setCaloriesBurnt(caloriesBurned);
         trip.setCarbonSaved(carbonSaved);
         trip.setDistance(distance);
-        
+
         insertTripIntoDatabase(trip);
 
         return trip;
