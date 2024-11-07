@@ -6,25 +6,29 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.jdbc.core.JdbcTemplate;
+
 
 import com.dto.AchievementDTO;
 import com.models.Achievement;
 import com.models.FriendRelationship;
-import com.models.UserInfo;
+import com.repository.*;
 
 @Service
 public class LeaderboardService {
 
     @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private FriendRelationshipRepository friendRelationshipRepository;
 
     @Autowired
-    private UserInfoService userInfoService; // Service to fetch user names
+    private UserInfoService userInfoService;
 
-    // RowMapper for Achievement to map SQL result set to Achievement objects
+    @Autowired
+    private JdbcTemplate jdbcTemplate;  
+    
+    // Achievement RowMapper remains the same
     private RowMapper<Achievement> achievementRowMapper = new RowMapper<Achievement>() {
         @Override
         public Achievement mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -39,15 +43,14 @@ public class LeaderboardService {
     };
 
     public List<String> getFriendsIds(String userId) {
-        String sql = "SELECT * FROM FriendRelationship WHERE (Unique_ID = ? OR Friend_Unique_ID = ?) AND status = 'ACCEPTED'";
-        
-        List<FriendRelationship> relationships = jdbcTemplate.query(sql, friendRelationshipRowMapper, userId, userId);
-
+        List<FriendRelationship> relationships = friendRelationshipRepository
+            .findByIdUniqueIdOrIdFriendUniqueIdAndStatus(userId, userId, "ACCEPTED");
+    
         List<String> friendsIds = relationships.stream()
-                .map(r -> r.getUniqueId().equals(userId) ? r.getFriendUser().getUserId() : r.getUniqueId())
-                .distinct()
-                .collect(Collectors.toList());
-
+            .map(r -> r.getId().getUniqueId().equals(userId) ? r.getId().getFriendUniqueId() : r.getId().getUniqueId())
+            .distinct()
+            .collect(Collectors.toList());
+    
         friendsIds.add(userId); // Optionally include the user itself
         return friendsIds;
     }
@@ -110,20 +113,4 @@ public class LeaderboardService {
         String sql = "SELECT name FROM UserInfo WHERE user_id = ?";
         return jdbcTemplate.queryForObject(sql, new Object[]{userId}, String.class);
     }
-    
-    private RowMapper<FriendRelationship> friendRelationshipRowMapper = new RowMapper<FriendRelationship>() {
-        @Override
-        public FriendRelationship mapRow(ResultSet rs, int rowNum) throws SQLException {
-            FriendRelationship relationship = new FriendRelationship();
-            relationship.setUniqueId(rs.getString("Unique_ID"));
-    
-            // Assuming that friendUser is already initialized, set its unique ID
-            UserInfo friendUser = new UserInfo(); // Ensure friendUser is not null
-            friendUser.setUserId(rs.getString("Friend_Unique_ID"));
-            relationship.setFriendUser(friendUser);
-    
-            relationship.setStatus(rs.getString("status"));
-            return relationship;
-        }
-    };
 }
