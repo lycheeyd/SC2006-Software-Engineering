@@ -194,6 +194,7 @@ public class HttpReqController {
             accountManagementService.deleteAccount(deleteAccountDTO.getUserID(), deleteAccountDTO.getEmail(),
                     deleteAccountDTO.getOtpCode());
 
+            System.out.println("Account deleted");
             return ResponseEntity.ok("Account deleted");
 
         } catch (RuntimeException e) {
