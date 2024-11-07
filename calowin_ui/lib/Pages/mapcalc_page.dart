@@ -432,6 +432,7 @@ Future<void> _retrieveMetrics() async {// Update with the actual user ID
           context,
           MaterialPageRoute(
             builder: (context) => SuccessPage(
+              userId: profile.getUserID(),
               caloriesBurnt: caloriesBurnt,
               carbonSaved: carbonSaved,
               distance: distance,
