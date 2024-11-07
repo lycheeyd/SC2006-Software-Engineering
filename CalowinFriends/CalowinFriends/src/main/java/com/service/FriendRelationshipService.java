@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -12,6 +13,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
+import com.dto.FriendRelationshipDTO;
 import com.models.FriendRelationship;
 import com.models.UserInfo;
 import com.repository.FriendRelationshipRepository;
@@ -24,117 +26,58 @@ public class FriendRelationshipService {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
-    
-    @Autowired
-    private UserInfoService userInfoService; // Ensure this service is available to fetch UserInfo
 
-    public FriendRelationship sendFriendRequest(String senderId, String receiverId) {
+    @Autowired
+    private UserInfoService userInfoService;
+
+    // Method to convert FriendRelationship to FriendRelationshipDTO
+    private FriendRelationshipDTO convertToDTO(FriendRelationship relationship) {
+        String userName = userInfoService.getUserNameById(relationship.getUser().getUserId());
+        String friendUserName = userInfoService.getUserNameById(relationship.getFriendUser().getUserId());
+
+        return new FriendRelationshipDTO(
+            relationship.getUser().getUserId(),
+            userName,
+            relationship.getFriendUser().getUserId(),
+            friendUserName,
+            relationship.getStatus()
+        );
+    }
+
+    public FriendRelationshipDTO sendFriendRequest(String senderId, String receiverId) {
         try {
-            // Check if the request already exists
             Optional<FriendRelationship> existingRequest = repository.findByUniqueIdAndFriendUser_UserId(senderId, receiverId);
             if (existingRequest.isPresent()) {
                 throw new IllegalArgumentException("Friend request already sent.");
             }
-            
-            // Fetch UserInfo objects for sender and receiver
+
             UserInfo senderUser = userInfoService.getUserInfoById(senderId);
             UserInfo receiverUser = userInfoService.getUserInfoById(receiverId);
-            
             if (senderUser == null || receiverUser == null) {
                 throw new IllegalArgumentException("Sender or receiver user not found.");
             }
 
-            // Create a new FriendRelationship object
             FriendRelationship relationship = new FriendRelationship();
-            relationship.setUser(senderUser);  // Set sender's UserInfo
-            relationship.setFriendUser(receiverUser);  // Set receiver's UserInfo
+            relationship.setUser(senderUser);
+            relationship.setFriendUser(receiverUser);
             relationship.setFriendedOn(LocalDateTime.now());
             relationship.setStatus("PENDING");
 
-            // Save the request to the database
-            return repository.save(relationship);
+            return convertToDTO(repository.save(relationship));
         } catch (DataAccessException e) {
-            // Handle database-related exceptions
             throw new RuntimeException("Database error occurred", e);
-        } catch (IllegalArgumentException e) {
-            // Handle illegal argument exception
-            throw e; // Re-throw to propagate the specific error
-        } catch (Exception e) {
-            // Handle any other unforeseen exceptions
-            throw new RuntimeException("Unexpected error occurred", e);
         }
     }
 
-    public List<FriendRelationship> getFriendRequests(String userId) {
-        return repository.findByFriendUser_UserId(userId);
+    public List<FriendRelationshipDTO> getPendingRequests(String userId) {
+        return repository.findByFriendUser_UserIdAndStatus(userId, "PENDING").stream()
+            .map(this::convertToDTO)
+            .collect(Collectors.toList());
     }
 
-    public FriendRelationship updateStatus(String uniqueId, String status) {
-        FriendRelationship relationship = repository.findById(uniqueId).orElseThrow();
-        relationship.setStatus(status);
-        return repository.save(relationship);
-    }
-
-    public List<FriendRelationship> getPendingRequests(String receiverId) {
-        return repository.findByFriendUser_UserIdAndStatus(receiverId, "PENDING");
-    }
-
-    public void cancelFriendRequest(String senderId, String receiverId) {
+    public FriendRelationshipDTO respondToRequest(String senderId, String receiverId, String status) {
         FriendRelationship relationship = repository.findByUniqueIdAndFriendUser_UserId(senderId, receiverId)
-                .orElseThrow(() -> new IllegalArgumentException("Friend request not found."));
-        
-        if (!"PENDING".equals(relationship.getStatus())) {
-            throw new IllegalArgumentException("Cannot cancel a non-pending request.");
-        }
-        
-        repository.delete(relationship);
-    }
-
-    public FriendRelationship acceptFriendRequest(String senderId, String receiverId) {
-        FriendRelationship relationship = repository.findByUniqueIdAndFriendUser_UserId(senderId, receiverId)
-                .orElseThrow(() -> new IllegalArgumentException("Friend request not found."));
-        
-        if (!"PENDING".equals(relationship.getStatus())) {
-            throw new IllegalArgumentException("Request is not pending.");
-        }
-        
-        relationship.setStatus("ACCEPTED");
-        return repository.save(relationship);
-    }
-
-    public FriendRelationship rejectFriendRequest(String senderId, String receiverId) {
-        FriendRelationship relationship = repository.findByUniqueIdAndFriendUser_UserId(senderId, receiverId)
-                .orElseThrow(() -> new IllegalArgumentException("Friend request not found."));
-        
-        if (!"PENDING".equals(relationship.getStatus())) {
-            throw new IllegalArgumentException("Request is not pending.");
-        }
-
-        relationship.setStatus("REJECTED");
-        return repository.save(relationship);
-    }
-
-    public void removeFriend(String userId, String friendId) {
-        Optional<FriendRelationship> relationship = repository.findByUniqueIdAndFriendUser_UserId(userId, friendId);
-        
-        if (relationship.isEmpty()) {
-            relationship = repository.findByUniqueIdAndFriendUser_UserId(friendId, userId);
-        }
-
-        if (relationship.isPresent() && "ACCEPTED".equals(relationship.get().getStatus())) {
-            repository.delete(relationship.get());
-        } else {
-            throw new IllegalArgumentException("No friendship found to remove.");
-        }
-    }
-    
-    public List<FriendRelationship> getFriendList(String userId) {
-        return repository.findAllFriendRelationships(userId, "ACCEPTED");
-    }
-
-    public FriendRelationship respondToRequest(String senderId, String receiverId, String status) {
-        FriendRelationship relationship = repository.findByUniqueIdAndFriendUser_UserId(senderId, receiverId)
-                .orElseThrow(() -> new IllegalArgumentException("Request not found"));
+            .orElseThrow(() -> new IllegalArgumentException("Request not found"));
 
         if (!"PENDING".equals(relationship.getStatus())) {
             throw new IllegalArgumentException("Request is not pending.");
@@ -145,7 +88,48 @@ public class FriendRelationshipService {
         }
 
         relationship.setStatus(status);
-        return repository.save(relationship);
+        return convertToDTO(repository.save(relationship));
+    }
+
+    public List<FriendRelationshipDTO> getFriendList(String userId) {
+        return repository.findAllFriendRelationships(userId, "ACCEPTED").stream()
+            .map(this::convertToDTO)
+            .collect(Collectors.toList());
+    }
+
+    public FriendRelationshipDTO acceptFriendRequest(String senderId, String receiverId) {
+        FriendRelationship relationship = repository.findByUniqueIdAndFriendUser_UserId(senderId, receiverId)
+            .orElseThrow(() -> new IllegalArgumentException("Friend request not found."));
+        
+        if (!"PENDING".equals(relationship.getStatus())) {
+            throw new IllegalArgumentException("Request is not pending.");
+        }
+        
+        relationship.setStatus("ACCEPTED");
+        return convertToDTO(repository.save(relationship));
+    }
+
+    public FriendRelationshipDTO rejectFriendRequest(String senderId, String receiverId) {
+        FriendRelationship relationship = repository.findByUniqueIdAndFriendUser_UserId(senderId, receiverId)
+            .orElseThrow(() -> new IllegalArgumentException("Friend request not found."));
+        
+        if (!"PENDING".equals(relationship.getStatus())) {
+            throw new IllegalArgumentException("Request is not pending.");
+        }
+
+        relationship.setStatus("REJECTED");
+        return convertToDTO(repository.save(relationship));
+    }
+
+    public void cancelFriendRequest(String senderId, String receiverId) {
+        FriendRelationship relationship = repository.findByUniqueIdAndFriendUser_UserId(senderId, receiverId)
+            .orElseThrow(() -> new IllegalArgumentException("Friend request not found."));
+        
+        if (!"PENDING".equals(relationship.getStatus())) {
+            throw new IllegalArgumentException("Cannot cancel a non-pending request.");
+        }
+        
+        repository.delete(relationship);
     }
 
     public String getRelationshipStatus(String userId1, String userId2) {
@@ -179,23 +163,36 @@ public class FriendRelationshipService {
             String friendUniqueId = relationship.getFriendUser().getUserId();
             String status = relationship.getStatus();
 
-            if ((uniqueId.equals(userId1) && friendUniqueId.equals(userId2)) ||
-                (uniqueId.equals(userId2) && friendUniqueId.equals(userId1))) {
-
-                if ("ACCEPTED".equals(status)) {
-                    return "FRIEND";
-                } else if ("PENDING".equals(status)) {
-                    if (uniqueId.equals(userId1) && friendUniqueId.equals(userId2)) {
-                        return "REQUESTSENT";
-                    } else if (uniqueId.equals(userId2) && friendUniqueId.equals(userId1)) {
-                        return "REQUESTRECEIVED";
-                    }
-                } else if ("REJECTED".equals(status)) {
-                    return "STRANGER";
+            if ("ACCEPTED".equals(status)) {
+                return "FRIEND";
+            } else if ("PENDING".equals(status)) {
+                if (uniqueId.equals(userId1) && friendUniqueId.equals(userId2)) {
+                    return "REQUESTSENT";
+                } else if (uniqueId.equals(userId2) && friendUniqueId.equals(userId1)) {
+                    return "REQUESTRECEIVED";
                 }
+            } else if ("REJECTED".equals(status)) {
+                return "STRANGER";
             }
         }
 
         return "STRANGER";
     }
+
+    public void removeFriend(String userId, String friendId) {
+        Optional<FriendRelationship> relationship = repository.findByUniqueIdAndFriendUser_UserId(userId, friendId);
+    
+        // Check if the reverse relationship exists (friend is userId and user is friendId)
+        if (relationship.isEmpty()) {
+            relationship = repository.findByUniqueIdAndFriendUser_UserId(friendId, userId);
+        }
+    
+        // If relationship exists and is accepted, delete it
+        if (relationship.isPresent() && "ACCEPTED".equals(relationship.get().getStatus())) {
+            repository.delete(relationship.get());
+        } else {
+            throw new IllegalArgumentException("No friendship found to remove.");
+        }
+    }
+    
 }

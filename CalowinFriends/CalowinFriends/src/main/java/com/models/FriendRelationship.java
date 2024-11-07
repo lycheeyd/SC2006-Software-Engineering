@@ -19,7 +19,7 @@ public class FriendRelationship {
     @Id
     @Column(name = "Unique_ID")
     private String uniqueId;
-//testing
+
     @ManyToOne
     @JoinColumn(name = "Unique_ID", referencedColumnName = "user_id", insertable = false, updatable = false)
     private UserInfo user;
