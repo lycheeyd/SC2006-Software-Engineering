@@ -85,10 +85,25 @@ public class FriendRelationshipService {
         // Retrieve relationships where the status is explicitly "ACCEPTED"
         return repository.findByIdUniqueIdOrIdFriendUniqueIdAndStatus(userId, userId, "ACCEPTED").stream()
             .filter(relationship -> "ACCEPTED".equals(relationship.getStatus())) // Ensure only accepted relationships
-            .map(this::convertToDTO)
+            .map(relationship -> {
+                // Determine the friend’s ID based on the direction of the relationship
+                String friendId = relationship.getId().getUniqueId().equals(userId) 
+                    ? relationship.getId().getFriendUniqueId() 
+                    : relationship.getId().getUniqueId();
+                
+                // Convert to DTO using friend ID and name (prevent adding the userId itself to the friend list)
+                return new FriendRelationshipDTO(
+                    userId,
+                    userInfoService.getUserNameById(userId),
+                    friendId,
+                    userInfoService.getUserNameById(friendId),
+                    relationship.getStatus()
+                );
+            })
+            .distinct() // Ensure no duplicate entries in the list
             .collect(Collectors.toList());
     }
-
+    
     public FriendRelationshipDTO acceptFriendRequest(String senderId, String receiverId) {
         return respondToRequest(senderId, receiverId, "ACCEPTED");
     }
