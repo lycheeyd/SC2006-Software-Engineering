@@ -1,8 +1,8 @@
 import 'package:calowin/common/colors_and_fonts.dart';
+import 'package:calowin/control/leaderboard_retriever.dart';
 import 'package:calowin/control/page_navigator.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:calowin/common/medals.dart';
 
 class RankPage extends StatefulWidget {
   final String userID;
@@ -15,41 +15,56 @@ class RankPage extends StatefulWidget {
 class _RankPageState extends State<RankPage> {
   String userID = "";
   bool _isCalorie = true;
+  LeaderboardRetriever retriever = LeaderboardRetriever();
+  List<LeaderboardItem> caloriesleaderBoard = [];
+  List<LeaderboardItem> carbonleaderBoard = [];
 
   //to be retrieved from backend
-  List<Map<String, dynamic>> caloriesleaderBoard = [
-    {"name": "Alice", "medal": Medals.caloriePlatinum, "points": 2000},
-    {"name": "Bob", "medal": Medals.caloriePlatinum, "points": 1900},
-    {"name": "Charlie", "medal": Medals.caloriePlatinum, "points": 1500},
-    {"name": "Diana", "medal": Medals.calorieGold, "points": 1300},
-    {"name": "Ethan", "medal": Medals.calorieGold, "points": 500},
-    {"name": "Fiona", "medal": Medals.calorieGold, "points": 93},
-    {"name": "George", "medal": Medals.calorieSilver, "points": 80},
-    {"name": "Hannah", "medal": Medals.calorieSilver, "points": 75},
-    {"name": "Ivan", "medal": Medals.calorieBronze, "points": 60},
-    {"name": "Jack", "medal": Medals.calorieBronze, "points": 50},
-  ];
+  // List<Map<String, dynamic>> caloriesleaderBoard = [
+  //   {"name": "Alice", "medal": Medals.caloriePlatinum, "points": 2000},
+  //   {"name": "Bob", "medal": Medals.caloriePlatinum, "points": 1900},
+  //   {"name": "Charlie", "medal": Medals.caloriePlatinum, "points": 1500},
+  //   {"name": "Diana", "medal": Medals.calorieGold, "points": 1300},
+  //   {"name": "Ethan", "medal": Medals.calorieGold, "points": 500},
+  //   {"name": "Fiona", "medal": Medals.calorieGold, "points": 93},
+  //   {"name": "George", "medal": Medals.calorieSilver, "points": 80},
+  //   {"name": "Hannah", "medal": Medals.calorieSilver, "points": 75},
+  //   {"name": "Ivan", "medal": Medals.calorieBronze, "points": 60},
+  //   {"name": "Jack", "medal": Medals.calorieBronze, "points": 50},
+  // ];
 
-  List<Map<String, dynamic>> carbonleaderBoard = [
-    {"name": "Liam", "medal": Medals.ecoPlatinum, "points": 2102},
-    {"name": "Mia", "medal": Medals.ecoGold, "points": 1221},
-    {"name": "Noah", "medal": Medals.ecoGold, "points": 646},
-    {"name": "Olivia", "medal": Medals.ecoSilver, "points": 131},
-    {"name": "Paul", "medal": Medals.ecoSilver, "points": 121},
-    {"name": "Quincy", "medal": Medals.ecoBronze, "points": 93},
-    {"name": "Rachel", "medal": Medals.ecoBronze, "points": 79},
-    {"name": "Sophia", "medal": Medals.ecoBronze, "points": 60},
-    {"name": "Thomas", "medal": Medals.ecoBronze, "points": 51},
-    {"name": "Uma", "medal": null, "points": 42},
-  ];
+  // List<Map<String, dynamic>> carbonleaderBoard = [
+  //   {"name": "Liam", "medal": Medals.ecoPlatinum, "points": 2102},
+  //   {"name": "Mia", "medal": Medals.ecoGold, "points": 1221},
+  //   {"name": "Noah", "medal": Medals.ecoGold, "points": 646},
+  //   {"name": "Olivia", "medal": Medals.ecoSilver, "points": 131},
+  //   {"name": "Paul", "medal": Medals.ecoSilver, "points": 121},
+  //   {"name": "Quincy", "medal": Medals.ecoBronze, "points": 93},
+  //   {"name": "Rachel", "medal": Medals.ecoBronze, "points": 79},
+  //   {"name": "Sophia", "medal": Medals.ecoBronze, "points": 60},
+  //   {"name": "Thomas", "medal": Medals.ecoBronze, "points": 51},
+  //   {"name": "Uma", "medal": null, "points": 42},
+  // ];
+
+  Future<void> _retrieveLeaderboards() async {
+    caloriesleaderBoard = await retriever.retrieveCalorieLeaderboard(userID);
+    carbonleaderBoard = await retriever.retrieveCarbonLeaderboard(userID);
+    setState(() {
+      caloriesleaderBoard = caloriesleaderBoard;
+      carbonleaderBoard = carbonleaderBoard;
+    });
+    print("Leaderboards retrieved");
+  }
 
   @override
   void initState() {
     super.initState();
     userID = widget.userID;
+    _retrieveLeaderboards();
   }
 
   void _toggleLeaderBoard() {
+    _retrieveLeaderboards();
     setState(() {
       _isCalorie = !_isCalorie;
     });
@@ -170,11 +185,21 @@ class _RankPageState extends State<RankPage> {
               ? caloriesleaderBoard.length
               : carbonleaderBoard.length,
           itemBuilder: (context, index) {
-            Map currentItem = _isCalorie
-                ? caloriesleaderBoard[index]
-                : carbonleaderBoard[index];
-            return _buildListItem(index, currentItem["name"],
-                currentItem["points"], currentItem["medal"]);
+            final currentItem;
+            final points;
+            final medal;
+            if(_isCalorie){
+                currentItem = caloriesleaderBoard[index];
+                points = currentItem.caloriePoint;
+                medal = currentItem.calorieMedal;
+            }
+            else{
+              currentItem = carbonleaderBoard[index];
+                points = currentItem.carbonPoint;
+                medal = currentItem.carbonMedal;
+            }
+            return _buildListItem(index, currentItem.userId,
+                points, medal);
           },
         ),
       ),

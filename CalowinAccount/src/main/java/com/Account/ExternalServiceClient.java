@@ -16,10 +16,11 @@ public class ExternalServiceClient {
 
     @Value("${friend.module.urlPrefix}")
     private String urlPrefix;
+    http://localhost:8080/status?userId1=123&userId2=456
 
-    public FriendStatus getFriendStatus(String userID) {
+    public FriendStatus getFriendStatus(String selfID, String otherID) {
         try {
-            String url = urlPrefix + "/friend/get-friendstatus/" + userID;
+            String url = urlPrefix + "/friend-requests/status?userId1=" + selfID + "&userId2=" + otherID;
             return restTemplate.getForObject(url, FriendStatus.class);
         } catch (RestClientException e) {
             // Handle the error or log it

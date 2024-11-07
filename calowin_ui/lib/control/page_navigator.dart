@@ -4,6 +4,7 @@ import 'package:calowin/Pages/otheruser_page.dart';
 import 'package:calowin/Pages/profile/profile_page.dart';
 import 'package:calowin/Pages/wellnesszone_page.dart';
 import 'package:calowin/common/user_profile.dart';
+import 'package:calowin/control/notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:calowin/Pages/mapcalc_page.dart';
 import 'package:calowin/Pages/rank_page.dart';
@@ -26,25 +27,14 @@ class PageNavigatorState extends State<PageNavigator> {
   //this is to set the page index
   int _currentIndex = 0;
   late UserProfile _profile;
+  final NotificationService notificationService = NotificationService();
 
   //this is to set parameters to pass to the pages
   Map<String, dynamic>? _currentParams;
 
   late List<Widget Function(Map<String, dynamic>?)> _pages;
 
-  List<String> listOfNotifications = <String>[
-    "John sent a Friend Request",
-    "Notification 2",
-    "Notification 3",
-    "Notification 4",
-    "Notification 4",
-    "Notification 4",
-    "Notification 4",
-    "Notification 4",
-    "Notification 4",
-    "Notification 4",
-    "Notification 4",
-  ];
+  List<String> listOfNotifications = [];
 
   bool _showNotifications =
       false; // State to track if notifications are visible
@@ -55,7 +45,7 @@ class PageNavigatorState extends State<PageNavigator> {
     _profile = widget.profile;
     _pages = [
     (params) => MapcalcPage(
-      targetName: params?['targetName'], targetLat: params?['targetLat'], targetLong: params?['targetLong'],
+      targetName: params?['targetName'], targetLat: params?['targetLat'], targetLong: params?['targetLong'], profile: _profile,
     ),
     (params) => RankPage(userID:  _profile.getUserID(),),
     (params) => ProfilePage(profile: _profile),
@@ -67,6 +57,8 @@ class PageNavigatorState extends State<PageNavigator> {
         ),
     (params) => AddfriendsPage(userID:  _profile.getUserID()),
   ];
+
+  _getNotifications();
   }
 
   void navigateToPage(int index, {Map<String, dynamic>? params}) {
@@ -75,6 +67,10 @@ class PageNavigatorState extends State<PageNavigator> {
       _currentParams = params; // Save parameters if needed
     });
     //print("Navigating to page $_currentIndex");
+  }
+
+  Future<void> _getNotifications() async {
+    listOfNotifications = await notificationService.fetchFriendRequests(_profile.getUserID());
   }
 
   void _toggleNotifications() {

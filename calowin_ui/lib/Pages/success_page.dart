@@ -1,8 +1,9 @@
 import 'package:calowin/common/colors_and_fonts.dart';
+import 'package:calowin/control/words2widget_converter.dart';
 import 'package:flutter/material.dart';
 import '../control/apiService.dart';
-import '../common/medals.dart';
 import 'package:google_fonts/google_fonts.dart';
+ // Import the converter
 
 class SuccessPage extends StatefulWidget {
   final int caloriesBurnt;
@@ -11,6 +12,7 @@ class SuccessPage extends StatefulWidget {
   final String currentLocation;
   final String destination;
   final double distance;
+  final String userId;
 
   SuccessPage({
     required this.caloriesBurnt,
@@ -19,6 +21,7 @@ class SuccessPage extends StatefulWidget {
     required this.currentLocation,
     required this.destination,
     required this.distance,
+    required this.userId,
   });
 
   @override
@@ -30,17 +33,15 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
   int totalCalorieBurntExp = 0;
   String carbonSavedMedal = "No Medal";
   String calorieBurntMedal = "No Medal";
+  late String _userId;
 
-  // Define thresholds for medals
-  final int pointsToNextCarbonBronze = 1000;
-  final int pointsToNextCarbonSilver = 5000;
-  final int pointsToNextCarbonGold = 10000;
-  final int pointsToNextCarbonPlatinum = 15000;
+  final int pointsToNextBronze = 1000;
+  final int pointsToNextSilver = 5000;
+  final int pointsToNextGold = 10000;
+  final int pointsToNextPlatinum = 15000;
 
-  final int pointsToNextCalorieBronze = 1000;
-  final int pointsToNextCalorieSilver = 5000;
-  final int pointsToNextCalorieGold = 10000;
-  final int pointsToNextCaloriePlatinum = 15000;
+  int maxCarbon = 0;
+  int maxCalorie = 0;
 
   late AnimationController _controller;
   late Animation<double> _animation;
@@ -48,30 +49,41 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
   @override
   void initState() {
     super.initState();
+    _userId = widget.userId;
     _controller = AnimationController(
       duration: const Duration(seconds: 2),
       vsync: this,
     );
     _animation = Tween<double>(begin: 0.0, end: 1.0).animate(_controller);
+    fetchAchievements();
 
+  }
+
+  @override 
+  void didUpdateWidget(SuccessPage oldWidget){
+    super.didUpdateWidget(oldWidget);
     fetchAchievements();
   }
 
   Future<void> fetchAchievements() async {
     ApiService apiService = ApiService();
-    var achievements = await apiService.getAchievementProgress();
+    var achievements = await apiService.getAchievementProgress(_userId);
     setState(() {
       totalCarbonSavedExp = achievements['totalCarbonSavedExp'];
       totalCalorieBurntExp = achievements['totalCalorieBurntExp'];
       carbonSavedMedal = achievements['carbonSavedMedal'];
       calorieBurntMedal = achievements['calorieBurntMedal'];
+      print(carbonSavedMedal);
+      print(calorieBurntMedal);
     });
-    _controller.forward(); // Start the animation
+    _controller.forward();
+    maxCarbon = _retrieveThreshold(totalCarbonSavedExp, pointsToNextPlatinum, pointsToNextGold, pointsToNextSilver, pointsToNextBronze);
+    maxCalorie = _retrieveThreshold(totalCalorieBurntExp, pointsToNextPlatinum, pointsToNextGold, pointsToNextSilver, pointsToNextBronze);
   }
 
   @override
   void dispose() {
-    _controller.dispose(); // Dispose of the controller
+    _controller.dispose();
     super.dispose();
   }
 
@@ -101,7 +113,7 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
                   ),
                   SizedBox(height: 10),
                   Text(
-                    "You have traveled ${widget.distance} km to ${widget.destination}.",
+                    "You have traveled ${widget.distance.toStringAsFixed(2)} km to ${widget.destination}.",
                     style: GoogleFonts.openSans(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -111,32 +123,23 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
                   ),
                   SizedBox(height: 20),
                   _buildProgressSection(
-                    title: "Carbon Saved EXP: ${_formatExpDisplay(totalCarbonSavedExp, pointsToNextCarbonPlatinum)}",
+                    title: "Carbon Saved EXP: ${_formatExpDisplay(totalCarbonSavedExp, maxCarbon)}",
                     value: totalCarbonSavedExp,
                     medal: carbonSavedMedal,
-                    pointsToNextBronze: pointsToNextCarbonBronze,
-                    pointsToNextSilver: pointsToNextCarbonSilver,
-                    pointsToNextGold: pointsToNextCarbonGold,
-                    pointsToNextPlatinum: pointsToNextCarbonPlatinum,
                     gainedExp: widget.carbonSaved,
-                    isCarbon: true,
                   ),
                   SizedBox(height: 15),
                   _buildProgressSection(
-                    title: "Calories Burnt EXP: ${_formatExpDisplay(totalCalorieBurntExp, pointsToNextCaloriePlatinum)}",
+                    title: "Calories Burnt EXP: ${_formatExpDisplay(totalCalorieBurntExp, maxCalorie)}",
                     value: totalCalorieBurntExp,
                     medal: calorieBurntMedal,
-                    pointsToNextBronze: pointsToNextCalorieBronze,
-                    pointsToNextSilver: pointsToNextCalorieSilver,
-                    pointsToNextGold: pointsToNextCalorieGold,
-                    pointsToNextPlatinum: pointsToNextCaloriePlatinum,
                     gainedExp: widget.caloriesBurnt,
-                    isCarbon: false,
                   ),
                   SizedBox(height: 20),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12), backgroundColor: Colors.green[700],
+                      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                      backgroundColor: Colors.green[700],
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -166,45 +169,24 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
     return currentExp >= platinumThreshold ? "$platinumThreshold/$platinumThreshold" : "$currentExp/$platinumThreshold";
   }
 
+  int _retrieveThreshold(int value, int pointsToNextPlatinum, int pointsToNextGold, int pointsToNextSilver, int pointsToNextBronze) {
+    if (value >= pointsToNextGold) return pointsToNextPlatinum;
+    if (value >= pointsToNextSilver) return pointsToNextGold;
+    if (value >= pointsToNextBronze) return pointsToNextSilver;
+    return pointsToNextBronze;
+  }
+
   Widget _buildProgressSection({
     required String title,
     required int value,
     required String medal,
-    required int pointsToNextBronze,
-    required int pointsToNextSilver,
-    required int pointsToNextGold,
-    required int pointsToNextPlatinum,
     required int gainedExp,
-    required bool isCarbon,
   }) {
-    double progress = 0.0;
-    String nextMedal = "No Medal";
-
-    if (value >= pointsToNextPlatinum) {
-      nextMedal = "MAX";
-      medal = "Platinum";
-      progress = 1.0;
-    } else if (value >= pointsToNextGold) {
-      nextMedal = "Platinum";
-      medal = "Gold";
-      progress = (value - pointsToNextGold) / (pointsToNextPlatinum - pointsToNextGold);
-    } else if (value >= pointsToNextSilver) {
-      nextMedal = "Gold";
-      medal = "Silver";
-      progress = (value - pointsToNextSilver) / (pointsToNextGold - pointsToNextSilver);
-    } else if (value >= pointsToNextBronze) {
-      nextMedal = "Silver";
-      medal = "Bronze";
-      progress = (value - pointsToNextBronze) / (pointsToNextSilver - pointsToNextBronze);
-    } else {
-      nextMedal = "Bronze";
-      progress = value / pointsToNextBronze;
-    }
-
+    double progress = (value >= pointsToNextPlatinum) ? 1.0 : value / pointsToNextBronze;
     progress = progress.clamp(0.0, 1.0);
 
     return Container(
-      decoration: _getCardBackgroundImage(medal), // Use image for background
+      decoration: _getCardBackgroundImage(medal),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -219,18 +201,16 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
             ),
             SizedBox(height: 10),
             Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                if (nextMedal != "No Medal") ...[
-                  _getMedalImage(nextMedal, isCarbon: isCarbon, size: 25),
-                  SizedBox(width: 8),
-                ],
+                SizedBox(height: 50, width: 50, child: Words2widgetConverter.convert(medal) ?? Container(),),
+                SizedBox(width: 8),
                 Expanded(
                   child: AnimatedBuilder(
                     animation: _animation,
                     builder: (context, child) {
-                      double animatedProgress = progress * _animation.value;
                       return LinearProgressIndicator(
-                        value: animatedProgress,
+                        value: progress * _animation.value,
                         backgroundColor: Colors.grey[300],
                         color: Colors.red,
                         minHeight: 8,
@@ -249,88 +229,48 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
                 ),
               ],
             ),
-            SizedBox(height: 10),
-            Text(
-              "Current Badge:",
-              style: GoogleFonts.openSans(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 5),
-            _getMedalImage(medal, isCarbon: isCarbon),
-            SizedBox(height: 5),
           ],
         ),
       ),
     );
   }
 
-  Widget _getMedalImage(String medal, {required bool isCarbon, double size = 50}) {
-    if (isCarbon) {
-      switch (medal) {
-        case "Gold":
-          return SizedBox(width: size, height: size, child: Medals.ecoGold);
-        case "Silver":
-          return SizedBox(width: size, height: size, child: Medals.ecoSilver);
-        case "Bronze":
-          return SizedBox(width: size, height: size, child: Medals.ecoBronze);
-        case "Platinum":
-          return SizedBox(width: size, height: size, child: Medals.ecoPlatinum);
-        default:
-          return Container();
-      }
-    } else {
-      switch (medal) {
-        case "Gold":
-          return SizedBox(width: size, height: size, child: Medals.calorieGold);
-        case "Silver":
-          return SizedBox(width: size, height: size, child: Medals.calorieSilver);
-        case "Bronze":
-          return SizedBox(width: size, height: size, child: Medals.calorieBronze);
-        case "Platinum":
-          return SizedBox(width: size, height: size, child: Medals.caloriePlatinum);
-        default:
-          return Container();
-       }
-    }
-  }
-
   BoxDecoration _getCardBackgroundImage(String medal) {
     switch (medal) {
-      case "Platinum":
+      case "CaloriePlatinum":
+      case "EcoPlatinum":
         return BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/images/Platinum.jpg'), // Platinum image
+            image: AssetImage('assets/images/Platinum.jpg'),
             fit: BoxFit.cover,
           ),
         );
-      case "Gold":
+      case "CalorieGold":
+      case "EcoGold":
         return BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/images/Gold.jpg'), // Gold image
+            image: AssetImage('assets/images/Gold.jpg'),
             fit: BoxFit.cover,
           ),
         );
-      case "Silver":
+      case "CalorieSilver":
+      case "EcoSilver":
         return BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/images/Silver.jpg'), // Silver image
+            image: AssetImage('assets/images/Silver.jpg'),
             fit: BoxFit.cover,
-          ),
-        );
-      case "Bronze":
+            )
+          );
+      case "CalorieBronze":
+      case "EcoBronze":
         return BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/images/Bronze.jpg'), // Bronze image
+            image: AssetImage('assets/images/Bronze.jpg'),
             fit: BoxFit.cover,
           ),
         );
       default:
-        return BoxDecoration(
-          color: Colors.white, // Default color if no medal is earned
-        );
+        return BoxDecoration(color: Colors.white);
     }
   }
 }
