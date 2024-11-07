@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import com.Database.CalowinDB.CalowinDBProperties;
-//import com.Database.CalowinSecureDB.CalowinSecureDBProperties;
 
 import javax.sql.DataSource;
 
@@ -17,8 +16,6 @@ public class DataSourceConfig {
 
     @Autowired
     private CalowinDBProperties calowinDBProperties;
-
-    
 
     @Bean(name = "calowinDBDataSource")
     public DataSource calowinDBDataSource() {

@@ -100,8 +100,8 @@ class _EditprofilePageState extends State<EditprofilePage> {
           headers: {"Content-Type": "application/json"},
           body: json.encode({
             "userID": _profile.getUserID(),
-            "name": _nameController.text,
-            "weight": _weightController.text,
+            "name": _profile.getName(),
+            "weight": _profile.getWeight(),
             "bio": _profile.getBio(),
           }),
         );
@@ -249,6 +249,7 @@ class _EditprofilePageState extends State<EditprofilePage> {
                 height: 20,
               ),
               InputField(
+                  onChange: _profile.setName,
                   obscureText: false,
                   hasError: _invalidName,
                   errorText: "Invalid Name",
@@ -297,7 +298,7 @@ class _EditprofilePageState extends State<EditprofilePage> {
                           maxLines: 3, // Set the maximum number of lines
                           minLines: 1, // Set the minimum number of lines
                           decoration: const InputDecoration(
-                            labelText: "Maximum 245 characters",
+                            labelText: "Maximum 100 characters",
                             labelStyle: TextStyle(fontSize: 12),
                             border: InputBorder.none,
                           ),
@@ -308,6 +309,7 @@ class _EditprofilePageState extends State<EditprofilePage> {
                 ),
               ),
               InputField(
+                onChange: (value){_profile.setWeight(double.parse(value));},
                   obscureText: false,
                   keyboardType:
                       const TextInputType.numberWithOptions(decimal: true),
