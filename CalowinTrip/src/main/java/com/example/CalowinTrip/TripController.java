@@ -229,4 +229,5 @@ public class TripController {
         throw new RuntimeException("User weight not found for userId: " + userId);
     }
     
+    
 }

@@ -18,55 +18,59 @@ public class AchievementController {
         this.achievement = new Achievement();
     }
 
-    // Endpoint to add trip metrics (carbon saved and calories burnt)
-    @PostMapping("/addTripMetrics")
-    public void addTripMetrics(@RequestParam int carbonSaved, @RequestParam int caloriesBurnt, Trip trip) {
-        achievement.addTripExperience(carbonSaved, caloriesBurnt);
-        // Save or update the user's achievement in the database
+   // Endpoint to add trip metrics (carbon saved and calories burnt)
+@PostMapping("/addTripMetrics")
+public void addTripMetrics(@RequestParam int carbonSaved, @RequestParam int caloriesBurnt, @RequestBody Trip trip) {
+    // Fetch the user's achievement
+    Achievement userAchievement = getUserAchievement(trip.getUserId());
+    
+    // Add the trip metrics to the user's achievement
+    userAchievement.addTripExperience(carbonSaved, caloriesBurnt);
+    
+    // Save or update the user's achievement in the database
     try {
-        saveOrUpdateAchievement(trip); // Pass the userId as a parameter
+        saveOrUpdateAchievement(userAchievement, trip); // Save using user-specific data
     } catch (SQLException e) {
-        // Handle the exception (log it, return an error response, etc.)
-        e.printStackTrace();
+        e.printStackTrace(); // Handle exception
     }
+}
 
-
+// Method to retrieve or create an achievement for the user
+private Achievement getUserAchievement(String userId) {
+    // You can fetch the user's achievement from the database here (e.g., using a SELECT query)
+    // If the user doesn't have an achievement, create a new one
+    Achievement achievement = new Achievement(); // Create a new one if not found
+    try (Connection conn = DatabaseConnection.getConnection()) {
+        String query = "SELECT * FROM achievement WHERE user_id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, userId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                // If the user exists, populate the Achievement object with their data
+                achievement.setTotalCarbonSavedExp(rs.getInt("total_carbon_saved"));
+                achievement.setTotalCalorieBurntExp(rs.getInt("total_calorie_burnt"));
+                achievement.setCarbonSavedMedal(rs.getString("carbon_medal"));
+                achievement.setCalorieBurntMedal(rs.getString("calorie_medal"));
+            }
+        }
+    } catch (SQLException e) {
+        e.printStackTrace(); // Handle exception
     }
+    return achievement;
+}
 
-    // Endpoint to get current achievement progress (EXP and medals)
-    @GetMapping("/progress")
-    public AchievementResponse getAchievementProgress() {
-        return new AchievementResponse(
-            achievement.getTotalCarbonSavedExp(),
-            achievement.getTotalCalorieBurntExp(),
-            achievement.getCarbonSavedMedal(),
-            achievement.getCalorieBurntMedal(),
-            achievement.pointsToNextCarbonBronze(),
-            achievement.pointsToNextCarbonSilver(),
-            achievement.pointsToNextCarbonGold(),
-            achievement.pointsToNextCarbonPlatinum(),
-            achievement.pointsToNextCalorieBronze(),
-            achievement.pointsToNextCalorieSilver(),
-            achievement.pointsToNextCalorieGold(),
-            achievement.pointsToNextCaloriePlatinum()
-        );
-    }
-
-    private void saveOrUpdateAchievement(Trip trip) throws SQLException {
-        
-        String selectQuery = "SELECT * FROM achievement WHERE user_id = ?";
-        String updateQuery = "UPDATE achievement SET total_carbon_saved = ?, total_calorie_burnt = ?, carbon_medal = ?, calorie_medal = ? WHERE user_id = ?";
-        String insertQuery = "INSERT INTO achievement (user_id, total_carbon_saved, total_calorie_burnt, carbon_medal, calorie_medal) VALUES (?, ?, ?, ?, ?)";
+// Save or update achievement in the database
+private void saveOrUpdateAchievement(Achievement achievement, Trip trip) throws SQLException {
+    String updateQuery = "UPDATE achievement SET total_carbon_saved = ?, total_calorie_burnt = ?, carbon_medal = ?, calorie_medal = ? WHERE user_id = ?";
+    String insertQuery = "INSERT INTO achievement (user_id, total_carbon_saved, total_calorie_burnt, carbon_medal, calorie_medal) VALUES (?, ?, ?, ?, ?)";
     
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement selectStmt = conn.prepareStatement(selectQuery)) {
-    
-            // Check if the user already has an entry
+    try (Connection conn = DatabaseConnection.getConnection()) {
+        String query = "SELECT * FROM achievement WHERE user_id = ?";
+        try (PreparedStatement selectStmt = conn.prepareStatement(query)) {
             selectStmt.setString(1, trip.getUserId());
             ResultSet rs = selectStmt.executeQuery();
-    
             if (rs.next()) {
-                // User exists, so update the existing record
+                // Update existing achievement
                 try (PreparedStatement updateStmt = conn.prepareStatement(updateQuery)) {
                     updateStmt.setInt(1, achievement.getTotalCarbonSavedExp());
                     updateStmt.setInt(2, achievement.getTotalCalorieBurntExp());
@@ -74,12 +78,9 @@ public class AchievementController {
                     updateStmt.setString(4, achievement.getCalorieBurntMedal());
                     updateStmt.setString(5, trip.getUserId());
                     updateStmt.executeUpdate();
-                    
-                    // Log to the console
-                    System.out.println("Record updated successfully for user " + trip.getUserId());
                 }
             } else {
-                // Insert new record
+                // Insert new achievement
                 try (PreparedStatement insertStmt = conn.prepareStatement(insertQuery)) {
                     insertStmt.setString(1, trip.getUserId());
                     insertStmt.setInt(2, achievement.getTotalCarbonSavedExp());
@@ -87,103 +88,9 @@ public class AchievementController {
                     insertStmt.setString(4, achievement.getCarbonSavedMedal());
                     insertStmt.setString(5, achievement.getCalorieBurntMedal());
                     insertStmt.executeUpdate();
-                    
-                    // Log to the console
-                    System.out.println("New record inserted for user " + trip.getUserId());
                 }
             }
-        } catch (SQLException e) {
-            System.out.println("Error while saving or updating achievement for user " + trip.getUserId());
-            throw e;  // Re-throw the exception to be handled at a higher level
         }
     }
-    
-    
-    // Response class to encapsulate achievement data
-    public static class AchievementResponse {
-        private int totalCarbonSavedExp;
-        private int totalCalorieBurntExp;
-        private String carbonSavedMedal;
-        private String calorieBurntMedal;
-        private int pointsToNextCarbonBronze;
-        private int pointsToNextCarbonSilver;
-        private int pointsToNextCarbonGold;
-        private int pointsToNextCarbonPlatinum;
-        private int pointsToNextCalorieBronze;
-        private int pointsToNextCalorieSilver;
-        private int pointsToNextCalorieGold;
-        private int pointsToNextCaloriePlatinum;
-
-        public AchievementResponse(int totalCarbonSavedExp, int totalCalorieBurntExp, String carbonSavedMedal,
-                                   String calorieBurntMedal, int pointsToNextCarbonBronze, int pointsToNextCarbonSilver,
-                                   int pointsToNextCarbonGold, int pointsToNextCarbonPlatinum, int pointsToNextCalorieBronze, int pointsToNextCalorieSilver,
-                                   int pointsToNextCalorieGold, int pointsToNextCaloriePlatinum) {
-            this.totalCarbonSavedExp = totalCarbonSavedExp;
-            this.totalCalorieBurntExp = totalCalorieBurntExp;
-            this.carbonSavedMedal = carbonSavedMedal;
-            this.calorieBurntMedal = calorieBurntMedal;
-            this.pointsToNextCarbonBronze = pointsToNextCarbonBronze;
-            this.pointsToNextCarbonSilver = pointsToNextCarbonSilver;
-            this.pointsToNextCarbonGold = pointsToNextCarbonGold;
-            this.pointsToNextCarbonPlatinum = pointsToNextCarbonPlatinum;
-            this.pointsToNextCalorieBronze = pointsToNextCalorieBronze;
-            this.pointsToNextCalorieSilver = pointsToNextCalorieSilver;
-            this.pointsToNextCalorieGold = pointsToNextCalorieGold;
-            this.pointsToNextCaloriePlatinum = pointsToNextCaloriePlatinum;
-        }
-
-        // Getters for the response fields
-        public int getTotalCarbonSavedExp() {
-            return totalCarbonSavedExp;
-        }
-
-        public int getTotalCalorieBurntExp() {
-            return totalCalorieBurntExp;
-        }
-
-        public String getCarbonSavedMedal() {
-            return carbonSavedMedal;
-        }
-
-        public String getCalorieBurntMedal() {
-            return calorieBurntMedal;
-        }
-
-        public int getPointsToNextCarbonBronze() {
-            return pointsToNextCarbonBronze;
-        }
-
-        public int getPointsToNextCarbonSilver() {
-            return pointsToNextCarbonSilver;
-        }
-
-        public int getPointsToNextCarbonGold() {
-            return pointsToNextCarbonGold;
-        }
-
-        public int getPointsToNextCarbonPlatinum() {
-            return pointsToNextCarbonPlatinum;
-        }
-
-        public int getPointsToNextCalorieBronze() {
-            return pointsToNextCalorieBronze;
-        }
-
-        public int getPointsToNextCalorieSilver() {
-            return pointsToNextCalorieSilver;
-        }
-
-        public int getPointsToNextCalorieGold() {
-            return pointsToNextCalorieGold;
-        }
-
-        public int getPointsToNextCaloriePlatinum() {
-            return pointsToNextCaloriePlatinum;
-        }
-
-
-        
-    }
-
 }
-
+}

@@ -75,12 +75,6 @@
             <version>12.6.4.jre11</version> <!--or the latest version -->
         </dependency>
 
-        <!-- PasswordEncoder -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-        </dependency>
-
         <!-- Java Mail (Email service) -->
         <dependency>
             <groupId>com.sun.mail</groupId>

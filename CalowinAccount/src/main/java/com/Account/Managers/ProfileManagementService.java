@@ -38,12 +38,12 @@ public class ProfileManagementService {
     }
 
     // View account method
-    public ViewProfileResponseDTO viewProfile(String userID) {
-        ProfileEntity profile = calowinDBRepository.findByUserID(userID)
+    public ViewProfileResponseDTO viewProfile(String selfID, String otherID) {
+        ProfileEntity profile = calowinDBRepository.findByUserID(otherID)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         
         // Get friend status from external service
-        FriendStatus friendStatus = externalServiceController.getFriendStatus(userID);
+        FriendStatus friendStatus = externalServiceController.getFriendStatus(selfID, otherID);
 
         return new ViewProfileResponseDTO(profile.getUserID(), profile.getName(), profile.getBio(), friendStatus);
 

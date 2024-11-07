@@ -1,6 +1,5 @@
 package com.example.CalowinTrip;
 
-
 public class Achievement {
     private int totalCarbonSavedExp;
     private int totalCalorieBurntExp;
@@ -152,7 +151,23 @@ public class Achievement {
         return calorieBurntMedal;
     }
 
-   
+    public void setTotalCarbonSavedExp(int totalCarbonSavedExp) {
+        this.totalCarbonSavedExp = totalCarbonSavedExp;
+        updateMedalStatus(); // Update medal after setting new value
+    }
 
-    
+    public void setTotalCalorieBurntExp(int totalCalorieBurntExp) {
+        this.totalCalorieBurntExp = totalCalorieBurntExp;
+        updateMedalStatus(); // Update medal after setting new value
+    }
+
+    public void setCalorieBurntMedal(String calorieBurntMedal) {
+        this.calorieBurntMedal = calorieBurntMedal;
+    }
+
+
+    public void setCarbonSavedMedal(String carbonSavedMedal) {
+        this.carbonSavedMedal = carbonSavedMedal;
+    }
 }
+

@@ -27,7 +27,7 @@ class _EditprofilePageState extends State<EditprofilePage> {
   @override
   void initState() {
     super.initState();
-    _profile = widget.profile;
+    _profile = UserProfile(userID: widget.profile.getUserID(), name: widget.profile.getName(), weight: widget.profile.getWeight(), bio: widget.profile.getBio());
     _nameController.text = _profile.getName();
     _weightController.text = _profile.getWeight().toString();
     _bioController.text = _profile.getBio();
@@ -100,18 +100,25 @@ class _EditprofilePageState extends State<EditprofilePage> {
           headers: {"Content-Type": "application/json"},
           body: json.encode({
             "userID": _profile.getUserID(),
-            "name": _nameController.text,
-            "weight": _weightController.text,
-            "bio": _bioController.text,
+            "name": _profile.getName(),
+            "weight": _profile.getWeight(),
+            "bio": _profile.getBio(),
           }),
         );
 
         final responseMessage = response.body;
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
 
         if (response.statusCode == 200) {
           // Signup successful
-          _showSuccessDialog(responseMessage);
+          _showSuccessDialog(responseData['message']);
+          final responseObject = UserProfile.fromJson(responseData['UserObject']);
+          setState(() {
+            _profile.setName(responseObject.getName());
+            _profile.setWeight(responseObject.getWeight());
+            _profile.setBio(responseObject.getBio());
 
+          });
         } else {
           _showErrorDialog(responseMessage);
         }
@@ -119,7 +126,7 @@ class _EditprofilePageState extends State<EditprofilePage> {
         _showErrorDialog("Network error: ${e.toString()}");
       }
     }
-    Navigator.pop(context);
+    
   }
 
   void _handleChangePassword() {
@@ -242,6 +249,7 @@ class _EditprofilePageState extends State<EditprofilePage> {
                 height: 20,
               ),
               InputField(
+                  onChange: _profile.setName,
                   obscureText: false,
                   hasError: _invalidName,
                   errorText: "Invalid Name",
@@ -280,7 +288,7 @@ class _EditprofilePageState extends State<EditprofilePage> {
                         padding: const EdgeInsets.symmetric(
                             vertical: 5, horizontal: 10),
                         child: TextField(
-                          onChanged: (value){ print(_bioController.text); },
+                          onChanged:_profile.setBio,
                           inputFormatters: [
                             MaxLinesInputFormatter(maxLines: 3),
                             LengthLimitingTextInputFormatter(100)
@@ -290,7 +298,7 @@ class _EditprofilePageState extends State<EditprofilePage> {
                           maxLines: 3, // Set the maximum number of lines
                           minLines: 1, // Set the minimum number of lines
                           decoration: const InputDecoration(
-                            labelText: "Maximum 245 characters",
+                            labelText: "Maximum 100 characters",
                             labelStyle: TextStyle(fontSize: 12),
                             border: InputBorder.none,
                           ),
@@ -301,6 +309,7 @@ class _EditprofilePageState extends State<EditprofilePage> {
                 ),
               ),
               InputField(
+                onChange: (value){_profile.setWeight(double.parse(value));},
                   obscureText: false,
                   keyboardType:
                       const TextInputType.numberWithOptions(decimal: true),
@@ -324,7 +333,7 @@ class _EditprofilePageState extends State<EditprofilePage> {
                         width: 400,
                         height: 45,
                         child: ElevatedButton(
-                            onPressed: _handleSaveChanges,
+                            onPressed: (){_handleSaveChanges();Navigator.pop(context,_profile);},
                             style: ElevatedButton.styleFrom(
                               elevation: 0,
                               backgroundColor: PrimaryColors.brightGreen,

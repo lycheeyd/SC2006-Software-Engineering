@@ -5,19 +5,28 @@ import java.time.LocalDateTime;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+
 // import com.ENUM.FriendRequestStatus;
+
+
 
 @Entity
 @Table(name = "FriendRelationship", schema = "dbo")
 public class FriendRelationship {
-
     @Id
     @Column(name = "Unique_ID")
     private String uniqueId;
+//testing
+    @ManyToOne
+    @JoinColumn(name = "Unique_ID", referencedColumnName = "user_id", insertable = false, updatable = false)
+    private UserInfo user;
 
-    @Column(name = "Friend_Unique_ID")
-    private String friendUniqueId;
+    @ManyToOne
+    @JoinColumn(name = "Friend_Unique_ID", referencedColumnName = "user_id", insertable = false, updatable = false)
+    private UserInfo friendUser;
 
     @Column(name = "[Friended On]")
     private LocalDateTime friendedOn;
@@ -35,12 +44,20 @@ public class FriendRelationship {
         this.uniqueId = uniqueId;
     }
 
-    public String getFriendUniqueId() {
-        return friendUniqueId;
+    public UserInfo getUser() {
+        return user;
     }
 
-    public void setFriendUniqueId(String friendUniqueId) {
-        this.friendUniqueId = friendUniqueId;
+    public void setUser(UserInfo user) {
+        this.user = user;
+    }
+
+    public UserInfo getFriendUser() {
+        return friendUser;
+    }
+
+    public void setFriendUser(UserInfo friendUser) {
+        this.friendUser = friendUser;
     }
 
     public LocalDateTime getFriendedOn() {

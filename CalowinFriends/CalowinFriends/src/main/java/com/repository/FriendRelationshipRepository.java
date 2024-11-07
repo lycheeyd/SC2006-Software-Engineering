@@ -9,15 +9,22 @@ import org.springframework.data.repository.query.Param;
 
 import com.models.FriendRelationship;
 
-
 public interface FriendRelationshipRepository extends JpaRepository<FriendRelationship, String> {
-    boolean existsByUniqueIdAndFriendUniqueId(String uniqueId, String friendUniqueId);
+    
+    boolean existsByUniqueIdAndFriendUser_UserId(String uniqueId, String friendUserId);
+    
     List<FriendRelationship> findByUniqueId(String uniqueId);
-    List<FriendRelationship> findByFriendUniqueId(String friendUniqueId);
-    List<FriendRelationship> findByFriendUniqueIdAndStatus(String friendUniqueId, String status);
-    Optional<FriendRelationship> findByUniqueIdAndFriendUniqueId(String uniqueId, String friendUniqueId);
-
-    @Query("SELECT f FROM FriendRelationship f WHERE (f.uniqueId = :userId OR f.friendUniqueId = :userId) AND f.status = :status")
+    
+    // Use friendUser_UserId to access the ID of the friend through the friendUser association
+    List<FriendRelationship> findByFriendUser_UserId(String friendUserId);
+    
+    List<FriendRelationship> findByFriendUser_UserIdAndStatus(String friendUserId, String status);
+    
+    Optional<FriendRelationship> findByUniqueIdAndFriendUser_UserId(String uniqueId, String friendUserId);
+    
+    @Query("SELECT f FROM FriendRelationship f WHERE (f.uniqueId = :userId OR f.friendUser.userId = :userId) AND f.status = :status")
     List<FriendRelationship> findByUserIdInEitherColumnAndStatus(@Param("userId") String userId, @Param("status") String status);
     
+    @Query("SELECT f FROM FriendRelationship f WHERE (f.uniqueId = :userId OR f.friendUser.userId = :userId) AND f.status = :status")
+    List<FriendRelationship> findAllFriendRelationships(@Param("userId") String userId, @Param("status") String status);
 }

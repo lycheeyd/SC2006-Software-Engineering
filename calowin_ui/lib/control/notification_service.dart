@@ -5,7 +5,7 @@ class NotificationService {
   final String baseUrl = "http://172.21.146.188:8084"; // Update with actual base URL
 
   Future<List<String>> fetchFriendRequests(String userId) async {
-    final response = await http.get(Uri.parse('$baseUrl/api/user/$userId/friend-requests'));
+    final response = await http.get(Uri.parse('$baseUrl/notifications/friend-requests/$userId'));
 
     if (response.statusCode == 200) {
       // Parse the JSON response

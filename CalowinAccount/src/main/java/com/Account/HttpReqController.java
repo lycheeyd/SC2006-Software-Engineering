@@ -194,10 +194,10 @@ public class HttpReqController {
     }
 
     @GetMapping("/view-profile/{selfID}/{otherID}")
-    public ResponseEntity<?> viewProfile(@PathVariable String userID) {
+    public ResponseEntity<?> viewProfile(@PathVariable String selfID, @PathVariable String otherID) {
         // View account logic
         try {
-            ViewProfileResponseDTO profile = profileManagementService.viewProfile(userID);
+            ViewProfileResponseDTO profile = profileManagementService.viewProfile(selfID, otherID);
             
             Map<String, Object> response = new HashMap<>();
             response.put("message", "Profile retrieved successfully");
