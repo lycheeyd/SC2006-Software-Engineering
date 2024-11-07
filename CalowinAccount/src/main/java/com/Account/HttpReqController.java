@@ -1,6 +1,5 @@
 package com.Account;
 
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,19 +49,22 @@ public class HttpReqController {
     public ResponseEntity<?> signup(@RequestBody SignupDTO signupDTO) {
         // Signup logic (save user details to DB)
         try {
-            LoginResponseDTO responseDTO = accountManagementService.signup(signupDTO.getEmail(), signupDTO.getPassword(), signupDTO.getConfirm_password(), signupDTO.getName(), signupDTO.getWeight());
-    
+            LoginResponseDTO responseDTO = accountManagementService.signup(signupDTO.getEmail(),
+                    signupDTO.getPassword(), signupDTO.getConfirm_password(), signupDTO.getName(),
+                    signupDTO.getWeight());
+
             // Prepare response after successful signup
             Map<String, Object> response = new HashMap<>();
             response.put("message", "Signup successful");
             response.put("UserObject", responseDTO);
-    
+
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    
+
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Signup failed: " + e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error during signup: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error during signup: " + e.getMessage());
         }
 
     }
@@ -85,9 +87,10 @@ public class HttpReqController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         } catch (Exception e) {
             // Handle other exceptions
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error during login: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error during login: " + e.getMessage());
         }
-        
+
     }
 
     @PostMapping("/send-otp")
@@ -95,11 +98,11 @@ public class HttpReqController {
         try {
             // Send the OTP
             otpService.sendOtpCode(sendOtpDTO.getEmail(), sendOtpDTO.getType());
-            
+
             return ResponseEntity.ok("OTP sent to email associate with the account");
-        
+
         } catch (Exception e) {
-           return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error sending OTP: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error sending OTP: " + e.getMessage());
         }
 
     }
@@ -111,11 +114,12 @@ public class HttpReqController {
             if (!otpService.verifyOTP(verifyOtpDTO.getEmail(), verifyOtpDTO.getOtpCode(), verifyOtpDTO.getType())) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid OTP");
             }
-            
+
             return ResponseEntity.ok("OTP valid");
-        
+
         } catch (Exception e) {
-           return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error validating OTP: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error validating OTP: " + e.getMessage());
         }
 
     }
@@ -124,13 +128,14 @@ public class HttpReqController {
     public ResponseEntity<?> changePassword(@RequestBody ChangePasswordDTO changePasswordDTO) {
         // Change password logic (update password in DB)
         try {
-            passwordManagementService.changePassword(changePasswordDTO.getUserID(), changePasswordDTO.getOldPassword(), changePasswordDTO.getNewPassword(), changePasswordDTO.getConfirm_newPassword());
-            
+            passwordManagementService.changePassword(changePasswordDTO.getUserID(), changePasswordDTO.getOldPassword(),
+                    changePasswordDTO.getNewPassword(), changePasswordDTO.getConfirm_newPassword());
+
             return ResponseEntity.ok("Password changed successfully");
 
         } catch (RuntimeException e) {
             // Return unauthorized error for invalid credentials
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
             // Handle other exceptions
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + e.getMessage());
@@ -149,7 +154,8 @@ public class HttpReqController {
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error sending new password: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error sending new password: " + e.getMessage());
         }
 
     }
@@ -159,11 +165,12 @@ public class HttpReqController {
         // Edit account logic
         try {
             System.out.println(editProfileDTO.getUserID());
-            ProfileEntity profile = profileManagementService.editProfile(editProfileDTO.getUserID(), editProfileDTO.getName(), editProfileDTO.getWeight(), editProfileDTO.getBio());
-            
+            ProfileEntity profile = profileManagementService.editProfile(editProfileDTO.getUserID(),
+                    editProfileDTO.getName(), editProfileDTO.getWeight(), editProfileDTO.getBio());
+
             Map<String, Object> response = new HashMap<>();
             response.put("message", "Profile updated successfully");
-            response.put("UserObject", profile);      
+            response.put("UserObject", profile);
 
             return ResponseEntity.ok(response);
 
@@ -181,14 +188,16 @@ public class HttpReqController {
     public ResponseEntity<?> deleteAccount(@RequestBody DeleteAccountDTO deleteAccountDTO) {
         // Delete account logic
         try {
-            accountManagementService.deleteAccount(deleteAccountDTO.getUserID(), deleteAccountDTO.getEmail(), deleteAccountDTO.getOtpCode());
-        
+            accountManagementService.deleteAccount(deleteAccountDTO.getUserID(), deleteAccountDTO.getEmail(),
+                    deleteAccountDTO.getOtpCode());
+
             return ResponseEntity.ok("Account deleted");
 
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting account: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error deleting account: " + e.getMessage());
         }
 
     }
@@ -198,7 +207,7 @@ public class HttpReqController {
         // View account logic
         try {
             ViewProfileResponseDTO profile = profileManagementService.viewProfile(selfID, otherID);
-            
+
             Map<String, Object> response = new HashMap<>();
             response.put("message", "Profile retrieved successfully");
             response.put("UserObject", profile);

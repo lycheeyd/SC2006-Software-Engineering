@@ -579,10 +579,10 @@ Future<void> _retrieveMetrics() async {// Update with the actual user ID
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text('Calories burned:',style: TextStyle(fontSize: 15,fontWeight: FontWeight.w500)),
-                              Text("${metrics!['caloriesBurnt']} kcal",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 15)),
+                              Text("${metrics!['caloriesBurnt'] * 2} kcal",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 15)),
                               const SizedBox(height: 7),
                               Text("Carbon saved:",style: TextStyle(fontSize: 15,fontWeight: FontWeight.w500)),
-                              Text("${metrics!['carbonSaved']} g",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 15)),
+                              Text("${metrics!['carbonSaved'] * 2} g",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 15)),
                               const SizedBox(height: 7),
                               Text("Distance:",style: TextStyle(fontSize: 15,fontWeight: FontWeight.w500)),
                               Text("${metrics!['distance'].toStringAsFixed(2)} km",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 15))

@@ -20,8 +20,8 @@ public class FriendRelationshipService {
     @Autowired
     private FriendRelationshipRepository friendRelationshipRepository;
 
-    public List<Map<String, Object>> getFriendRequestsForUser(String userId) {
+    public List<String> getFriendRequestsForUser(String userId) {
         // Call the repository to execute the query based on userId
-        return friendRelationshipRepository.executeRawQuery(userId);
+        return friendRelationshipRepository.findPendingFriendRequests(userId);
     }
 }

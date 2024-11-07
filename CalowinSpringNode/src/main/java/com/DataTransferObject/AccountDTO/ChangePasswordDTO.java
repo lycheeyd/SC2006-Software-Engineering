@@ -1,17 +1,17 @@
 package com.DataTransferObject.AccountDTO;
 
 public class ChangePasswordDTO {
-    private String username;
+    private String userID;
     private String oldPassword;
     private String newPassword;
     private String confirm_newPassword;
 
-    public String getUsername() {
-        return this.username;
+    public String getUserID() {
+        return this.userID;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setUsername(String userID) {
+        this.userID = userID;
     }
 
     public String getOldPassword() {

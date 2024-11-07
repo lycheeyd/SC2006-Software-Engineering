@@ -12,8 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.models.FriendRelationship;
-import com.models.UserInfo;
+import com.dto.FriendRelationshipDTO;
 import com.service.FriendRelationshipService;
 import com.service.UserInfoService;
 
@@ -23,15 +22,15 @@ public class FriendRelationshipController {
 
     @Autowired
     private FriendRelationshipService friendService;
-    
+
     @Autowired
-    private UserInfoService userInfoService; // For searching users by username or name
+    private UserInfoService userInfoService;
 
     // Send Friend Request
     @PostMapping("/send")
-    public ResponseEntity<FriendRelationship> sendRequest(@RequestParam String senderId, @RequestParam String receiverId) {
+    public ResponseEntity<FriendRelationshipDTO> sendRequest(@RequestParam String senderId, @RequestParam String receiverId) {
         try {
-            FriendRelationship result = friendService.sendFriendRequest(senderId, receiverId);
+            FriendRelationshipDTO result = friendService.sendFriendRequest(senderId, receiverId);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
@@ -40,10 +39,10 @@ public class FriendRelationshipController {
 
     // View Pending Friend Requests
     @GetMapping("/pending/{receiverId}")
-    public ResponseEntity<List<FriendRelationship>> getPendingRequests(@PathVariable String receiverId) {
+    public ResponseEntity<List<FriendRelationshipDTO>> getPendingRequests(@PathVariable String receiverId) {
         try {
-            List<FriendRelationship> result = friendService.getPendingRequests(receiverId);
-            return ResponseEntity.ok(result);
+            List<FriendRelationshipDTO> dtoList = friendService.getPendingRequests(receiverId);
+            return ResponseEntity.ok(dtoList);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
@@ -51,12 +50,12 @@ public class FriendRelationshipController {
 
     // Respond to Friend Request (Accept or Reject)
     @PostMapping("/respond")
-    public ResponseEntity<FriendRelationship> respondToRequest(
+    public ResponseEntity<FriendRelationshipDTO> respondToRequest(
             @RequestParam String senderId, 
             @RequestParam String receiverId, 
             @RequestParam String status) {
         try {
-            FriendRelationship result = friendService.respondToRequest(senderId, receiverId, status);
+            FriendRelationshipDTO result = friendService.respondToRequest(senderId, receiverId, status);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
@@ -76,9 +75,9 @@ public class FriendRelationshipController {
 
     // Accept Friend Request
     @PostMapping("/accept")
-    public ResponseEntity<FriendRelationship> acceptFriendRequest(@RequestParam String senderId, @RequestParam String receiverId) {
+    public ResponseEntity<FriendRelationshipDTO> acceptFriendRequest(@RequestParam String senderId, @RequestParam String receiverId) {
         try {
-            FriendRelationship result = friendService.acceptFriendRequest(senderId, receiverId);
+            FriendRelationshipDTO result = friendService.acceptFriendRequest(senderId, receiverId);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
@@ -87,9 +86,9 @@ public class FriendRelationshipController {
 
     // Reject Friend Request
     @PostMapping("/reject")
-    public ResponseEntity<FriendRelationship> rejectFriendRequest(@RequestParam String senderId, @RequestParam String receiverId) {
+    public ResponseEntity<FriendRelationshipDTO> rejectFriendRequest(@RequestParam String senderId, @RequestParam String receiverId) {
         try {
-            FriendRelationship result = friendService.rejectFriendRequest(senderId, receiverId);
+            FriendRelationshipDTO result = friendService.rejectFriendRequest(senderId, receiverId);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
@@ -109,32 +108,26 @@ public class FriendRelationshipController {
 
     // View Friend List
     @GetMapping("/friends/{userId}")
-    public ResponseEntity<List<FriendRelationship>> getFriendList(@PathVariable String userId) {
+    public ResponseEntity<List<FriendRelationshipDTO>> getFriendList(@PathVariable String userId) {
         try {
-            List<FriendRelationship> result = friendService.getFriendList(userId);
-            return ResponseEntity.ok(result);
+            List<FriendRelationshipDTO> dtoList = friendService.getFriendList(userId);
+            return ResponseEntity.ok(dtoList);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
-    // Search for Friends (by username or name)
-    @GetMapping("/search")
-    public ResponseEntity<List<UserInfo>> searchFriends(@RequestParam String searchTerm) {
-        try {
-            List<UserInfo> result = userInfoService.searchByUserIdOrName(searchTerm);
-            return ResponseEntity.ok(result);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
-    }
-
+    // Get Relationship Status between two users
     @GetMapping("/status")
     public ResponseEntity<String> getRelationshipStatus(
             @RequestParam("userId1") String userId1,
             @RequestParam("userId2") String userId2) {
         
-        String status = friendService.getRelationshipStatus(userId1, userId2);
-        return ResponseEntity.ok(status);
+        try {
+            String status = friendService.getRelationshipStatus(userId1, userId2);
+            return ResponseEntity.ok(status);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 }

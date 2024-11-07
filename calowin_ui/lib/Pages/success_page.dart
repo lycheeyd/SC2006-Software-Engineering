@@ -3,7 +3,6 @@ import 'package:calowin/control/words2widget_converter.dart';
 import 'package:flutter/material.dart';
 import '../control/apiService.dart';
 import 'package:google_fonts/google_fonts.dart';
- // Import the converter
 
 class SuccessPage extends StatefulWidget {
   final int caloriesBurnt;
@@ -35,6 +34,7 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
   String calorieBurntMedal = "No Medal";
   late String _userId;
 
+  // Thresholds for medal levels
   final int pointsToNextBronze = 1000;
   final int pointsToNextSilver = 5000;
   final int pointsToNextGold = 10000;
@@ -56,11 +56,10 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
     );
     _animation = Tween<double>(begin: 0.0, end: 1.0).animate(_controller);
     fetchAchievements();
-
   }
 
-  @override 
-  void didUpdateWidget(SuccessPage oldWidget){
+  @override
+  void didUpdateWidget(SuccessPage oldWidget) {
     super.didUpdateWidget(oldWidget);
     fetchAchievements();
   }
@@ -68,6 +67,8 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
   Future<void> fetchAchievements() async {
     ApiService apiService = ApiService();
     var achievements = await apiService.getAchievementProgress(_userId);
+  
+
     setState(() {
       totalCarbonSavedExp = achievements['totalCarbonSavedExp'];
       totalCalorieBurntExp = achievements['totalCalorieBurntExp'];
@@ -75,8 +76,8 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
       calorieBurntMedal = achievements['calorieBurntMedal'];
     });
     _controller.forward();
-    maxCarbon = _retrieveThreshold(totalCarbonSavedExp, pointsToNextPlatinum, pointsToNextGold, pointsToNextSilver, pointsToNextBronze);
-    maxCalorie = _retrieveThreshold(totalCalorieBurntExp, pointsToNextPlatinum, pointsToNextGold, pointsToNextSilver, pointsToNextBronze);
+    maxCarbon = _retrieveThreshold(totalCarbonSavedExp);
+    maxCalorie = _retrieveThreshold(totalCalorieBurntExp);
   }
 
   @override
@@ -124,14 +125,16 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
                     title: "Carbon Saved EXP: ${_formatExpDisplay(totalCarbonSavedExp, maxCarbon)}",
                     value: totalCarbonSavedExp,
                     medal: carbonSavedMedal,
-                    gainedExp: widget.carbonSaved,
+                    gainedExp: widget.carbonSaved*2,
+                    threshold: maxCarbon,
                   ),
                   SizedBox(height: 15),
                   _buildProgressSection(
                     title: "Calories Burnt EXP: ${_formatExpDisplay(totalCalorieBurntExp, maxCalorie)}",
                     value: totalCalorieBurntExp,
                     medal: calorieBurntMedal,
-                    gainedExp: widget.caloriesBurnt,
+                    gainedExp: widget.caloriesBurnt*2,
+                    threshold: maxCalorie,
                   ),
                   SizedBox(height: 20),
                   ElevatedButton(
@@ -163,11 +166,11 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
     );
   }
 
-  String _formatExpDisplay(int currentExp, int platinumThreshold) {
-    return currentExp >= platinumThreshold ? "$platinumThreshold/$platinumThreshold" : "$currentExp/$platinumThreshold";
+  String _formatExpDisplay(int currentExp, int threshold) {
+    return currentExp >= threshold ? "$threshold/$threshold" : "$currentExp/$threshold";
   }
 
-  int _retrieveThreshold(int value, int pointsToNextPlatinum, int pointsToNextGold, int pointsToNextSilver, int pointsToNextBronze) {
+  int _retrieveThreshold(int value) {
     if (value >= pointsToNextGold) return pointsToNextPlatinum;
     if (value >= pointsToNextSilver) return pointsToNextGold;
     if (value >= pointsToNextBronze) return pointsToNextSilver;
@@ -175,62 +178,120 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
   }
 
   Widget _buildProgressSection({
-    required String title,
-    required int value,
-    required String medal,
-    required int gainedExp,
-  }) {
-    double progress = (value >= pointsToNextPlatinum) ? 1.0 : value / pointsToNextBronze;
-    progress = progress.clamp(0.0, 1.0);
+  required String title,
+  required int value,
+  required String medal,
+  required int gainedExp,
+  required int threshold,
+}) {
+  double progress = (value >= threshold) ? 1.0 : value / threshold;
+  progress = progress.clamp(0.0, 1.0);
 
-    return Container(
-      decoration: _getCardBackgroundImage(medal),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Text(
-              title,
-              style: GoogleFonts.openSans(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+  // Get the next threshold medal if the user is below the current medal
+  String medalToDisplay = _getNextThresholdMedal(value, threshold);
+
+  String BgToDisplay = _getBG(value, threshold);
+
+  // Select the correct medal image based on the threshold medal
+  Image? medalImage = _getMedalImage(medalToDisplay);
+
+  return Container(
+    decoration: _getCardBackgroundImage(BgToDisplay),
+    child: Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        children: [
+          Text(
+            title,
+            style: GoogleFonts.openSans(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Show the next threshold medal if below the current level
+              SizedBox(
+                height: 50,
+                width: 50,
+                child: medalImage ?? Container(),
               ),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(height: 50, width: 50, child: Words2widgetConverter.convert(medal) ?? Container(),),
-                SizedBox(width: 8),
-                Expanded(
-                  child: AnimatedBuilder(
-                    animation: _animation,
-                    builder: (context, child) {
-                      return LinearProgressIndicator(
-                        value: progress * _animation.value,
-                        backgroundColor: Colors.grey[300],
-                        color: Colors.red,
-                        minHeight: 8,
-                      );
-                    },
-                  ),
+              SizedBox(width: 8),
+              Expanded(
+                child: AnimatedBuilder(
+                  animation: _animation,
+                  builder: (context, child) {
+                    return LinearProgressIndicator(
+                      value: progress * _animation.value,
+                      backgroundColor: Colors.grey[300],
+                      color: Colors.red,
+                      minHeight: 8,
+                    );
+                  },
                 ),
-                SizedBox(width: 10),
-                Text(
-                  value >= pointsToNextPlatinum ? "MAX" : "+$gainedExp EXP",
-                  style: GoogleFonts.openSans(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
+              ),
+              SizedBox(width: 10),
+              Text(
+                value >= threshold ? "MAX" : " +$gainedExp EXP",
+                style: GoogleFonts.openSans(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
                 ),
-              ],
-            ),
-          ],
-        ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ],
       ),
-    );
+    ),
+  );
+}
+
+String _getNextThresholdMedal(int value, int threshold) {
+  if (value < pointsToNextBronze) {
+    return "EcoBronze";  // Below Bronze level, show Bronze
+  } else if (value < pointsToNextSilver) {
+    return "EcoSilver";  // Bronze level achieved
+  } else if (value < pointsToNextGold) {
+    return "EcoGold";  // Silver level achieved
+  } else if (value < pointsToNextPlatinum) {
+    return "EcoPlatinum";  // Gold level achieved
+  } else {
+    return "EcoPlatinum";  // Platinum or higher
+  }
+}
+String _getBG(int value, int threshold) {
+  if (value >= pointsToNextPlatinum) {
+    return "EcoPlatinum";  // Platinum or higher level
+  } else if (value >= pointsToNextGold) {
+    return "EcoGold";       // Gold level achieved
+  } else if (value >= pointsToNextSilver) {
+    return "EcoSilver";     // Silver level achieved
+  } else if (value >= pointsToNextBronze) {
+    return "EcoBronze";     // Bronze level achieved
+  } else {
+    return "No Medal";      // Below Bronze level
+  }
+}
+
+
+
+  Image? _getMedalImage(String medal) {
+    switch (medal) {
+      case "EcoPlatinum":
+        return Words2widgetConverter.convert("EcoPlatinum");
+      case "EcoGold":
+        return Words2widgetConverter.convert("EcoGold");
+      case "EcoSilver":
+        return Words2widgetConverter.convert("EcoSilver");
+      case "EcoBronze":
+        return Words2widgetConverter.convert("EcoBronze");
+      default:
+        return null;
+    }
   }
 
   BoxDecoration _getCardBackgroundImage(String medal) {
@@ -257,8 +318,8 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
           image: DecorationImage(
             image: AssetImage('assets/images/Silver.jpg'),
             fit: BoxFit.cover,
-            )
-          );
+          ),
+        );
       case "CalorieBronze":
       case "EcoBronze":
         return BoxDecoration(

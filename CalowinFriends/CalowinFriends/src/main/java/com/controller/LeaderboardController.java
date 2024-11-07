@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.models.Achievement;
+import com.dto.AchievementDTO;
 import com.service.LeaderboardService;
 
 @RestController
@@ -21,9 +21,9 @@ public class LeaderboardController {
     private LeaderboardService service;
 
     @GetMapping("/carbon")
-    public ResponseEntity<List<Achievement>> getCarbonLeaderboard(@RequestParam String userId) {
+    public ResponseEntity<List<AchievementDTO>> getCarbonLeaderboard(@RequestParam String userId) {
         try {
-            List<Achievement> result = service.getCarbonLeaderboard(userId);
+            List<AchievementDTO> result = service.getCarbonLeaderboard(userId); // Adjusted to use AchievementDTO
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
@@ -31,9 +31,9 @@ public class LeaderboardController {
     }
 
     @GetMapping("/calories")
-    public ResponseEntity<List<Achievement>> getCaloriesLeaderboard(@RequestParam String userId) {
+    public ResponseEntity<List<AchievementDTO>> getCaloriesLeaderboard(@RequestParam String userId) {
         try {
-            List<Achievement> result = service.getCaloriesLeaderboard(userId);
+            List<AchievementDTO> result = service.getCaloriesLeaderboard(userId); // Adjusted to use AchievementDTO
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);

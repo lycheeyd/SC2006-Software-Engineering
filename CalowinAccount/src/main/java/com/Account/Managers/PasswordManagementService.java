@@ -40,14 +40,15 @@ public class PasswordManagementService {
     private String SECRET_KEY;
 
     // Change password method
-    public void changePassword(String userid, String oldPassword, String newPassword, String confirmNewPassword) throws Exception {
+    public void changePassword(String userid, String oldPassword, String newPassword, String confirmNewPassword)
+            throws Exception {
         // Check if user exist
         UserEntity user = calowinSecureDBRepository.findByUserID(userid)
                 .orElseThrow(() -> new RuntimeException("Invalid user"));
 
+        String decryptedOldPassword = passwordSecurityService.decrypt(oldPassword, SECRET_KEY);
         String decryptedNewPassword = passwordSecurityService.decrypt(newPassword, SECRET_KEY);
         String decryptedConfirmNewPassword = passwordSecurityService.decrypt(confirmNewPassword, SECRET_KEY);
-        String decryptedOldPassword = passwordSecurityService.decrypt(oldPassword, SECRET_KEY);
 
         // Check if new password meet requirements
         passwordSecurityService.isPasswordValid(decryptedNewPassword, decryptedConfirmNewPassword);
@@ -56,8 +57,8 @@ public class PasswordManagementService {
         if (!passwordEncoder.matches(decryptedOldPassword, user.getPassword())) {
             throw new RuntimeException("Wrong password");
         }
-        
-        // Update new password into database (CALOWIN_SECURE) 
+
+        // Update new password into database (CALOWIN_SECURE)
         user.setPassword(passwordEncoder.encode(decryptedNewPassword));
         calowinSecureDBRepository.save(user);
 
@@ -67,7 +68,7 @@ public class PasswordManagementService {
     public void forgotPassword(String email, String otpCode) throws Exception {
         UserEntity user = calowinSecureDBRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Invalid user"));
-        
+
         // Authenticate OTP
         if (!otpService.verifyOTP(email, otpCode, ActionType.FORGOT_PASSWORD)) {
             throw new RuntimeException("Invalid OTP");
