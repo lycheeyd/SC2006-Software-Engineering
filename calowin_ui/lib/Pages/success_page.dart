@@ -125,7 +125,7 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
                     title: "Carbon Saved EXP: ${_formatExpDisplay(totalCarbonSavedExp, maxCarbon)}",
                     value: totalCarbonSavedExp,
                     medal: carbonSavedMedal,
-                    gainedExp: widget.carbonSaved*2,
+                    gainedExp: widget.carbonSaved,
                     threshold: maxCarbon,
                   ),
                   SizedBox(height: 15),
@@ -133,7 +133,7 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
                     title: "Calories Burnt EXP: ${_formatExpDisplay(totalCalorieBurntExp, maxCalorie)}",
                     value: totalCalorieBurntExp,
                     medal: calorieBurntMedal,
-                    gainedExp: widget.caloriesBurnt*2,
+                    gainedExp: widget.caloriesBurnt,
                     threshold: maxCalorie,
                   ),
                   SizedBox(height: 20),
@@ -190,13 +190,13 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
   // Get the next threshold medal if the user is below the current medal
   String medalToDisplay = _getNextThresholdMedal(value, threshold);
 
-  String BgToDisplay = _getBG(value, threshold);
+  String bgToDisplay = _getBG(value, threshold);
 
   // Select the correct medal image based on the threshold medal
   Image? medalImage = _getMedalImage(medalToDisplay);
 
   return Container(
-    decoration: _getCardBackgroundImage(BgToDisplay),
+    decoration: _getCardBackgroundImage(bgToDisplay),
     child: Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -276,8 +276,6 @@ String _getBG(int value, int threshold) {
     return "No Medal";      // Below Bronze level
   }
 }
-
-
 
   Image? _getMedalImage(String medal) {
     switch (medal) {

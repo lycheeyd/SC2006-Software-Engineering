@@ -56,9 +56,7 @@ public class TripController {
         trip.setCaloriesBurnt(caloriesBurned);
         trip.setCarbonSaved(carbonSaved);
         trip.setDistance(distance);
-
-        achievementController.addTripMetrics(carbonSaved, caloriesBurned, user_Id);
-
+        
         insertTripIntoDatabase(trip);
 
         return trip;
