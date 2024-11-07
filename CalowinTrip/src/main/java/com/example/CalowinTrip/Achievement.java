@@ -1,6 +1,5 @@
 package com.example.CalowinTrip;
 
-
 public class Achievement {
     private int totalCarbonSavedExp;
     private int totalCalorieBurntExp;
@@ -68,6 +67,41 @@ public class Achievement {
         }
     }
 
+    // New methods to calculate points needed for the next medal
+    public int pointsToNextCarbonBronze() {
+        return CARBON_BRONZE_THRESHOLD - totalCarbonSavedExp > 0 ? CARBON_BRONZE_THRESHOLD - totalCarbonSavedExp : 0;
+    }
+
+    public int pointsToNextCarbonSilver() {
+        return CARBON_SILVER_THRESHOLD - totalCarbonSavedExp > 0 ? CARBON_SILVER_THRESHOLD - totalCarbonSavedExp : 0;
+    }
+
+    public int pointsToNextCarbonGold() {
+        return CARBON_GOLD_THRESHOLD - totalCarbonSavedExp > 0 ?  CARBON_GOLD_THRESHOLD - totalCarbonSavedExp : 0;
+    }
+
+    public int pointsToNextCarbonPlatinum() {
+        return CARBON_PLATINUM_THRESHOLD - totalCarbonSavedExp > 0 ? CARBON_PLATINUM_THRESHOLD - totalCarbonSavedExp : 0;
+
+    }
+
+    public int pointsToNextCalorieBronze() {
+        return CALORIE_BRONZE_THRESHOLD - totalCalorieBurntExp > 0 ? CALORIE_BRONZE_THRESHOLD - totalCalorieBurntExp : 0;
+    }
+
+    public int pointsToNextCalorieSilver() {
+        return CALORIE_SILVER_THRESHOLD - totalCalorieBurntExp > 0 ? CALORIE_SILVER_THRESHOLD - totalCalorieBurntExp : 0;
+    }
+
+    public int pointsToNextCalorieGold() {
+        return CALORIE_GOLD_THRESHOLD - totalCalorieBurntExp > 0 ? CALORIE_GOLD_THRESHOLD - totalCalorieBurntExp : 0;
+    }
+
+    public int pointsToNextCaloriePlatinum() {
+        return CALORIE_PLATINUM_THRESHOLD - totalCalorieBurntExp > 0 ? CALORIE_PLATINUM_THRESHOLD - totalCalorieBurntExp : 0;
+
+    }
+
     public int getCarbonBronzeThreshold() {
         return CARBON_BRONZE_THRESHOLD;
     }
@@ -119,19 +153,21 @@ public class Achievement {
 
     public void setTotalCarbonSavedExp(int totalCarbonSavedExp) {
         this.totalCarbonSavedExp = totalCarbonSavedExp;
+        updateMedalStatus(); // Update medal after setting new value
     }
 
     public void setTotalCalorieBurntExp(int totalCalorieBurntExp) {
         this.totalCalorieBurntExp = totalCalorieBurntExp;
-    }
-    
-    public void setCarbonSavedMedal(String carbonSavedMedal) {
-        this.carbonSavedMedal = carbonSavedMedal;
+        updateMedalStatus(); // Update medal after setting new value
     }
 
     public void setCalorieBurntMedal(String calorieBurntMedal) {
         this.calorieBurntMedal = calorieBurntMedal;
     }
 
-    
+
+    public void setCarbonSavedMedal(String carbonSavedMedal) {
+        this.carbonSavedMedal = carbonSavedMedal;
+    }
 }
+
