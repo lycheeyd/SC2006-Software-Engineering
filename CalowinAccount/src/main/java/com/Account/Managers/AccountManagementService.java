@@ -16,6 +16,8 @@ import com.Account.Services.OTPService;
 import com.Account.Services.PasswordSecurityService;
 import com.DataTransferObject.LoginResponseDTO;
 import com.Database.CalowinDB.AchievementRepository;
+import com.Database.CalowinDB.FriendRelationshipRepository;
+import com.Database.CalowinDB.TripsRepository;
 import com.Database.CalowinDB.UserInfoRepository;
 import com.Database.CalowinSecureDB.SecureInfoDBRepository;
 
@@ -41,6 +43,12 @@ public class AccountManagementService {
 
     @Autowired
     private AchievementRepository achievementRepository;
+
+    @Autowired
+    private TripsRepository tripsRepository;
+
+    @Autowired
+    private FriendRelationshipRepository friendRelationshipRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -124,8 +132,15 @@ public class AccountManagementService {
 
         // Delete from CalowinDB
         userInfoRepository.deleteByUserID(userID); //ProfileEntity
-        // ADD MORE FOR EACH TABLE
+
+        achievementRepository.deleteByUserID(userID); // AchievementEntry
         
+        tripsRepository.deleteByUserID(userID); //TripsEntry
+
+        friendRelationshipRepository.deleteByUserID(userID); //FriendRelationshipEntry
+
+        // ADD MORE FOR EACH TABLE
+
     }
 
     // Method to generate a unique 8-character userID
