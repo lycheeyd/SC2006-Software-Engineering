@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/achievements")
 public class AchievementController {
 
-    private final Achievement achievement;
+    private Achievement achievement;
 
     public AchievementController() {
         this.achievement = new Achievement();
@@ -36,54 +36,16 @@ public class AchievementController {
     // Endpoint to get current achievement progress (EXP and medals)
     @GetMapping("/progress")
     public AchievementResponse getAchievementProgress(String userId) {
-        Achievement userAchievement = loadUserAchievement(userId);
+       
 
         return new AchievementResponse(
 
             achievement.getTotalCarbonSavedExp(),
             achievement.getTotalCalorieBurntExp(),
             achievement.getCarbonSavedMedal(),
-            achievement.getCalorieBurntMedal(),
-            achievement.pointsToNextCarbonBronze(),
-            achievement.pointsToNextCarbonSilver(),
-            achievement.pointsToNextCarbonGold(),
-            achievement.pointsToNextCarbonPlatinum(),
-            achievement.pointsToNextCalorieBronze(),
-            achievement.pointsToNextCalorieSilver(),
-            achievement.pointsToNextCalorieGold(),
-            achievement.pointsToNextCaloriePlatinum()
+            achievement.getCalorieBurntMedal()
         );
     }
-
-    // Method to load user-specific achievement data from the database
-private Achievement loadUserAchievement(String userId) {
-    String query = "SELECT total_carbon_saved, total_calorie_burnt, carbon_medal, calorie_medal FROM achievement WHERE user_id = ?";
-    Achievement achievement = new Achievement();
-
-    try (Connection conn = DatabaseConnection.getConnection();
-         PreparedStatement stmt = conn.prepareStatement(query)) {
-
-        stmt.setString(1, userId);
-        ResultSet rs = stmt.executeQuery();
-
-        if (rs.next()) {
-            // Retrieve and set achievement data for the user
-            achievement.setTotalCarbonSavedExp(rs.getInt("total_carbon_saved"));
-            achievement.setTotalCalorieBurntExp(rs.getInt("total_calorie_burnt"));
-            achievement.setCarbonSavedMedal(rs.getString("carbon_medal"));
-            achievement.setCalorieBurntMedal(rs.getString("calorie_medal"));
-            
-        } else {
-            // Handle the case where no record exists for the user (optional)
-            System.out.println("No achievement record found for user " + userId);
-        }
-    } catch (SQLException e) {
-        System.out.println("Error while loading achievement data for user " + userId);
-        e.printStackTrace();
-    }
-
-    return achievement;
-}
 
     private void saveOrUpdateAchievement(Trip trip) throws SQLException {
         
@@ -139,31 +101,14 @@ private Achievement loadUserAchievement(String userId) {
         private int totalCalorieBurntExp;
         private String carbonSavedMedal;
         private String calorieBurntMedal;
-        private int pointsToNextCarbonBronze;
-        private int pointsToNextCarbonSilver;
-        private int pointsToNextCarbonGold;
-        private int pointsToNextCarbonPlatinum;
-        private int pointsToNextCalorieBronze;
-        private int pointsToNextCalorieSilver;
-        private int pointsToNextCalorieGold;
-        private int pointsToNextCaloriePlatinum;
 
         public AchievementResponse(int totalCarbonSavedExp, int totalCalorieBurntExp, String carbonSavedMedal,
-                                   String calorieBurntMedal, int pointsToNextCarbonBronze, int pointsToNextCarbonSilver,
-                                   int pointsToNextCarbonGold, int pointsToNextCarbonPlatinum, int pointsToNextCalorieBronze, int pointsToNextCalorieSilver,
-                                   int pointsToNextCalorieGold, int pointsToNextCaloriePlatinum) {
+                                   String calorieBurntMedal) {
             this.totalCarbonSavedExp = totalCarbonSavedExp;
             this.totalCalorieBurntExp = totalCalorieBurntExp;
             this.carbonSavedMedal = carbonSavedMedal;
             this.calorieBurntMedal = calorieBurntMedal;
-            this.pointsToNextCarbonBronze = pointsToNextCarbonBronze;
-            this.pointsToNextCarbonSilver = pointsToNextCarbonSilver;
-            this.pointsToNextCarbonGold = pointsToNextCarbonGold;
-            this.pointsToNextCarbonPlatinum = pointsToNextCarbonPlatinum;
-            this.pointsToNextCalorieBronze = pointsToNextCalorieBronze;
-            this.pointsToNextCalorieSilver = pointsToNextCalorieSilver;
-            this.pointsToNextCalorieGold = pointsToNextCalorieGold;
-            this.pointsToNextCaloriePlatinum = pointsToNextCaloriePlatinum;
+       
         }
 
         // Getters for the response fields
@@ -183,37 +128,7 @@ private Achievement loadUserAchievement(String userId) {
             return calorieBurntMedal;
         }
 
-        public int getPointsToNextCarbonBronze() {
-            return pointsToNextCarbonBronze;
-        }
-
-        public int getPointsToNextCarbonSilver() {
-            return pointsToNextCarbonSilver;
-        }
-
-        public int getPointsToNextCarbonGold() {
-            return pointsToNextCarbonGold;
-        }
-
-        public int getPointsToNextCarbonPlatinum() {
-            return pointsToNextCarbonPlatinum;
-        }
-
-        public int getPointsToNextCalorieBronze() {
-            return pointsToNextCalorieBronze;
-        }
-
-        public int getPointsToNextCalorieSilver() {
-            return pointsToNextCalorieSilver;
-        }
-
-        public int getPointsToNextCalorieGold() {
-            return pointsToNextCalorieGold;
-        }
-
-        public int getPointsToNextCaloriePlatinum() {
-            return pointsToNextCaloriePlatinum;
-        }
+      
 
 
         

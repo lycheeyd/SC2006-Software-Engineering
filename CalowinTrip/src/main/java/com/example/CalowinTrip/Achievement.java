@@ -153,20 +153,20 @@ public class Achievement {
     }
 
     public void setTotalCarbonSavedExp(int totalCarbonSavedExp) {
-        this.totalCarbonSavedExp = totalCarbonSavedExp;
-    }
-    
-    public void setTotalCalorieBurntExp(int totalCalorieBurntExp) {
-        this.totalCalorieBurntExp = totalCalorieBurntExp;
-    }
-    
-    public void setCarbonSavedMedal(String carbonSavedMedal) {
-        this.carbonSavedMedal = carbonSavedMedal;
-    }
-    
-    public void setCalorieBurntMedal(String calorieBurntMedal) {
-        this.calorieBurntMedal = calorieBurntMedal;
-    }
+    this.totalCarbonSavedExp = totalCarbonSavedExp;
+}
+
+public void setTotalCalorieBurntExp(int totalCalorieBurntExp) {
+    this.totalCalorieBurntExp = totalCalorieBurntExp;
+}
+
+public void setCarbonSavedMedal(String carbonSavedMedal) {
+    this.carbonSavedMedal = carbonSavedMedal;
+}
+
+public void setCalorieBurntMedal(String calorieBurntMedal) {
+    this.calorieBurntMedal = calorieBurntMedal;
+}
 
    
 
