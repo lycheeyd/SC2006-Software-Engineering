@@ -58,10 +58,12 @@ public class FriendRelationshipService {
     }
 
     public List<FriendRelationshipDTO> getPendingRequests(String userId) {
+        // Fetch only requests where the userId is in the Friend_Unique_ID column and status is "PENDING"
         return repository.findByIdFriendUniqueIdAndStatus(userId, "PENDING").stream()
             .map(this::convertToDTO)
             .collect(Collectors.toList());
     }
+    
 
     public FriendRelationshipDTO respondToRequest(String senderId, String receiverId, String status) {
         FriendRelationshipId id = new FriendRelationshipId(senderId, receiverId);
@@ -123,7 +125,7 @@ public class FriendRelationshipService {
 
         repository.delete(relationship);
     }
-    
+
     public FriendStatus getRelationshipStatus(String userId1, String userId2) {
         Optional<FriendRelationship> directRelationship = repository.findById(new FriendRelationshipId(userId1, userId2));
         Optional<FriendRelationship> reverseRelationship = repository.findById(new FriendRelationshipId(userId2, userId1));
