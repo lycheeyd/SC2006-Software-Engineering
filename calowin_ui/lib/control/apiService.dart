@@ -118,10 +118,10 @@ Future<Map<String, dynamic>> startTrip(
 
 
   // Fetch achievement progress from the backend
-  Future<Map<String, dynamic>> getAchievementProgress(String userId) async {
+  Future<Map<String, dynamic>> getAchievementProgress() async {
     final response =
-        //await http.get(Uri.parse(baseUrl + "/achievements/progress"));
-        await http.get(Uri.parse(baseUrl + "/achievements/progress?userId=$userId"));
+        await http.get(Uri.parse(baseUrl + "/achievements/progress"));
+        //await http.get(Uri.parse(baseUrl + "/achievements/progress?userId=$userId"));
 
 
     if (response.statusCode == 200) {

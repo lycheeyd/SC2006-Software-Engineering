@@ -67,8 +67,8 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
 
   Future<void> fetchAchievements() async {
     ApiService apiService = ApiService();
-    var achievements = await apiService.getAchievementProgress(_userId);
-    //var achievements = await apiService.getAchievementProgress();
+    //var achievements = await apiService.getAchievementProgress(_userId);
+    var achievements = await apiService.getAchievementProgress();
 
     setState(() {
       totalCarbonSavedExp = achievements['totalCarbonSavedExp'];
