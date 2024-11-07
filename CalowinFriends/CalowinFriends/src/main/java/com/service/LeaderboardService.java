@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.models.Achievement;
 import com.models.FriendRelationship;
+import com.models.UserInfo;
 
 @Service
 public class LeaderboardService {
@@ -39,7 +40,12 @@ public class LeaderboardService {
         public FriendRelationship mapRow(ResultSet rs, int rowNum) throws SQLException {
             FriendRelationship relationship = new FriendRelationship();
             relationship.setUniqueId(rs.getString("Unique_ID"));
-            relationship.setFriendUniqueId(rs.getString("Friend_Unique_ID"));
+            
+            // Assuming that friendUser is already initialized, set its unique ID
+            UserInfo friendUser = new UserInfo(); // Ensure friendUser is not null
+            friendUser.setUserId(rs.getString("Friend_Unique_ID"));
+            relationship.setFriendUser(friendUser);
+            
             relationship.setStatus(rs.getString("status"));
             return relationship;
         }
@@ -51,27 +57,24 @@ public class LeaderboardService {
         // Fetch relationships from the database
         List<FriendRelationship> relationships = jdbcTemplate.query(sql, friendRelationshipRowMapper, userId, userId);
         
-        // Log the relationships fetched from the repository
-        // System.out.println("Fetched relationships for user " + userId + ":");
-        // relationships.forEach(r -> System.out.println("Unique_ID: " + r.getUniqueId() + ", Friend_Unique_ID: " + r.getFriendUniqueId() + ", Status: " + r.getStatus()));
-    
         // Collect friend IDs based on which side the user appears in the relationship
         List<String> friendsIds = relationships.stream()
-                .map(r -> {
+                .<String>map(r -> {
                     if (r.getUniqueId().equals(userId)) {
-                        return r.getFriendUniqueId();  // If userId matches Unique_ID, take Friend_Unique_ID
+                        return r.getFriendUser().getUserId();  // If userId matches Unique_ID, take Friend_Unique_ID
                     } else {
                         return r.getUniqueId();  // Otherwise, take Unique_ID as the friend ID
                     }
                 })
                 .distinct() // Ensure unique friend IDs
                 .collect(Collectors.toList());
-                
-        friendsIds.add(userId);
-
-        // System.out.println("Friends' IDs for user " + userId + ": " + friendsIds);
+        
+        friendsIds.add(userId); // Optionally include the user itself if needed
+        
         return friendsIds;
     }
+    
+    
     public List<Achievement> getCarbonLeaderboard(String userId) {
         List<String> friendsIds = getFriendsIds(userId);
         
@@ -100,8 +103,13 @@ public class LeaderboardService {
             achievementRowMapper
         ).stream()
          .sorted((a, b) -> Integer.compare(b.getTotalCalorieBurnt(), a.getTotalCalorieBurnt()))
-         .peek(a -> System.out.println(a.getUserId() + ": " + a.getTotalCalorieBurnt() + ", Carbon Medal: " + a.getCarbonMedal() + ", Calorie Medal: " + a.getCalorieMedal()))
+        //  .peek(a -> System.out.println(a.getUserId() + ": " + a.getTotalCalorieBurnt() + ", Carbon Medal: " + a.getCarbonMedal() + ", Calorie Medal: " + a.getCalorieMedal()))
          .collect(Collectors.toList());
+    }
+
+    public String getUserNameById(String userId) {
+        String sql = "SELECT name FROM UserInfo WHERE user_id = ?";
+        return jdbcTemplate.queryForObject(sql, new Object[]{userId}, String.class);
     }
     
 }
