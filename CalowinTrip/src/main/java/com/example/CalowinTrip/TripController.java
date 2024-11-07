@@ -44,8 +44,11 @@ public class TripController {
     public Trip startTrip(@RequestBody Trip trip, String user_Id) {
         double distance = calculateDistance(trip.getCurrentLocation(), trip.getDestination());
 
+
+        user_Id = trip.getUserId();
             // Retrieve user weight from the database
         double weight = getUserWeight(user_Id);
+
 
         int caloriesBurned = calculateCalories(trip.getTravelMethod(), distance, weight);
         int carbonSaved = calculateCarbon(trip.getTravelMethod(), distance);

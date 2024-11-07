@@ -125,7 +125,7 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
                     title: "Carbon Saved EXP: ${_formatExpDisplay(totalCarbonSavedExp, maxCarbon)}",
                     value: totalCarbonSavedExp,
                     medal: carbonSavedMedal,
-                    gainedExp: widget.carbonSaved,
+                    gainedExp: widget.carbonSaved*2,
                     threshold: maxCarbon,
                   ),
                   SizedBox(height: 15),
@@ -133,7 +133,7 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
                     title: "Calories Burnt EXP: ${_formatExpDisplay(totalCalorieBurntExp, maxCalorie)}",
                     value: totalCalorieBurntExp,
                     medal: calorieBurntMedal,
-                    gainedExp: widget.caloriesBurnt,
+                    gainedExp: widget.caloriesBurnt*2,
                     threshold: maxCalorie,
                   ),
                   SizedBox(height: 20),
@@ -190,11 +190,13 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
   // Get the next threshold medal if the user is below the current medal
   String medalToDisplay = _getNextThresholdMedal(value, threshold);
 
+  String BgToDisplay = _getBG(value, threshold);
+
   // Select the correct medal image based on the threshold medal
   Image? medalImage = _getMedalImage(medalToDisplay);
 
   return Container(
-    decoration: _getCardBackgroundImage(medalToDisplay),
+    decoration: _getCardBackgroundImage(BgToDisplay),
     child: Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -233,7 +235,7 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
               ),
               SizedBox(width: 10),
               Text(
-                value >= threshold ? "MAX" : "+$gainedExp EXP",
+                value >= threshold ? "MAX" : " +$gainedExp EXP",
                 style: GoogleFonts.openSans(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -248,20 +250,35 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
   );
 }
 
-// Method to get the next threshold medal based on the current experience points
 String _getNextThresholdMedal(int value, int threshold) {
-  if (value < pointsToNextPlatinum) {
-    return "EcoPlatinum";  // User is at Platinum level
-  } else if (value < pointsToNextGold) {
-    return "EcoGold";  // User is at Gold level
+  if (value < pointsToNextBronze) {
+    return "EcoBronze";  // Below Bronze level, show Bronze
   } else if (value < pointsToNextSilver) {
-    return "EcoSilver";  // User is at Silver level
-  } else if (value < pointsToNextBronze) {
-    return "EcoBronze";  // User is at Bronze level
+    return "EcoSilver";  // Bronze level achieved
+  } else if (value < pointsToNextGold) {
+    return "EcoGold";  // Silver level achieved
+  } else if (value < pointsToNextPlatinum) {
+    return "EcoPlatinum";  // Gold level achieved
   } else {
-    return "EcoBronze";  // Default to Bronze if below the Bronze threshold
+    return "EcoPlatinum";  // Platinum or higher
   }
 }
+String _getBG(int value, int threshold) {
+  if (value >= pointsToNextPlatinum) {
+    return "EcoPlatinum";  // Platinum or higher level
+  } else if (value >= pointsToNextGold) {
+    return "EcoGold";       // Gold level achieved
+  } else if (value >= pointsToNextSilver) {
+    return "EcoSilver";     // Silver level achieved
+  } else if (value >= pointsToNextBronze) {
+    return "EcoBronze";     // Bronze level achieved
+  } else {
+    return "No Medal";      // Below Bronze level
+  }
+}
+
+
+
   Image? _getMedalImage(String medal) {
     switch (medal) {
       case "EcoPlatinum":
