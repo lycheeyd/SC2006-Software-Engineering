@@ -41,11 +41,11 @@ public class TripController {
     }
 
     @PostMapping("/start")
-    public Trip startTrip(@RequestBody Trip trip) {
+    public Trip startTrip(@RequestBody Trip trip, String user_Id) {
         double distance = calculateDistance(trip.getCurrentLocation(), trip.getDestination());
 
             // Retrieve user weight from the database
-        double weight = getUserWeight(trip.getUserId());
+        double weight = getUserWeight(user_Id);
 
         int caloriesBurned = calculateCalories(trip.getTravelMethod(), distance, weight);
         int carbonSaved = calculateCarbon(trip.getTravelMethod(), distance);
@@ -54,7 +54,7 @@ public class TripController {
         trip.setCarbonSaved(carbonSaved);
         trip.setDistance(distance);
 
-        achievementController.addTripMetrics(carbonSaved, caloriesBurned, trip);
+        achievementController.addTripMetrics(carbonSaved, caloriesBurned, user_Id);
 
         insertTripIntoDatabase(trip);
 

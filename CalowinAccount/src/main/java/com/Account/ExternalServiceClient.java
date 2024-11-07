@@ -16,7 +16,6 @@ public class ExternalServiceClient {
 
     @Value("${friend.module.urlPrefix}")
     private String urlPrefix;
-    http://localhost:8080/status?userId1=123&userId2=456
 
     public FriendStatus getFriendStatus(String selfID, String otherID) {
         try {
