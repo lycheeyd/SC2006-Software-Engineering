@@ -1,3 +1,5 @@
+import 'package:calowin/control/words2widget_converter.dart';
+
 enum UserStatus { friend, requested, stranger, friendrequest }
 
 class UserProfile {
@@ -42,9 +44,19 @@ class UserProfile {
       userID: json['userID'] as String,
       bio: json['bio'] as String?,
       weight: (json['weight'] as num?)?.toDouble(),  
-      // Convert to int if available
-      // Other fields like _carbonSaved, _calorieBurn, and _badges can remain null
-      // or be set later as they are not part of LoginResponseDTO
+      carbonSaved: (json['totalCarbonSaved'] as num?)?.toInt(),
+      calorieBurn: (json['totalCalorieBurnt'] as num?)?.toInt(),
+      badges: [json['carbonMedal'] as String, json['calorieMedal'] as String]
+    );
+  }
+
+  factory UserProfile.othersFromJson(Map<String, dynamic> json) {
+    return UserProfile(
+      name: json['name'] as String,
+      email: json['email'] as String?,
+      userID: json['userID'] as String,
+      bio: json['bio'] as String?,
+      weight: (json['weight'] as num?)?.toDouble(),  
     );
   }
 

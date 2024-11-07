@@ -13,7 +13,8 @@ class SuccessPage extends StatefulWidget {
   final double distance;
   final String userId;
 
-  SuccessPage({
+  const SuccessPage({
+    super.key,
     required this.caloriesBurnt,
     required this.carbonSaved,
     required this.tripMethod,
@@ -24,7 +25,7 @@ class SuccessPage extends StatefulWidget {
   });
 
   @override
-  _SuccessPageState createState() => _SuccessPageState();
+  State<SuccessPage> createState() => _SuccessPageState();
 }
 
 class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStateMixin {
@@ -125,7 +126,7 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
                     title: "Carbon Saved EXP: ${_formatExpDisplay(totalCarbonSavedExp, maxCarbon)}",
                     value: totalCarbonSavedExp,
                     medal: carbonSavedMedal,
-                    gainedExp: widget.carbonSaved*2,
+                    gainedExp: widget.carbonSaved,
                     threshold: maxCarbon,
                   ),
                   SizedBox(height: 15),
@@ -133,7 +134,7 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
                     title: "Calories Burnt EXP: ${_formatExpDisplay(totalCalorieBurntExp, maxCalorie)}",
                     value: totalCalorieBurntExp,
                     medal: calorieBurntMedal,
-                    gainedExp: widget.caloriesBurnt*2,
+                    gainedExp: widget.caloriesBurnt,
                     threshold: maxCalorie,
                   ),
                   SizedBox(height: 20),
@@ -188,15 +189,14 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
   progress = progress.clamp(0.0, 1.0);
 
   // Get the next threshold medal if the user is below the current medal
-  String medalToDisplay = _getNextThresholdMedal(value, threshold);
 
-  String BgToDisplay = _getBG(value, threshold);
+  String bgToDisplay = _getBG(value, threshold);
 
   // Select the correct medal image based on the threshold medal
-  Image? medalImage = _getMedalImage(medalToDisplay);
+  Image? medalImage = _getMedalImage(value,threshold,medal);
 
   return Container(
-    decoration: _getCardBackgroundImage(BgToDisplay),
+    decoration: _getCardBackgroundImage(bgToDisplay),
     child: Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -215,9 +215,14 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
             children: [
               // Show the next threshold medal if below the current level
               SizedBox(
-                height: 50,
-                width: 50,
-                child: medalImage ?? Container(),
+                height: 60,
+                width: 80,
+                child: Column(
+                  children: [
+                    SizedBox(height: 40,width: 40,child: medalImage),
+                    Text("Next Level",style: TextStyle(fontSize: 10),)
+                  ],
+                ),
               ),
               SizedBox(width: 8),
               Expanded(
@@ -250,17 +255,21 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
   );
 }
 
-String _getNextThresholdMedal(int value, int threshold) {
+Image? _getMedalImage(int value, int threshold,String medal) {
+  String type;
+  if(medal.contains("Eco")) {type = "Eco";}
+  else {type = "Calorie";}
+
   if (value < pointsToNextBronze) {
-    return "EcoBronze";  // Below Bronze level, show Bronze
+    return Words2widgetConverter.convert("${type}Bronze");  // Below Bronze level, show Bronze
   } else if (value < pointsToNextSilver) {
-    return "EcoSilver";  // Bronze level achieved
+    return Words2widgetConverter.convert("${type}Silver"); 
   } else if (value < pointsToNextGold) {
-    return "EcoGold";  // Silver level achieved
+    return Words2widgetConverter.convert("${type}Gold"); 
   } else if (value < pointsToNextPlatinum) {
-    return "EcoPlatinum";  // Gold level achieved
+    return Words2widgetConverter.convert("${type}Platinum"); 
   } else {
-    return "EcoPlatinum";  // Platinum or higher
+    return Words2widgetConverter.convert("${type}Platinum"); 
   }
 }
 String _getBG(int value, int threshold) {
@@ -278,21 +287,6 @@ String _getBG(int value, int threshold) {
 }
 
 
-
-  Image? _getMedalImage(String medal) {
-    switch (medal) {
-      case "EcoPlatinum":
-        return Words2widgetConverter.convert("EcoPlatinum");
-      case "EcoGold":
-        return Words2widgetConverter.convert("EcoGold");
-      case "EcoSilver":
-        return Words2widgetConverter.convert("EcoSilver");
-      case "EcoBronze":
-        return Words2widgetConverter.convert("EcoBronze");
-      default:
-        return null;
-    }
-  }
 
   BoxDecoration _getCardBackgroundImage(String medal) {
     switch (medal) {

@@ -27,7 +27,7 @@ class _EditprofilePageState extends State<EditprofilePage> {
   @override
   void initState() {
     super.initState();
-    _profile = UserProfile(userID: widget.profile.getUserID(), name: widget.profile.getName(), weight: widget.profile.getWeight(), bio: widget.profile.getBio());
+    _profile = widget.profile.copyProfile(widget.profile);
     _nameController.text = _profile.getName();
     _weightController.text = _profile.getWeight().toString();
     _bioController.text = _profile.getBio();
@@ -110,7 +110,6 @@ class _EditprofilePageState extends State<EditprofilePage> {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
 
         if (response.statusCode == 200) {
-          // Signup successful
           _showSuccessDialog(responseData['message']);
           final responseObject = UserProfile.fromJson(responseData['UserObject']);
           setState(() {
@@ -123,7 +122,7 @@ class _EditprofilePageState extends State<EditprofilePage> {
           _showErrorDialog(responseMessage);
         }
       } catch (e) {
-        _showErrorDialog("Network error: ${e.toString()}");
+        if(mounted)_showErrorDialog("Network error: ${e.toString()}");
       }
     }
     

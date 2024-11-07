@@ -85,7 +85,7 @@ class _RankPageState extends State<RankPage> {
   Widget _buildListItem(int index, LeaderboardItem user, Image? medal, int points) {
     Color tileColor;
     double fontsize = 18;
-    double medalsize = 45;
+    double medalsize = 40;
     TextStyle fontStyle =
         GoogleFonts.rammettoOne(fontSize: fontsize, color: Colors.black);
     switch (index) {
