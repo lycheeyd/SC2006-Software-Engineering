@@ -27,7 +27,7 @@ class _EditprofilePageState extends State<EditprofilePage> {
   @override
   void initState() {
     super.initState();
-    _profile = UserProfile(userID: widget.profile.getUserID(), name: widget.profile.getName(), weight: widget.profile.getWeight(), bio: widget.profile.getBio());
+    _profile = UserProfile(userID: widget.profile.getUserID(), email: widget.profile.getEmail(), name: widget.profile.getName(), weight: widget.profile.getWeight(), bio: widget.profile.getBio());
     _nameController.text = _profile.getName();
     _weightController.text = _profile.getWeight().toString();
     _bioController.text = _profile.getBio();
@@ -45,6 +45,7 @@ class _EditprofilePageState extends State<EditprofilePage> {
   String? _nameError;
   String? _weightError;
   String? _bioError;
+  
 
   void _checkName() {
     setState(() {
@@ -117,7 +118,6 @@ class _EditprofilePageState extends State<EditprofilePage> {
             _profile.setName(responseObject.getName());
             _profile.setWeight(responseObject.getWeight());
             _profile.setBio(responseObject.getBio());
-
           });
         } else {
           _showErrorDialog(responseMessage);
@@ -126,7 +126,6 @@ class _EditprofilePageState extends State<EditprofilePage> {
         _showErrorDialog("Network error: ${e.toString()}");
       }
     }
-    
   }
 
   void _handleChangePassword() {
@@ -134,12 +133,15 @@ class _EditprofilePageState extends State<EditprofilePage> {
         MaterialPageRoute(builder: (context) => ChangepasswordPage(userID: _profile.getUserID())));
   }
   
-  Future<void> _sendOTP(String email) async {
+  Future<void> _sendOTP() async {
     try {
       final response = await http.post(
         Uri.parse('http://172.21.146.188:8080/central/account/send-otp'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'email': email, 'type': ActionType.DELETE_ACCOUNT.value}),
+        body: jsonEncode({
+          'email': _profile.getEmail() ?? "",
+          'type': ActionType.DELETE_ACCOUNT.value,
+        }),
       );
 
       final responseMessage = response.body;
@@ -155,14 +157,6 @@ class _EditprofilePageState extends State<EditprofilePage> {
   }
 
   Future<void> _handleDeleteAccount(String otpCode) async {
-    String email = _profile.getEmail() ?? "";
-    String userID = _profile.getUserID();
-
-    try {
-      _sendOTP(email);   
-    } catch (e) {
-      return;
-    }
     
     final String url = "http://172.21.146.188:8080/central/account/delete-account";
 
@@ -170,7 +164,11 @@ class _EditprofilePageState extends State<EditprofilePage> {
       final response = await http.post(
         Uri.parse(url),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'userID': userID, 'email': email, 'otpCode': otpCode}),
+        body: jsonEncode({
+          'userID': _profile.getUserID(), 
+          'email': _profile.getEmail() ?? "", 
+          'otpCode': otpCode,
+        }),
       );
 
       final responseMessage = response.body;
@@ -388,7 +386,9 @@ class _EditprofilePageState extends State<EditprofilePage> {
                             width: 150,
                             height: 40,
                             child: ElevatedButton(
-                                onPressed: () => showDialog(
+                                onPressed: () {
+                                  _sendOTP(); 
+                                  showDialog(
                                     context: context,
                                     builder: (BuildContext context) {
                                       return InputDialog(
@@ -405,7 +405,8 @@ class _EditprofilePageState extends State<EditprofilePage> {
                                           onCancel: () {
                                             Navigator.of(context).pop();
                                           });
-                                    }),
+                                    });
+                                  },
                                 style: ElevatedButton.styleFrom(
                                   elevation: 0,
                                   backgroundColor: Colors.red,

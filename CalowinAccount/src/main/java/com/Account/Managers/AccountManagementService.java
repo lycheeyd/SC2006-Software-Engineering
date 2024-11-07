@@ -8,12 +8,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.Account.Entities.AchievementEntry;
 import com.Account.Entities.ActionType;
 import com.Account.Entities.ProfileEntity;
 import com.Account.Entities.UserEntity;
 import com.Account.Services.OTPService;
 import com.Account.Services.PasswordSecurityService;
 import com.DataTransferObject.LoginResponseDTO;
+import com.Database.CalowinDB.AchievementRepository;
 import com.Database.CalowinDB.UserInfoRepository;
 import com.Database.CalowinSecureDB.SecureInfoDBRepository;
 
@@ -32,10 +34,13 @@ public class AccountManagementService {
     private PlatformTransactionManager calowinDBTransactionManager;
 
     @Autowired
-    private SecureInfoDBRepository calowinSecureDBRepository;
+    private SecureInfoDBRepository secureInfoRepository;
 
     @Autowired
-    private UserInfoRepository calowinDBRepository;
+    private UserInfoRepository userInfoRepository;
+
+    @Autowired
+    private AchievementRepository achievementRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -53,7 +58,7 @@ public class AccountManagementService {
     @Transactional // (transactionManager = "calowinSecureDBTransactionManager")
     public LoginResponseDTO signup(String email, String encryptedPassword, String encryptedConfirmPassword, String name, float weight) throws Exception {
         // Check if user exist
-        if (calowinSecureDBRepository.findByEmail(email).isPresent()) {
+        if (secureInfoRepository.findByEmail(email).isPresent()) {
             throw new RuntimeException("User already exists");
         }
 
@@ -68,14 +73,19 @@ public class AccountManagementService {
 
         // Create and store user credentials in database (CALOWIN_SECURE)
         UserEntity user = new UserEntity(userID, email, passwordEncoder.encode(decryptedConfirmPassword));
-        calowinSecureDBRepository.save(user);
+        secureInfoRepository.save(user);
 
         // Create and store user info in database (CALOWIN)
         ProfileEntity profile = new ProfileEntity(userID, name, weight, "");
-        calowinDBRepository.save(profile);
+        userInfoRepository.save(profile);
+
+        // Create and initialise default empty entry in database (CALOWIN - Achievement Table)
+        AchievementEntry achievement = new AchievementEntry(userID, 0, 0, "No Medal", "No Medal");
+        achievementRepository.save(achievement);
 
         // Prepare and returns user data to frontend
-        return new LoginResponseDTO(user.getUserID(), user.getEmail(), profile.getName(), profile.getWeight(), profile.getBio());
+        return new LoginResponseDTO(user.getUserID(), user.getEmail(), profile.getName(), profile.getWeight(), profile.getBio(), 
+                                    achievement.getTotalCarbonSaved(), achievement.getTotalCalorieBurnt(), achievement.getCarbonMedal(), achievement.getCalorieMedal());
 
     }
 
@@ -83,17 +93,21 @@ public class AccountManagementService {
     public LoginResponseDTO login(String email, String encryptedPassword) throws Exception {
         String decryptedPassword = passwordSecurityService.decrypt(encryptedPassword, SECRET_KEY);
 
-        UserEntity user = calowinSecureDBRepository.findByEmail(email)
+        UserEntity user = secureInfoRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Invalid email or password"));
 
         if (!passwordEncoder.matches(decryptedPassword, user.getPassword())) {
             throw new RuntimeException("Invalid email or password");
         }
 
-        ProfileEntity profile = calowinDBRepository.findByUserID(user.getUserID())
-        .orElseThrow(() -> new Exception("Failed to retrieve userdata"));
+        ProfileEntity profile = userInfoRepository.findByUserID(user.getUserID())
+                .orElseThrow(() -> new Exception("Failed to retrieve user data"));
 
-        return new LoginResponseDTO(user.getUserID(), user.getEmail(), profile.getName(), profile.getWeight(), profile.getBio());
+        AchievementEntry achievement = achievementRepository.findByUserID(user.getUserID())
+                .orElseThrow(() -> new Exception("Failed to retrieve achievement data"));
+
+        return new LoginResponseDTO(user.getUserID(), user.getEmail(), profile.getName(), profile.getWeight(), profile.getBio(), 
+                                    achievement.getTotalCarbonSaved(), achievement.getTotalCalorieBurnt(), achievement.getCarbonMedal(), achievement.getCalorieMedal());
     
     }
 
@@ -106,10 +120,10 @@ public class AccountManagementService {
         }
 
         // Delete from CalowinSecureDB
-        calowinSecureDBRepository.deleteByUserID(userID); //UserEntity
+        secureInfoRepository.deleteByUserID(userID); //UserEntity
 
         // Delete from CalowinDB
-        calowinDBRepository.deleteByUserID(userID); //ProfileEntity
+        userInfoRepository.deleteByUserID(userID); //ProfileEntity
         // ADD MORE FOR EACH TABLE
         
     }
@@ -124,7 +138,7 @@ public class AccountManagementService {
             // Generate random 8-character alphanumeric string (both letters and numbers)
             userID = RandomStringUtils.randomAlphanumeric(8).toUpperCase();;
             // Check if the generated userID already exists in the database
-            exists = calowinSecureDBRepository.existsByUserID(userID);
+            exists = secureInfoRepository.existsByUserID(userID);
         } while (exists);
     
         return userID;

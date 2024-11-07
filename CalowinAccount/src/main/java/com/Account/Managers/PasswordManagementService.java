@@ -22,7 +22,7 @@ public class PasswordManagementService {
     private PlatformTransactionManager calowinSecureDBTransactionManager;
 
     @Autowired
-    private SecureInfoDBRepository calowinSecureDBRepository;
+    private SecureInfoDBRepository secureInfoRepository;
 
     @Autowired
     private PasswordSecurityService passwordSecurityService;
@@ -43,7 +43,7 @@ public class PasswordManagementService {
     public void changePassword(String userid, String oldPassword, String newPassword, String confirmNewPassword)
             throws Exception {
         // Check if user exist
-        UserEntity user = calowinSecureDBRepository.findByUserID(userid)
+        UserEntity user = secureInfoRepository.findByUserID(userid)
                 .orElseThrow(() -> new RuntimeException("Invalid user"));
 
         String decryptedOldPassword = passwordSecurityService.decrypt(oldPassword, SECRET_KEY);
@@ -60,13 +60,13 @@ public class PasswordManagementService {
 
         // Update new password into database (CALOWIN_SECURE)
         user.setPassword(passwordEncoder.encode(decryptedNewPassword));
-        calowinSecureDBRepository.save(user);
+        secureInfoRepository.save(user);
 
     }
 
     // Forgot password method
     public void forgotPassword(String email, String otpCode) throws Exception {
-        UserEntity user = calowinSecureDBRepository.findByEmail(email)
+        UserEntity user = secureInfoRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Invalid user"));
 
         // Authenticate OTP
@@ -78,7 +78,7 @@ public class PasswordManagementService {
         String newPassword = passwordSecurityService.generateRandomPassword();
 
         user.setPassword(passwordEncoder.encode(newPassword));
-        calowinSecureDBRepository.save(user);
+        secureInfoRepository.save(user);
 
         // Send new password to email
         ActionType type = ActionType.SEND_NEW_PASSWORD;

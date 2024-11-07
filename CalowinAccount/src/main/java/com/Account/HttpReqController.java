@@ -58,6 +58,7 @@ public class HttpReqController {
             response.put("message", "Signup successful");
             response.put("UserObject", responseDTO);
 
+            System.out.println(response);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
 
         } catch (RuntimeException e) {
@@ -79,6 +80,7 @@ public class HttpReqController {
             Map<String, Object> response = new HashMap<>();
             response.put("message", "Login successful");
             response.put("UserObject", responseDTO);
+
             System.out.println(response);
             return ResponseEntity.ok(response);
 
@@ -172,6 +174,7 @@ public class HttpReqController {
             response.put("message", "Profile updated successfully");
             response.put("UserObject", profile);
 
+            System.out.println(response);
             return ResponseEntity.ok(response);
 
         } catch (RuntimeException e) {
@@ -212,6 +215,7 @@ public class HttpReqController {
             response.put("message", "Profile retrieved successfully");
             response.put("UserObject", profile);
 
+            System.out.println(response);
             return ResponseEntity.ok(response);
 
         } catch (RuntimeException e) {
