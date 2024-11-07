@@ -65,21 +65,18 @@ public class AchievementController {
                     updateStmt.setString(4, achievement.getCalorieBurntMedal());
                     updateStmt.setString(5, trip.getUserId());
                     updateStmt.executeUpdate();
-
                     // Log to the console
                     System.out.println("Record updated successfully for user " + trip.getUserId());
                 }
             } else {
                 // Insert new record
                 try (PreparedStatement insertStmt = conn.prepareStatement(insertQuery)) {
-
                     insertStmt.setString(1, trip.getUserId());
                     insertStmt.setInt(2, achievement.getTotalCarbonSavedExp());
                     insertStmt.setInt(3, achievement.getTotalCalorieBurntExp());
                     insertStmt.setString(4, achievement.getCarbonSavedMedal());
                     insertStmt.setString(5, achievement.getCalorieBurntMedal());
                     insertStmt.executeUpdate();
-
                     // Log to the console
                     System.out.println("New record inserted for user " + trip.getUserId());
                 }
