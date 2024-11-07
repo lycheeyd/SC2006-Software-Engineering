@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ENUM.FriendStatus;
 import com.dto.FriendRelationshipDTO;
 import com.models.FriendRelationship;
 import com.models.FriendRelationshipId;
@@ -105,26 +106,36 @@ public class FriendRelationshipService {
 
         repository.delete(relationship);
     }
-
-    public String getRelationshipStatus(String userId1, String userId2) {
-        List<FriendRelationship> relationships = repository.findByIdUniqueIdOrIdFriendUniqueIdAndStatus(userId1, userId2, "ACCEPTED");
-    
-        for (FriendRelationship relationship : relationships) {
-            String uniqueId = relationship.getId().getUniqueId();
-            String friendUniqueId = relationship.getId().getFriendUniqueId();
-            String status = relationship.getStatus();
-    
-            if ("ACCEPTED".equals(status)) {
-                return "FRIEND";
-            } else if ("PENDING".equals(status)) {
-                return uniqueId.equals(userId1) ? "REQUESTSENT" : "REQUESTRECEIVED";
-            } else if ("REJECTED".equals(status)) {
-                return "STRANGER"; // Return STRANGER if status is REJECTED
+    public FriendStatus getRelationshipStatus(String userId1, String userId2) {
+        // Check for a direct relationship from userId1 to userId2
+        Optional<FriendRelationship> directRelationship = repository.findById(new FriendRelationshipId(userId1, userId2));
+        if (directRelationship.isPresent()) {
+            String status = directRelationship.get().getStatus();
+            switch (status) {
+                case "ACCEPTED":
+                    return FriendStatus.FRIEND;
+                case "PENDING":
+                    return FriendStatus.REQUESTSENT;
+                case "REJECTED":
+                    return FriendStatus.STRANGER;
             }
         }
     
-        return "STRANGER";
+        // Check for a reverse relationship from userId2 to userId1
+        Optional<FriendRelationship> reverseRelationship = repository.findById(new FriendRelationshipId(userId2, userId1));
+        if (reverseRelationship.isPresent()) {
+            String status = reverseRelationship.get().getStatus();
+            if ("PENDING".equals(status)) {
+                return FriendStatus.REQUESTRECIEVED;
+            } else if ("REJECTED".equals(status)) {
+                return FriendStatus.STRANGER;
+            }
+        }
+    
+        // If no relationship exists, default to STRANGER
+        return FriendStatus.STRANGER;
     }
+    
     
 
     public void removeFriend(String userId, String friendId) {
