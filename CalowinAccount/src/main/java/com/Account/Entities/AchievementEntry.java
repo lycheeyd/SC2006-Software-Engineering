@@ -1,28 +1,37 @@
-package com.DataTransferObject;
+package com.Account.Entities;
 
-public class LoginResponseDTO {
-    
-    // UserEntity
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "Achievement")
+
+public class AchievementEntry {
+
+    @Id
+    @Column(name = "user_id", length = 8, nullable = false, unique = true)
     private String userID;
-    private String email;
-    private String name;
-    private float weight;
-    private String bio;
 
-    //AchievementEntry
+    @Column(name = "total_carbon_saved", nullable = false)
     private int totalCarbonSaved;
+
+    @Column(name = "total_calorie_burnt", nullable = false)
     private int totalCalorieBurnt;
+
+    @Column(name = "carbon_medal", nullable = false)
     private String carbonMedal;
+
+    @Column(name = "calorie_medal", nullable = false)
     private String calorieMedal;
 
+    // Default constructor is required by JPA
+    public AchievementEntry() {
+    }
 
-    public LoginResponseDTO(String userID, String email, String name, float weight, String bio, int totalCarbonSaved, int totalCalorieBurnt, String carbonMedal, String calorieMedal) {
+    public AchievementEntry(String userID, int totalCarbonSaved, int totalCalorieBurnt, String carbonMedal, String calorieMedal) {
         this.userID = userID;
-        this.email = email;
-        this.name = name;
-        this.weight = weight;
-        this.bio = bio;
-        
         this.totalCarbonSaved = totalCarbonSaved;
         this.totalCalorieBurnt = totalCalorieBurnt;
         this.carbonMedal = carbonMedal;
@@ -35,38 +44,6 @@ public class LoginResponseDTO {
 
     public void setUserID(String userID) {
         this.userID = userID;
-    }
-
-    public String getEmail() {
-        return this.email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getName() {
-        return this.name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public float getWeight() {
-        return this.weight;
-    }
-
-    public void setWeight(float weight) {
-        this.weight = weight;
-    }
-
-    public String getBio() {
-        return this.bio;
-    }
-
-    public void setBio(String bio) {
-        this.bio = bio;
     }
 
     public int getTotalCarbonSaved() {

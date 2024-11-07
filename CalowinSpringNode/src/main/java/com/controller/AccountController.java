@@ -116,7 +116,7 @@ public class AccountController extends HttpReqController{
             if (statusCode == HttpStatus.UNAUTHORIZED) {
                 return ResponseEntity.status(statusCode).body("Incorrect password.");
             } else {
-                return ResponseEntity.status(statusCode).body(statusCode + ex.getMessage());
+                return ResponseEntity.status(statusCode).body(ex.getMessage());
             }
         } catch (Exception ex)  {
             System.out.println(ex);
@@ -173,7 +173,7 @@ public class AccountController extends HttpReqController{
             if (statusCode == HttpStatus.UNAUTHORIZED) {
                 return ResponseEntity.status(statusCode).body("Invalid OTP");
             } else {
-                return ResponseEntity.status(statusCode).body(statusCode + ex.getMessage());
+                return ResponseEntity.status(statusCode).body(ex.getMessage());
             }
         } catch (Exception ex)  {
             System.out.println(ex);

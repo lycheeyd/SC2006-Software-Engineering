@@ -287,7 +287,6 @@ String _getBG(int value, int threshold) {
 }
 
 
-
   BoxDecoration _getCardBackgroundImage(String medal) {
     switch (medal) {
       case "CaloriePlatinum":
