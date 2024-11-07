@@ -82,7 +82,9 @@ public class FriendRelationshipService {
     }
 
     public List<FriendRelationshipDTO> getFriendList(String userId) {
+        // Retrieve relationships where the status is explicitly "ACCEPTED"
         return repository.findByIdUniqueIdOrIdFriendUniqueIdAndStatus(userId, userId, "ACCEPTED").stream()
+            .filter(relationship -> "ACCEPTED".equals(relationship.getStatus())) // Ensure only accepted relationships
             .map(this::convertToDTO)
             .collect(Collectors.toList());
     }
