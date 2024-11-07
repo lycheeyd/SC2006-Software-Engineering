@@ -181,11 +181,11 @@ public class AccountController extends HttpReqController{
         }
     }
 
-    @GetMapping("/view-profile/{userID}")
-    public ResponseEntity<?> viewProfile(@PathVariable String userID) {
+    @GetMapping("/view-profile/{selfID}/{otherID}")
+    public ResponseEntity<?> viewProfile(@PathVariable String selfID, @PathVariable String otherID) {
         // Forward view profile request to AccountModule
         try {
-            String url = urlPrefix + "/account/view-profile/" + userID;
+            String url = urlPrefix + "/account/view-profile/" + selfID + "/" + otherID;
             return restTemplate.getForEntity(url, Map.class);
         } catch (Exception ex)  {
             System.out.println(ex);
