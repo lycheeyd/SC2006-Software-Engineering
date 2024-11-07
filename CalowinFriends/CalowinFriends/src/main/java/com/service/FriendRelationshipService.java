@@ -1,11 +1,15 @@
 package com.service;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
 import com.models.FriendRelationship;
@@ -17,6 +21,9 @@ public class FriendRelationshipService {
     @Autowired
     private FriendRelationshipRepository repository;
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+    
     public FriendRelationship sendFriendRequest(String senderId, String receiverId) {
         try {
             // Check if the request already exists
@@ -127,6 +134,53 @@ public class FriendRelationshipService {
         relationship.setStatus(status);
         return repository.save(relationship);
     }
+    
+    public String getRelationshipStatus(String userId1, String userId2) {
+        // SQL to check for any relationship where either user references the other
+        String sql = "SELECT * FROM FriendRelationship WHERE " +
+                     "(Unique_ID = ? AND Friend_Unique_ID = ?) OR " +
+                     "(Unique_ID = ? AND Friend_Unique_ID = ?)";
 
+        List<FriendRelationship> relationships = jdbcTemplate.query(
+            sql, 
+            new Object[]{userId1, userId2, userId2, userId1}, 
+            new RowMapper<FriendRelationship>() {
+                @Override
+                public FriendRelationship mapRow(ResultSet rs, int rowNum) throws SQLException {
+                    FriendRelationship relationship = new FriendRelationship();
+                    relationship.setUniqueId(rs.getString("Unique_ID"));
+                    relationship.setFriendUniqueId(rs.getString("Friend_Unique_ID"));
+                    relationship.setStatus(rs.getString("status"));
+                    return relationship;
+                }
+            }
+        );
+
+        // Check the relationships based on the rules provided
+        for (FriendRelationship relationship : relationships) {
+            String uniqueId = relationship.getUniqueId();
+            String friendUniqueId = relationship.getFriendUniqueId();
+            String status = relationship.getStatus();
+
+            if ((uniqueId.equals(userId1) && friendUniqueId.equals(userId2)) ||
+                (uniqueId.equals(userId2) && friendUniqueId.equals(userId1))) {
+
+                if ("ACCEPTED".equals(status)) {
+                    return "FRIEND";
+                } else if ("PENDING".equals(status)) {
+                    if (uniqueId.equals(userId1) && friendUniqueId.equals(userId2)) {
+                        return "REQUESTSENT";
+                    } else if (uniqueId.equals(userId2) && friendUniqueId.equals(userId1)) {
+                        return "REQUESTRECEIVED";
+                    }
+                } else if ("REJECTED".equals(status)) {
+                    return "STRANGER";
+                }
+            }
+        }
+
+        // If no relationship is found, return STRANGER
+        return "STRANGER";
+    }
 
 }

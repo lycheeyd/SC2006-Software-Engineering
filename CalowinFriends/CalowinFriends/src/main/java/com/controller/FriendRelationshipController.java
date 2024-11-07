@@ -128,4 +128,13 @@ public class FriendRelationshipController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
+    @GetMapping("/status")
+    public ResponseEntity<String> getRelationshipStatus(
+            @RequestParam("userId1") String userId1,
+            @RequestParam("userId2") String userId2) {
+        
+        String status = friendService.getRelationshipStatus(userId1, userId2);
+        return ResponseEntity.ok(status);
+    }
 }
