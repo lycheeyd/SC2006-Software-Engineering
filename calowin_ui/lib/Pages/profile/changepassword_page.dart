@@ -2,7 +2,6 @@ import 'package:calowin/common/AES_Encryptor.dart';
 import 'package:calowin/common/colors_and_fonts.dart';
 import 'package:calowin/common/custom_scaffold.dart';
 import 'package:calowin/common/input_field.dart';
-import 'package:calowin/common/user_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
@@ -37,12 +36,12 @@ class _ChangepasswordPageState extends State<ChangepasswordPage> {
     userID = widget.userID;
   }
 
-    void _checkCurrentPassword() {     
+  void _checkCurrentPassword() {     
     setState(() {
       if (_currentPWController.text.isEmpty) {
-        _confirmPasswordError = "Enter old password";
+        _currentPasswordError = "Enter current password";
       } else {
-        _confirmPasswordError = null;
+        _currentPasswordError = null;
       }
     });
   }
@@ -60,7 +59,7 @@ class _ChangepasswordPageState extends State<ChangepasswordPage> {
   }
 
   void _checkPasswordValid() {
-    final passwordPattern = r'^(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])(?=.*[@#$%^&+=!])(?=.{8,60}).*$';        
+    final passwordPattern = r'^(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])(?=.*[@#$%^&+=!])(?=.{8,60}).*$';    
     setState(() {
       if (_newPWController.text.isEmpty) {
         _passwordError = "New password is required";
@@ -107,8 +106,9 @@ class _ChangepasswordPageState extends State<ChangepasswordPage> {
 
         if (response.statusCode == 200) {
           // Signup successful
+          Navigator.pop(context);
+          Navigator.pop(context);
           _showSuccessDialog(responseMessage);
-
         } else {
           _showErrorDialog(responseMessage);
         }
@@ -117,8 +117,6 @@ class _ChangepasswordPageState extends State<ChangepasswordPage> {
       }
     }
   
-    Navigator.pop(context);
-    Navigator.pop(context);
   }
 
   void _showErrorDialog(String message) {
@@ -204,6 +202,21 @@ class _ChangepasswordPageState extends State<ChangepasswordPage> {
                         errorText: "Wrong Password!",
                         hasError: _wrongPW,
                       ),
+                      if(_currentPasswordError != null)
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 20.0), // Adjust padding as needed
+                            child: Text(
+                              _currentPasswordError!,
+                              style: GoogleFonts.roboto(
+                                fontSize: 11,
+                                color: Colors.redAccent.shade400,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                      ),
                       const SizedBox(height: 10),
 
                       InputField(
@@ -213,6 +226,21 @@ class _ChangepasswordPageState extends State<ChangepasswordPage> {
                         inputHint: "Enter Your New Password",
                         errorText: "Invalid Password!",
                         hasError: _wrongNewPW,
+                      ),
+                      if(_passwordError != null)
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 20.0), // Adjust padding as needed
+                            child: Text(
+                              _passwordError!,
+                              style: GoogleFonts.roboto(
+                                fontSize: 11,
+                                color: Colors.redAccent.shade400,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
                       ),
                       const SizedBox(height: 10),
 
@@ -225,6 +253,22 @@ class _ChangepasswordPageState extends State<ChangepasswordPage> {
                             "Please make sure you entered the same as above!",
                         hasError: _newPWNotSame,
                       ),
+                      if(_confirmPasswordError != null)
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 20.0), // Adjust padding as needed
+                            child: Text(
+                              _confirmPasswordError!,
+                              style: GoogleFonts.roboto(
+                                fontSize: 11,
+                                color: Colors.redAccent.shade400,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                      ),
+                      const SizedBox(height: 10),
                     ],
                   ),
                 ),
