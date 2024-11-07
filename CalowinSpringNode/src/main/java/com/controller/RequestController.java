@@ -28,14 +28,14 @@ public class RequestController {
 
         try {
             // Use RestTemplate to make the request to the backend
-            ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(
+            ResponseEntity<List<String>> response = restTemplate.exchange(
                     url,
                     HttpMethod.GET,
                     null,
-                    new ParameterizedTypeReference<List<Map<String, Object>>>() {
+                    new ParameterizedTypeReference<List<String>>() {
                     });
 
-            List<Map<String, Object>> friendRequests = response.getBody();
+            List<String> friendRequests = response.getBody();
 
             if (friendRequests == null || friendRequests.isEmpty()) {
                 return new ResponseEntity<>("No friend requests found for the given userId.", HttpStatus.NOT_FOUND);
