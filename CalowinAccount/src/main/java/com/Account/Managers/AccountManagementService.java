@@ -20,6 +20,8 @@ import com.Database.CalowinDB.FriendRelationshipRepository;
 import com.Database.CalowinDB.TripsRepository;
 import com.Database.CalowinDB.UserInfoRepository;
 import com.Database.CalowinSecureDB.SecureInfoDBRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.apache.commons.lang3.RandomStringUtils;
 
@@ -27,6 +29,8 @@ import org.apache.commons.lang3.RandomStringUtils;
 @Service
 public class AccountManagementService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(AccountManagementService.class);
+    
     @Autowired
     @Qualifier("calowinSecureDBTransactionManager")
     private PlatformTransactionManager calowinSecureDBTransactionManager;
@@ -120,27 +124,40 @@ public class AccountManagementService {
     }
 
     // Delete account method
-    @Transactional // (transactionManager = "CalowinSecureDBTransactionManager")
+    @Transactional (transactionManager = "CalowinSecureDBTransactionManager", rollbackFor = Exception.class)
     public void deleteAccount(String userID, String email, String otpCode) throws Exception {
-        // Authenticate OTP
-        if (!otpService.verifyOTP(email, otpCode, ActionType.DELETE_ACCOUNT)) {
-            throw new RuntimeException("Invalid OTP");
-        }
-
-        // Delete from CalowinSecureDB
-        secureInfoRepository.deleteByUserID(userID); //UserEntity
-
-        // Delete from CalowinDB
-        userInfoRepository.deleteByUserID(userID); //ProfileEntity
-
-        achievementRepository.deleteByUserID(userID); // AchievementEntry
+        LOGGER.info("Starting account deletion for userID: {}", userID);
         
-        tripsRepository.deleteByUserID(userID); //TripsEntry
+        try {
+            // Authenticate OTP
+            if (!otpService.verifyOTP(email, otpCode, ActionType.DELETE_ACCOUNT)) {
+                throw new RuntimeException("Invalid OTP");
+            }
 
-        friendRelationshipRepository.deleteByUserID(userID); //FriendRelationshipEntry
+            // Delete from CalowinSecureDB
+            LOGGER.info("Deleting from SecureInfoRepository...");
+            secureInfoRepository.deleteByUserID(userID); //UserEntity
 
-        // ADD MORE FOR EACH TABLE
+            // Delete from CalowinDB
+            LOGGER.info("Deleting from UserInfoRepository...");
+            userInfoRepository.deleteByUserID(userID); //ProfileEntity
 
+            LOGGER.info("Deleting from AchievementRepository...");
+            achievementRepository.deleteByUserID(userID); // AchievementEntry
+            
+            LOGGER.info("Deleting from TripsRepository...");
+            tripsRepository.deleteByUserID(userID); //TripsEntry
+
+            LOGGER.info("Deleting from FriendRelationshipRepository...");
+            friendRelationshipRepository.deleteByUserID(userID); //FriendRelationshipEntry
+
+            // ADD MORE FOR EACH TABLE 
+            LOGGER.info("Successfully deleted all associated records for userID: {}", userID);          
+        } catch (Exception e) {
+            LOGGER.error("Error during account deletion for userID: {}, rolling back. Reason: {}", userID, e.getMessage());
+            throw e; // Trigger rollback
+        }
+        
     }
 
     // Method to generate a unique 8-character userID
