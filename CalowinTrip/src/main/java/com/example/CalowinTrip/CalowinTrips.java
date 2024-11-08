@@ -4,11 +4,11 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class CalowinApplication {
+public class CalowinTrips {
 
 	public static void main(String[] args) {
-		SpringApplication.run(CalowinApplication.class, args);
-		
+		SpringApplication.run(CalowinTrips.class, args);
+
 	}
 
 }
