@@ -106,8 +106,9 @@ class _ChangepasswordPageState extends State<ChangepasswordPage> {
 
         if (response.statusCode == 200) {
           // Signup successful
-          Navigator.pop(context);
-          Navigator.pop(context);
+          if(mounted)
+          {Navigator.pop(context);
+          Navigator.pop(context);}
           _showSuccessDialog(responseMessage);
         } else {
           _showErrorDialog(responseMessage);
@@ -116,7 +117,11 @@ class _ChangepasswordPageState extends State<ChangepasswordPage> {
         _showErrorDialog("Network error: ${e.toString()}");
       }
     }
-  
+    if(mounted)
+    {
+      Navigator.pop(context);
+      Navigator.pop(context);
+    }
   }
 
   void _showErrorDialog(String message) {

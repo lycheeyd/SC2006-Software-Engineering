@@ -1,3 +1,5 @@
+enum UserStatus { FRIEND, REQUESTSENT, STRANGER, REQUESTRECIEVED }
+
 class UserProfile {
   late String _name;
   late String? _email;
@@ -7,6 +9,7 @@ class UserProfile {
   late int? _carbonSaved;
   late int? _calorieBurn;
   late List<String>? _badges;
+  late UserStatus? _status;
 
   // Constructor
   UserProfile({
@@ -18,6 +21,7 @@ class UserProfile {
     int? carbonSaved,
     int? calorieBurn,
     List<String>? badges,
+    UserStatus? status,
   }) {
     _name = name;
     _email = email;
@@ -27,7 +31,13 @@ class UserProfile {
     _carbonSaved = carbonSaved;
     _calorieBurn = calorieBurn;
     _badges = badges;
+    _status = status;
   }
+
+  static T stringToEnum<T>(String value, List<T> enumValues) {
+    return enumValues.firstWhere((e) => e.toString().split('.').last == value, orElse: () => throw ArgumentError('No matching enum value for $value'));
+  }
+
 
   // Factory constructor for deserialization from LoginResponseDTO
   factory UserProfile.fromJson(Map<String, dynamic> json) {
@@ -36,24 +46,73 @@ class UserProfile {
       email: json['email'] as String?,
       userID: json['userID'] as String,
       bio: json['bio'] as String?,
-      weight: (json['weight'] as num?)?.toDouble(),  // Convert to int if available
-      // Other fields like _carbonSaved, _calorieBurn, and _badges can remain null
-      // or be set later as they are not part of LoginResponseDTO
+      weight: (json['weight'] as num?)?.toDouble(),  
+      carbonSaved: (json['totalCarbonSaved'] as num?)?.toInt(),
+      calorieBurn: (json['totalCalorieBurnt'] as num?)?.toInt(),
+      badges: [json['carbonMedal'] as String, json['calorieMedal'] as String]
+    );
+  }
+
+  factory UserProfile.editfromJson(Map<String, dynamic> json) {
+    return UserProfile(
+      name: json['name'] as String,
+      userID: json['userID'] as String,
+      bio: json['bio'] as String?,
+      weight: (json['weight'] as num?)?.toDouble(),  
+    );
+  }
+
+  factory UserProfile.othersFromJson(Map<String, dynamic> json) {
+    return UserProfile(
+      name: json['name'] as String,
+      userID: json['userID'] as String,
+      bio: json['bio'] as String?,
+      status:  stringToEnum((json['friendStatus']) as String,UserStatus.values),
+      carbonSaved: (json['totalCarbonSaved'] as num?)?.toInt(),
+      calorieBurn: (json['totalCalorieBurnt'] as num?)?.toInt(),
+      badges: [json['carbonMedal'] as String, json['calorieMedal'] as String]
+    );
+  }
+
+  factory UserProfile.receiverFromJson(Map<String, dynamic> json) {
+    return UserProfile(
+      name: json['friendUserName'] as String,
+      userID: json['friendUserId'] as String,
+    );
+  }
+
+  factory UserProfile.senderFromJson(Map<String, dynamic> json) {
+    return UserProfile(
+      name: json['userName'] as String,
+      userID: json['userId'] as String,
+    );
+  }
+
+  factory UserProfile.userInfoFromJson(Map<String, dynamic> json) {
+    return UserProfile(
+      name: json['name'] as String,
+      userID: json['userId'] as String,
     );
   }
 
   UserProfile copyProfile(UserProfile profile) {
     return UserProfile(
-      userID: _userID = profile._userID,
-      name: _name = profile._name,
-      weight: _weight = profile._weight,
-      bio: _bio = profile._bio,
+      name: _name = profile.getName(),
+      email: _email = profile.getEmail(),
+      userID: _userID = profile.getUserID(),
+      bio: _bio = profile.getBio(),
+      weight: _weight = profile.getWeight(),
+      carbonSaved: _carbonSaved = profile.getCarbonSaved(),
+      calorieBurn: _calorieBurn = profile.getCalorieBurn(),
+      badges: _badges = profile.getBadges(),
+      status: _status = profile.getStatus(),
     );
   }
 
 
   // Getters
   String getName() => _name;
+  UserStatus? getStatus() => _status;
   String? getEmail() => _email;
   String getUserID() => _userID;
   String getBio() => _bio ?? "";
@@ -85,5 +144,9 @@ class UserProfile {
 
   void setBadges(List<String> badges) {
     _badges = badges;
+  }
+
+  void setStatus(UserStatus status){
+    _status = status;
   }
 }

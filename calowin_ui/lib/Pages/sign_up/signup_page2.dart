@@ -91,7 +91,7 @@ class _SignupPage2State extends State<SignupPage2> {
           _showSuccessDialog("Signup successful! Welcome to CaloWin!");
           print(response.body);
           final Map<String, dynamic> responseData = jsonDecode(response.body);
-          final loginResponse = UserProfile.fromJson(responseData);
+          final loginResponse = UserProfile.fromJson(responseData['UserObject']);
           // Navigate to the next page
           Navigator.of(context).push(
             PageRouteBuilder(

@@ -1,19 +1,19 @@
 import 'package:calowin/common/colors_and_fonts.dart';
 import 'package:calowin/common/dualbutton_dialog.dart';
+import 'package:calowin/common/singlebutton_dialog.dart';
+import 'package:calowin/control/friends_controller.dart';
+import 'package:calowin/control/user_retriever.dart';
 import 'package:calowin/control/page_navigator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:calowin/common/user_profile.dart';
 import 'package:calowin/control/words2widget_converter.dart';
 import 'package:flutter/material.dart';
 
-//for setting this user's status relative to the current account
-enum UserStatus { friend, requested, stranger, friendrequest }
-
 class OtheruserPage extends StatefulWidget {
   final String? otherUserID;
   final String? userID;
 
-  const OtheruserPage({super.key, this.userID, this.otherUserID});
+  const OtheruserPage({super.key,this.userID,this.otherUserID});
 
   @override
   State<OtheruserPage> createState() => _OtheruserPageState();
@@ -23,69 +23,65 @@ class _OtheruserPageState extends State<OtheruserPage> {
   //define retrieve logic here
   late String? _userID;
   late String? _otherUserID;
-  late UserProfile? _profile;
-  late final List<Image?> _badges = [];
+  late UserProfile _profile = UserProfile(name: "NA", userID: "NA");
+  late List<Image?> _badges = [];
   late UserStatus _userStatus;
-  late bool _userFound;
+  bool _userFound = false;
+  final UserRetriever _userRetriever = UserRetriever();
+  final FriendsController _friendsController = FriendsController();
 
   //Need to set the state of this user, such as requested or friend or pending for approve etc
   //currently only taking in the userid for testing
   @override
   void initState() {
-    super.initState();
-    _userStatus = UserStatus.friend; //change this to retrieve from database
+    super.initState(); //change this to retrieve from database
     _userID = widget.userID;
     _otherUserID = widget.otherUserID;
-    getUserProfile(_userID);
+    getUserProfile(_userID,_otherUserID);
+    _userStatus = _profile.getStatus() ?? UserStatus.STRANGER;
+    //print(_userStatus);
   }
 
   // to check for any change in the userid passed into this page
   @override
   void didUpdateWidget(OtheruserPage oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.userID != oldWidget.userID) {
-      _userStatus = UserStatus.friend;
+    if (widget.otherUserID != oldWidget.otherUserID) {
+      _otherUserID = widget.otherUserID;
       _userID = widget.userID; // Update the userID
-      getUserProfile(_userID);
+      getUserProfile(_userID,_otherUserID);
+      _userStatus = _profile.getStatus() ?? UserStatus.STRANGER;
+      //print(_userStatus);
+      //print("User ID passed: $_userID, OtherUserID passed: $_otherUserID");
       // Fetch the new profile
     }
   }
 
   //the setting user's state can be handled here
-  void getUserProfile(String? id) {
-    setState(() {
-      if (id == null) {
+  Future<void> getUserProfile(String? user, String? otherUser) async {
+    if(user == null  || otherUser == null) {
+      //print("user id not passed");
+      setState(() {
         _userFound = false;
-        // A placeholder profile to prevent errors
-        _profile = UserProfile(
-            name: "Friend 1",
-            email: "Friend@gmail.com",
-            userID: id ?? "#000000",
-            bio: "I\nAm\nYourFriend",
-            weight: 80,
-            carbonSaved: 4000,
-            calorieBurn: 2300,
-            badges: ["CalorieGold", "EcoBronze"]);
-      } else {
-        _userFound = true;
-        _userStatus = UserStatus.friend;
-        _profile = UserProfile(
-            name: "Friend 1",
-            email: "Friend@gmail.com",
-            userID: id,
-            bio: "I\nAm\nYourFriend",
-            weight: 80,
-            carbonSaved: 4000,
-            calorieBurn: 2300,
-            badges: ["CalorieGold", "EcoBronze"]);
-        _badges.clear(); // Clear previous badges before adding new ones
-        for (int i = 0; i < _profile!.getBadges().length; i++) {
-          if (Words2widgetConverter.convert(_profile!.getBadges()[i]) != null) {
+    });
+    return;
+    }
+    _profile = await _userRetriever.retrieveFriend(user, otherUser);
+    //print("Profile of : ${_profile.getEmail()}");
+    setState(() {
+      _profile = _profile;
+      _userStatus = _profile.getStatus() ?? UserStatus.STRANGER;
+      if(_profile.getBadges().isNotEmpty)
+      {
+        _badges = [];
+        for (int i = 0; i < _profile.getBadges().length; i++) {
+          if (Words2widgetConverter.convert(_profile.getBadges()[i]) != null) {
             _badges
-                .add(Words2widgetConverter.convert(_profile!.getBadges()[i]));
+                .add(Words2widgetConverter.convert(_profile.getBadges()[i]));
           }
         }
-      }
+        }
+      _userFound = true;
     });
   }
 
@@ -98,33 +94,113 @@ class _OtheruserPageState extends State<OtheruserPage> {
     }
   }
 
-  void _handleRequestFriend() {
+  Future<void> _handleRequestFriend() async {
+    bool success = await _friendsController.requestFriend(_userID!,_otherUserID!);
     setState(() {
-      _userStatus = UserStatus.requested;
+      if(success){
+        getUserProfile(_userID, _otherUserID);
+        showDialog(
+          context: context, 
+          builder: (BuildContext context) {
+            return SinglebuttonDialog(title: "Success", content: "Request sent successfully", onConfirm: ()=>Navigator.pop(context));
+            }); 
+        _userStatus = UserStatus.REQUESTSENT;
+      }
+      else{
+        showDialog(
+          context: context, 
+          builder: (BuildContext context) {
+            return SinglebuttonDialog(title: "Failed", content: "Failed to send request, please try again later", onConfirm: ()=>Navigator.pop(context));
+            });
+      }
     });
   }
 
-  void _handleUnrequestFriend() {
+  Future<void> _handleUnrequestFriend() async {
+    bool success = await _friendsController.cancelRequest(_userID!,_otherUserID!);
     setState(() {
-      _userStatus = UserStatus.stranger;
+      if(success){
+        getUserProfile(_userID, _otherUserID);
+        showDialog(
+          context: context, 
+          builder: (BuildContext context) {
+            return SinglebuttonDialog(title: "Success", content: "Request cancelled successfully", onConfirm: ()=>Navigator.pop(context));
+            }); 
+        _userStatus = UserStatus.REQUESTSENT;
+      }
+      else{
+        showDialog(
+          context: context, 
+          builder: (BuildContext context) {
+            return SinglebuttonDialog(title: "Failed", content: "Failed to cancel request, please try again later", onConfirm: ()=>Navigator.pop(context));
+            });
+      }
     });
   }
 
-  void _handleRemoveFriend() {
+  Future<void> _handleRemoveFriend() async {
+    bool success = await _friendsController.removeFriend(_userID!,_otherUserID!);
     setState(() {
-      _userStatus = UserStatus.stranger;
+      if(success){
+        getUserProfile(_userID, _otherUserID);
+        showDialog(
+          context: context, 
+          builder: (BuildContext context) {
+            return SinglebuttonDialog(title: "Success", content: "Friend removed successfully", onConfirm: ()=>Navigator.pop(context));
+            }); 
+        _userStatus = UserStatus.STRANGER;
+      }
+      else{
+        showDialog(
+          context: context, 
+          builder: (BuildContext context) {
+            return SinglebuttonDialog(title: "Failed", content: "Failed to remove friend, please try again later", onConfirm: ()=>Navigator.pop(context));
+            });
+      }
     });
   }
 
-  void _handleAccept() {
+  Future<void> _handleAccept() async {
+    bool success = await _friendsController.acceptFriend(_userID!,_otherUserID!);
     setState(() {
-      _userStatus = UserStatus.friend;
+      if(success){
+        getUserProfile(_userID, _otherUserID);
+        showDialog(
+          context: context, 
+          builder: (BuildContext context) {
+            return SinglebuttonDialog(title: "Success", content: "Friend added successfully", onConfirm: ()=>Navigator.pop(context));
+            }); 
+        _userStatus = UserStatus.FRIEND;
+      }
+      else{
+        showDialog(
+          context: context, 
+          builder: (BuildContext context) {
+            return SinglebuttonDialog(title: "Failed", content: "Failed to add friend, please try again later", onConfirm: ()=>Navigator.pop(context));
+            });
+      }
     });
   }
 
-  void _handleReject() {
+  Future<void> _handleReject() async {
+    bool success = await _friendsController.rejectFriend(_userID!,_otherUserID!);
     setState(() {
-      _userStatus = UserStatus.stranger;
+      if(success){
+        getUserProfile(_userID, _otherUserID);
+        showDialog(
+          context: context, 
+          builder: (BuildContext context) {
+            return SinglebuttonDialog(title: "Success", content: "Request rejected successfully", onConfirm: ()=>Navigator.pop(context));
+            }); 
+        _userStatus = UserStatus.STRANGER;
+      }
+      else{
+        showDialog(
+          context: context, 
+          builder: (BuildContext context) {
+            return SinglebuttonDialog(title: "Failed", content: "Failed to reject request, please try again later", onConfirm: ()=>Navigator.pop(context));
+            });
+      }
     });
   }
 
@@ -205,7 +281,7 @@ class _OtheruserPageState extends State<OtheruserPage> {
   Widget build(BuildContext context) {
     Widget getPage() {
       switch (_userStatus) {
-        case UserStatus.friend:
+        case UserStatus.FRIEND:
           return Align(
             alignment: Alignment.bottomCenter,
             child: SizedBox(
@@ -241,7 +317,7 @@ class _OtheruserPageState extends State<OtheruserPage> {
             ),
           );
 
-        case UserStatus.stranger:
+        case UserStatus.STRANGER:
           return Align(
             alignment: Alignment.bottomCenter,
             child: SizedBox(
@@ -267,7 +343,7 @@ class _OtheruserPageState extends State<OtheruserPage> {
             ),
           );
 
-        case UserStatus.friendrequest:
+        case UserStatus.REQUESTRECIEVED:
           return Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -322,7 +398,7 @@ class _OtheruserPageState extends State<OtheruserPage> {
               )
             ],
           );
-        case UserStatus.requested:
+        case UserStatus.REQUESTSENT:
           return Align(
             alignment: Alignment.bottomCenter,
             child: SizedBox(
