@@ -1,4 +1,4 @@
-import 'dart:math';
+
 
 import 'package:calowin/Pages/sign_up/signup_page.dart';
 import 'package:calowin/common/ActionType.dart';
@@ -12,6 +12,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:calowin/common/AES_Encryptor.dart';
+import 'package:provider/provider.dart';
 
 
 class Loginpage extends StatefulWidget {
@@ -24,11 +25,19 @@ class Loginpage extends StatefulWidget {
 class _LoginpageState extends State<Loginpage> {
   final TextEditingController _inputPassword = TextEditingController();
   final TextEditingController _inputEmail = TextEditingController();
+  UserProfile profile = UserProfile(name: "NA", userID: "NA");
 
   bool _wrongPassword = false;
   bool _invalidEmail = false;
 
-  Future<void> _handleLogin(BuildContext context) async {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    profile = Provider.of<UserProfile>(context);
+  }
+
+
+  Future<void> _handleLogin() async {
     setState(() {
       _wrongPassword = false;
       _invalidEmail = false;
@@ -63,13 +72,15 @@ class _LoginpageState extends State<Loginpage> {
         // Navigate to the next page
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         final loginResponse = UserProfile.fromJson(responseData['UserObject']);
+        profile.copyProfile(loginResponse);
+        profile.updateProfile();
         //print(loginResponse.getEmail());
-        if(mounted && loginResponse!=null)
+        if(mounted)
         {
           Navigator.of(context).push(
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
-                PageNavigator(profile: loginResponse),
+                PageNavigator(profile: profile),
             transitionsBuilder: (context, animation, secondaryAnimation, child) {
               return child; // No custom transition
             },
@@ -77,7 +88,7 @@ class _LoginpageState extends State<Loginpage> {
           ),
         );
         }
-        else print("Login response is null");
+        else{ print("Login response is null");}
       } else {
         _showErrorDialog(responseMessage);
         setState(() {
@@ -365,7 +376,7 @@ class _LoginpageState extends State<Loginpage> {
                             width: 272,
                             height: 45,
                             child: ElevatedButton(
-                                onPressed: ()=>_handleLogin(context),
+                                onPressed: ()=>_handleLogin(),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor:
                                       const Color.fromARGB(255, 48, 93, 48),

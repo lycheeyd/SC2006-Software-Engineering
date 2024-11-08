@@ -1,8 +1,17 @@
 import 'package:calowin/Pages/login_page.dart';
+import 'package:calowin/common/user_profile.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => UserProfile(name: "NA",userID: "NA")),
+      ],
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -18,13 +27,6 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/login': (context) => const Loginpage(),}
-      //   '/signup': (context) => const SignupPage(),
-      //   '/home': (context) => const PageNavigator(
-      //         startPage: 0,
-      //       ),
-      //   '/profile': (context) => const ProfilePage(),
-      //   '/editprofile': (context) => const EditprofilePage()
-      //   },
     );
   }
 }

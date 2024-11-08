@@ -1,5 +1,3 @@
-import 'dart:collection';
-
 import 'package:calowin/common/colors_and_fonts.dart';
 import 'package:calowin/common/singlebutton_dialog.dart';
 import 'package:calowin/common/user_profile.dart';
@@ -9,15 +7,15 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AddfriendsPage extends StatefulWidget {
-  final String userID;
-  const AddfriendsPage({super.key,required this.userID});
+  final UserProfile profile;
+  const AddfriendsPage({super.key,required this.profile});
 
   @override
   State<AddfriendsPage> createState() => _AddfriendsPageState();
 }
 
 class _AddfriendsPageState extends State<AddfriendsPage> {
-  late String? _userID;
+  late UserProfile _profile;
   List<UserProfile> _searchList = [];
   List<UserProfile> _friendRequests = [];
   final FriendsController _friendsController = FriendsController();
@@ -25,21 +23,22 @@ class _AddfriendsPageState extends State<AddfriendsPage> {
   @override
   void initState() {
     super.initState();
-    _userID = widget.userID;
+    _profile = widget.profile;
     _getRequesters();
   }
 
-  @override  
-  void didUpdateWidget(AddfriendsPage oldWidget){
-    super.didUpdateWidget(oldWidget);
-    _getRequesters();
-  }
+  // @override  
+  // void didUpdateWidget(AddfriendsPage oldWidget){
+  //   super.didUpdateWidget(oldWidget);
+  //   _getRequesters();
+  // }
 
   Future<void> _getRequesters() async {
-    _friendRequests = await _friendsController.retrieveRequesterList(_userID!);
-    setState(() {
+    _friendRequests = await _friendsController.retrieveRequesterList(_profile.getUserID());
+    if(mounted)
+   { setState(() {
       _friendRequests = _friendRequests;
-    });
+    });}
   }
 
 
@@ -52,7 +51,7 @@ class _AddfriendsPageState extends State<AddfriendsPage> {
   }
 
   void _handleSearch(String search) async {
-    _searchList = await _friendsController.searchUser(search,_userID!);
+    _searchList = await _friendsController.searchUser(search,_profile.getUserID());
     setState(() {
       _searchList = _searchList;
     });
@@ -62,15 +61,16 @@ class _AddfriendsPageState extends State<AddfriendsPage> {
     final pageNavigatorState =
         context.findAncestorStateOfType<PageNavigatorState>();
     if (pageNavigatorState != null) {
-      pageNavigatorState.navigateToPage(5,params: {'otherUserID': id,'userID':_userID}); // Navigate to OtheruserPage
+      pageNavigatorState.navigateToPage(5,params: {'otherUserID': id,'userID':_profile.getUserID()}); // Navigate to OtheruserPage
     }
   }
 
   void _handleAccept(String id) async {
-    bool success = await _friendsController.acceptFriend(_userID!,id);
+    bool success = await _friendsController.acceptFriend(_profile.getUserID(),id);
     setState(() {
       if(success){
         _getRequesters();
+        _profile.updateProfile(); //notify other pages that user relationships has been changed
         showDialog(
           context: context, 
           builder: (BuildContext context) {
@@ -88,7 +88,8 @@ class _AddfriendsPageState extends State<AddfriendsPage> {
   }
 
   void _handleReject(String id) async {
-    bool success = await _friendsController.rejectFriend(_userID!,id);
+    bool success = await _friendsController.rejectFriend(_profile.getUserID(),id);
+    _profile.updateProfile(); //notify other pages that user relationships has been changed
     setState(() {
       if(success){
         showDialog(

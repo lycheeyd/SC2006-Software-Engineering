@@ -4,6 +4,7 @@ import 'package:calowin/control/friends_controller.dart';
 import 'package:calowin/control/page_navigator.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 class FriendsPage extends StatefulWidget {
   final String userID;
@@ -17,6 +18,20 @@ class _FriendsPageState extends State<FriendsPage> {
   final FriendsController friendListRetriever = FriendsController();
   late String _userID;
   List<UserProfile> _friendlist = [];
+  late UserProfile _notifier;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _notifier = Provider.of<UserProfile>(context,listen: true);
+    _notifier.addListener(_getFriends);
+  }
+
+  @override
+  void dispose() {
+    _notifier.removeListener(_getFriends);
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -25,18 +40,19 @@ class _FriendsPageState extends State<FriendsPage> {
     _getFriends();
   }
 
-  @override
-  void didUpdateWidget(FriendsPage oldWidget){
-    super.didUpdateWidget(oldWidget);
-    _getFriends();
-  }
+  // @override
+  // void didUpdateWidget(FriendsPage oldWidget){
+  //   super.didUpdateWidget(oldWidget);
+  //   _getFriends();
+  // }
 
   //handle the loading of friend list
   Future<void> _getFriends() async {
     _friendlist = await friendListRetriever.retrieveFriendList(_userID);
-    setState(() {
+    if(mounted)
+    {setState(() {
       _friendlist = _friendlist;
-    });
+    });}
   }
 
   //handle redirection to add friends page

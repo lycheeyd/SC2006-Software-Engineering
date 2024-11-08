@@ -5,13 +5,12 @@ import 'package:calowin/Pages/profile/profile_page.dart';
 import 'package:calowin/Pages/wellnesszone_page.dart';
 import 'package:calowin/common/user_profile.dart';
 import 'package:calowin/control/friends_controller.dart';
-import 'package:calowin/control/notification_service.dart';
-import 'package:calowin/control/user_retriever.dart';
 import 'package:flutter/material.dart';
 import 'package:calowin/Pages/mapcalc_page.dart';
 import 'package:calowin/Pages/rank_page.dart';
 import 'package:calowin/common/colors_and_fonts.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 class PageNavigator extends StatefulWidget {
   final UserProfile profile;
@@ -29,8 +28,8 @@ class PageNavigatorState extends State<PageNavigator> {
   //this is to set the page index
   int _currentIndex = 0;
   UserProfile _profile = UserProfile(name: "Error loading user", userID: "Error loading user");
+  late UserProfile _profileNotify;
   final FriendsController _friendsController = FriendsController();
-  final UserRetriever _userRetriever = UserRetriever();
 
   //this is to set parameters to pass to the pages
   Map<String, dynamic>? _currentParams;
@@ -47,38 +46,54 @@ class PageNavigatorState extends State<PageNavigator> {
   void initState() {
     super.initState();
     _profile = widget.profile;
+    //initialise the pages
     _pages = [
     (params) => MapcalcPage(
       targetName: params?['targetName'], targetLat: params?['targetLat'], targetLong: params?['targetLong'], profile: _profile,
     ),
-    (params) => RankPage(
-      key: UniqueKey(), // Assign a unique key to force rebuild
-      userID:  _profile.getUserID(),),
-    (params) => ProfilePage(profile: _profile),
-    (params) => FriendsPage(
-      key: UniqueKey(), // Assign a unique key to force rebuild
-      userID:  _profile.getUserID()),
+
+    //needs to listen to change in profile
+    (params) => RankPage(userID:  _profileNotify.getUserID(),),
+    
+    //needs to listen to change in profile
+    (params) => ProfilePage(profile: _profileNotify),
+
+    //needs to listen to change in profile
+    (params) => FriendsPage(userID:  _profileNotify.getUserID()),
+
     (params) => const WellnessZonePage(),
-    //below are all not available in navigation bar
+
+    //needs to listen to change in profile
     (params) => OtheruserPage(
-          key: UniqueKey(), // Assign a unique key to force rebuild
-          otherUserID: params?['otherUserID'], userID: params?['userID'], //passing the user's id to redirect
+          otherUserID: params?['otherUserID'], profile: _profileNotify, //passing the user's id to redirect
         ),
+    //needs to listen to change in profile
     (params) => AddfriendsPage(
-      key: UniqueKey(), // Assign a unique key to force rebuild
-      userID:  _profile.getUserID()),
+    profile:  _profileNotify),
   ];
+  }
 
-  _getNotifications();
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _profileNotify = Provider.of<UserProfile>(context,listen: true);
+    _profileNotify.addListener(_getNotifications);
+    _getNotifications();
+  }
+
+  @override
+  void dispose() {
+    _profileNotify.removeListener(_getNotifications);
+    super.dispose();
   }
 
 
-  Future<void> _getSelf() async {
-    _profile = await _userRetriever.retrieveSelf(_profile.getUserID());
-    setState(() {
-      _profile = _profile;
-    });
-  }
+  // Future<void> _getSelf() async {
+  //   _profile = await _userRetriever.retrieveSelf(_profile.getUserID());
+  //   setState(() {
+  //     _profile = _profile;
+  //   });
+  // }
 
   void navigateToPage(int index, {Map<String, dynamic>? params}) {
     setState(() {
@@ -91,11 +106,13 @@ class PageNavigatorState extends State<PageNavigator> {
   Future<void> _getNotifications() async {
     listOfNotifications = await _friendsController.retrieveRequesterList(_profile.getUserID());
     
-      setState(() {
+      if(mounted){
+        setState(() {
         if(listOfNotifications.isNotEmpty){
         _hasNoti = true;}
         else {_hasNoti = false;}
       });
+      }
   }
 
   void _toggleNotifications() {

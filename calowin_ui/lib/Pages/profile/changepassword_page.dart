@@ -106,9 +106,6 @@ class _ChangepasswordPageState extends State<ChangepasswordPage> {
 
         if (response.statusCode == 200) {
           // Signup successful
-          if(mounted)
-          {Navigator.pop(context);
-          Navigator.pop(context);}
           _showSuccessDialog(responseMessage);
         } else {
           _showErrorDialog(responseMessage);
@@ -152,7 +149,7 @@ class _ChangepasswordPageState extends State<ChangepasswordPage> {
         //content: Text(message),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: (){Navigator.pop(context);Navigator.pop(context);},
             child: const Text('OK'),
           ),
         ],

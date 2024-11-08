@@ -10,6 +10,8 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:provider/provider.dart';
+
 class SignupPage2 extends StatefulWidget {
   final String email;
   final String password;
@@ -29,12 +31,19 @@ class SignupPage2 extends StatefulWidget {
 class _SignupPage2State extends State<SignupPage2> {
   final TextEditingController _inputWeight = TextEditingController();
   final TextEditingController _inputName = TextEditingController();
+  late final UserProfile profile;
 
   String? _nameError;
   String? _weightError;
 
   final InputBorder inputBorder = UnderlineInputBorder(
       borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none);
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    profile = Provider.of<UserProfile>(context,listen: false);
+  }
 
   void _checkName() {
     setState(() {
@@ -88,21 +97,11 @@ class _SignupPage2State extends State<SignupPage2> {
 
         if (response.statusCode == 201) {
           // Signup successful
-          _showSuccessDialog("Signup successful! Welcome to CaloWin!");
-          print(response.body);
+          //print(response.body);
           final Map<String, dynamic> responseData = jsonDecode(response.body);
           final loginResponse = UserProfile.fromJson(responseData['UserObject']);
-          // Navigate to the next page
-          Navigator.of(context).push(
-            PageRouteBuilder(
-              pageBuilder: (context, animation, secondaryAnimation) =>
-                  PageNavigator(profile: loginResponse),
-              transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                return child; // No custom transition
-              },
-              settings: const RouteSettings(arguments: 'disableSwipe'),
-            ),
-          );
+          profile.copyProfile(loginResponse);
+          _showSuccessDialog("Signup successful! Welcome to CaloWin!");
         } else {
           _showErrorDialog(errorMessage);
         }
@@ -140,7 +139,18 @@ class _SignupPage2State extends State<SignupPage2> {
         //content: Text(message),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: (){
+              Navigator.of(context).push(
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      PageNavigator(profile: profile),
+                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                    return child; // No custom transition
+                  },
+                  settings: const RouteSettings(arguments: 'disableSwipe'),
+                ),
+            );
+            },
             child: const Text('OK'),
           ),
         ],

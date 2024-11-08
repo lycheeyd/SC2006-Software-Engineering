@@ -1,8 +1,10 @@
 import 'package:calowin/common/colors_and_fonts.dart';
+import 'package:calowin/common/user_profile.dart';
 import 'package:calowin/control/leaderboard_retriever.dart';
 import 'package:calowin/control/page_navigator.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 class RankPage extends StatefulWidget {
   final String userID;
@@ -18,6 +20,7 @@ class _RankPageState extends State<RankPage> {
   LeaderboardRetriever retriever = LeaderboardRetriever();
   List<LeaderboardItem> caloriesleaderBoard = [];
   List<LeaderboardItem> carbonleaderBoard = [];
+  late UserProfile _profile;
 
   //to be retrieved from backend
   // List<Map<String, dynamic>> caloriesleaderBoard = [
@@ -49,10 +52,10 @@ class _RankPageState extends State<RankPage> {
   Future<void> _retrieveLeaderboards() async {
     caloriesleaderBoard = await retriever.retrieveCalorieLeaderboard(userID);
     carbonleaderBoard = await retriever.retrieveCarbonLeaderboard(userID);
-    setState(() {
+    if(mounted) {setState(() {
       caloriesleaderBoard = caloriesleaderBoard;
       carbonleaderBoard = carbonleaderBoard;
-    });
+    });}
     //print("Leaderboards retrieved");
   }
 
@@ -61,6 +64,19 @@ class _RankPageState extends State<RankPage> {
     super.initState();
     userID = widget.userID;
     _retrieveLeaderboards();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _profile = Provider.of<UserProfile>(context, listen: true); // Listen false for initialization
+    _profile.addListener(_retrieveLeaderboards); // Add listener for profile changes
+  }
+
+  @override
+  void dispose() {
+    _profile.removeListener(_retrieveLeaderboards);
+    super.dispose();
   }
 
   void _toggleLeaderBoard() {
@@ -84,7 +100,7 @@ class _RankPageState extends State<RankPage> {
 
   Widget _buildListItem(int index, LeaderboardItem user, Image? medal, int points) {
     Color tileColor;
-    double fontsize = 18;
+    double fontsize = 15;
     double medalsize = 40;
     TextStyle fontStyle =
         GoogleFonts.rammettoOne(fontSize: fontsize, color: Colors.black);
@@ -177,29 +193,31 @@ class _RankPageState extends State<RankPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 5),
-        child: ListView.builder(
-          scrollDirection: Axis.vertical,
-          shrinkWrap: true,
-          itemCount: _isCalorie
-              ? caloriesleaderBoard.length
-              : carbonleaderBoard.length,
-          itemBuilder: (context, index) {
-            final LeaderboardItem currentItem;
-            final int points;
-            final Image? medal;
-            if(_isCalorie){
-                currentItem = caloriesleaderBoard[index];
-                points = currentItem.caloriePoint;
-                medal = currentItem.calorieMedal;
-            }
-            else{
-              currentItem = carbonleaderBoard[index];
-                points = currentItem.carbonPoint;
-                medal = currentItem.carbonMedal;
-            }
-            return _buildListItem(index, currentItem,
-                medal, points);
-          },
+        child: SizedBox.expand(
+          child: ListView.builder(
+            scrollDirection: Axis.vertical,
+            shrinkWrap: true,
+            itemCount: _isCalorie
+                ? caloriesleaderBoard.length
+                : carbonleaderBoard.length,
+            itemBuilder: (context, index) {
+              final LeaderboardItem currentItem;
+              final int points;
+              final Image? medal;
+              if(_isCalorie){
+                  currentItem = caloriesleaderBoard[index];
+                  points = currentItem.caloriePoint;
+                  medal = currentItem.calorieMedal;
+              }
+              else{
+                currentItem = carbonleaderBoard[index];
+                  points = currentItem.carbonPoint;
+                  medal = currentItem.carbonMedal;
+              }
+              return _buildListItem(index, currentItem,
+                  medal, points);
+            },
+          ),
         ),
       ),
     );

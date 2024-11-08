@@ -147,7 +147,7 @@ class _EditprofilePageState extends State<EditprofilePage> {
       final responseMessage = response.body;
 
       if (response.statusCode == 200) {
-        _showSuccessDialog(responseMessage);
+        _showsentSuccessDialog(responseMessage);
       } else {
         _showErrorDialog(responseMessage);
       }
@@ -205,6 +205,24 @@ class _EditprofilePageState extends State<EditprofilePage> {
     );
   }
 
+  void _showsentSuccessDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(message),
+        //content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            }, 
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showSuccessDialog(String message) {
     showDialog(
       context: context,
@@ -215,6 +233,7 @@ class _EditprofilePageState extends State<EditprofilePage> {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
+              Navigator.pop(context,_profile);
             }, 
             child: const Text('OK'),
           ),
@@ -287,13 +306,16 @@ class _EditprofilePageState extends State<EditprofilePage> {
                   children: [
                     Align(
                       alignment: Alignment.topLeft,
-                      child: Text(
-                        textAlign: TextAlign.left,
-                        "Bio",
-                        style: GoogleFonts.poppins(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 15),
+                        child: Text(
+                          textAlign: TextAlign.left,
+                          "Bio",
+                          style: GoogleFonts.poppins(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white),
+                        ),
                       ),
                     ),
                     const SizedBox(

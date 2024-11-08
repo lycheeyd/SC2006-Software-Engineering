@@ -107,7 +107,7 @@ class _MapcalcPageState extends State<MapcalcPage> {
       });
 
       if (mapController != null) {
-        mapController!.animateCamera(
+        mapController.animateCamera(
           CameraUpdate.newLatLngZoom(
             LatLng(userCurrentLocation.latitude ?? 0, userCurrentLocation.longitude ?? 0),
             15,

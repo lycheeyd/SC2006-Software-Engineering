@@ -1,6 +1,8 @@
+import 'package:flutter/material.dart';
+
 enum UserStatus { FRIEND, REQUESTSENT, STRANGER, REQUESTRECIEVED }
 
-class UserProfile {
+class UserProfile extends ChangeNotifier{
   late String _name;
   late String? _email;
   late String _userID;
@@ -93,6 +95,15 @@ class UserProfile {
       name: json['name'] as String,
       userID: json['userId'] as String,
     );
+  }
+
+  //function to be called when made changes to the current user to alert all other pages
+  void updateProfile(){
+    // print("Update Profile called, the new profile as follow:");
+    // print("name: $_name");
+    // print("bio: $_bio");
+    // print("weight: $_weight");
+    notifyListeners();
   }
 
   UserProfile copyProfile(UserProfile profile) {

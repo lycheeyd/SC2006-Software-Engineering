@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:calowin/common/user_profile.dart';
 import 'package:calowin/control/words2widget_converter.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ProfilePage extends StatefulWidget {
   final UserProfile profile;
@@ -15,17 +16,25 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   //define retrieve logic here
-  late final UserProfile _profile;
-  late final List<Image?> _badges = [];
+  late UserProfile _profile;
+  late List<Image?> _badges = [];
 
   @override
-  void initState() {
-    super.initState();
-    getUserProfile(widget.profile);
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _profile = Provider.of<UserProfile>(context);
+    _profile.addListener(getUserProfile); // Add listener for profile changes
+    getUserProfile();
   }
 
-  void getUserProfile(UserProfile profile) {
-    _profile = profile;
+  @override
+  void dispose() {
+    _profile.removeListener(getUserProfile);
+    super.dispose();
+  }
+
+  void getUserProfile() {
+    _badges = [];
     for (int i = 0; i < _profile.getBadges().length; i++) {
       if (Words2widgetConverter.convert(_profile.getBadges()[i]) != null) {
         _badges.add(Words2widgetConverter.convert(_profile.getBadges()[i]));
@@ -43,6 +52,7 @@ class _ProfilePageState extends State<ProfilePage> {
         _profile.setName(updatedProfile.getName());
         _profile.setBio(updatedProfile.getBio());
         _profile.setWeight(updatedProfile.getWeight());
+        _profile.updateProfile(); //notify other pages about this change
       });
     }
   }

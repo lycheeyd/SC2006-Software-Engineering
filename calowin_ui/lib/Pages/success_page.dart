@@ -1,6 +1,8 @@
 import 'package:calowin/common/colors_and_fonts.dart';
+import 'package:calowin/common/user_profile.dart';
 import 'package:calowin/control/words2widget_converter.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../control/apiService.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -34,6 +36,7 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
   String carbonSavedMedal = "No Medal";
   String calorieBurntMedal = "No Medal";
   late String _userId;
+  late UserProfile profileChangeNotify;
 
   // Thresholds for medal levels
   final int pointsToNextBronze = 1000;
@@ -60,6 +63,12 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    profileChangeNotify = Provider.of<UserProfile>(context,listen: false);
+  }
+
+  @override
   void didUpdateWidget(SuccessPage oldWidget) {
     super.didUpdateWidget(oldWidget);
     fetchAchievements();
@@ -72,9 +81,24 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
 
     setState(() {
       totalCarbonSavedExp = achievements['totalCarbonSavedExp'];
+      profileChangeNotify.setCarbonSaved(totalCarbonSavedExp);
+
       totalCalorieBurntExp = achievements['totalCalorieBurntExp'];
+      profileChangeNotify.setCalorieBurn(totalCalorieBurntExp);
+
+      List<String> medals = [];
       carbonSavedMedal = achievements['carbonSavedMedal'];
+      medals.add(carbonSavedMedal);
+      print(carbonSavedMedal);
+
       calorieBurntMedal = achievements['calorieBurntMedal'];
+      medals.add(calorieBurntMedal);
+      print(calorieBurntMedal);
+
+      profileChangeNotify.setBadges(medals);
+
+      profileChangeNotify.updateProfile();
+
     });
     _controller.forward();
     maxCarbon = _retrieveThreshold(totalCarbonSavedExp);

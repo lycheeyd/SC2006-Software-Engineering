@@ -172,6 +172,10 @@ class _MapcalcPageState extends State<MapcalcPage> {
   }
 
   void getPlaceDetails(String placeId) async {
+    setState(() {
+      _currentIndex = -1;
+    });
+
     Uri uri = Uri.https(
       "maps.googleapis.com",
       'maps/api/place/details/json',
@@ -564,7 +568,7 @@ Future<void> _retrieveMetrics() async {// Update with the actual user ID
                       alignment: Alignment.topLeft,
                       child: IconButton(onPressed: _initializeLocation, icon: Icon(Icons.refresh),iconSize: 30,)
                       ),
-                    if(metrics != null) Align(
+                    if(metrics != null && _currentIndex<4 && _currentIndex >=0) Align(
                       alignment: Alignment.bottomLeft,
                       child: Padding(
                         padding: const EdgeInsets.only(left: 0),

@@ -8,12 +8,13 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:calowin/common/user_profile.dart';
 import 'package:calowin/control/words2widget_converter.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class OtheruserPage extends StatefulWidget {
   final String? otherUserID;
-  final String? userID;
+  final UserProfile profile;
 
-  const OtheruserPage({super.key,this.userID,this.otherUserID});
+  const OtheruserPage({super.key,required this.profile,this.otherUserID});
 
   @override
   State<OtheruserPage> createState() => _OtheruserPageState();
@@ -21,7 +22,7 @@ class OtheruserPage extends StatefulWidget {
 
 class _OtheruserPageState extends State<OtheruserPage> {
   //define retrieve logic here
-  late String? _userID;
+  late UserProfile _selfProfileNotifier;
   late String? _otherUserID;
   late UserProfile _profile = UserProfile(name: "NA", userID: "NA");
   late List<Image?> _badges = [];
@@ -35,11 +36,17 @@ class _OtheruserPageState extends State<OtheruserPage> {
   @override
   void initState() {
     super.initState(); //change this to retrieve from database
-    _userID = widget.userID;
+    _selfProfileNotifier = widget.profile;
     _otherUserID = widget.otherUserID;
-    getUserProfile(_userID,_otherUserID);
+    getUserProfile(_selfProfileNotifier.getUserID(),_otherUserID);
     _userStatus = _profile.getStatus() ?? UserStatus.STRANGER;
     //print(_userStatus);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _selfProfileNotifier = Provider.of<UserProfile>(context,listen: false);
   }
 
   // to check for any change in the userid passed into this page
@@ -48,11 +55,9 @@ class _OtheruserPageState extends State<OtheruserPage> {
     super.didUpdateWidget(oldWidget);
     if (widget.otherUserID != oldWidget.otherUserID) {
       _otherUserID = widget.otherUserID;
-      _userID = widget.userID; // Update the userID
-      getUserProfile(_userID,_otherUserID);
-      _userStatus = _profile.getStatus() ?? UserStatus.STRANGER;
+      getUserProfile(_selfProfileNotifier.getUserID(),_otherUserID);
       //print(_userStatus);
-      //print("User ID passed: $_userID, OtherUserID passed: $_otherUserID");
+      //print("User ID passed: $_selfProfileNotifier.getUserID(), OtherUserID passed: $_otherUserID");
       // Fetch the new profile
     }
   }
@@ -61,9 +66,11 @@ class _OtheruserPageState extends State<OtheruserPage> {
   Future<void> getUserProfile(String? user, String? otherUser) async {
     if(user == null  || otherUser == null) {
       //print("user id not passed");
-      setState(() {
+      if(mounted){
+        setState(() {
         _userFound = false;
     });
+    }
     return;
     }
     _profile = await _userRetriever.retrieveFriend(user, otherUser);
@@ -95,16 +102,17 @@ class _OtheruserPageState extends State<OtheruserPage> {
   }
 
   Future<void> _handleRequestFriend() async {
-    bool success = await _friendsController.requestFriend(_userID!,_otherUserID!);
+    bool success = await _friendsController.requestFriend(_selfProfileNotifier.getUserID(),_otherUserID!);
     setState(() {
       if(success){
-        getUserProfile(_userID, _otherUserID);
+        getUserProfile(_selfProfileNotifier.getUserID(), _otherUserID);
         showDialog(
           context: context, 
           builder: (BuildContext context) {
             return SinglebuttonDialog(title: "Success", content: "Request sent successfully", onConfirm: ()=>Navigator.pop(context));
             }); 
         _userStatus = UserStatus.REQUESTSENT;
+        _selfProfileNotifier.updateProfile(); //notify other pages that user relationships has been changed
       }
       else{
         showDialog(
@@ -117,16 +125,17 @@ class _OtheruserPageState extends State<OtheruserPage> {
   }
 
   Future<void> _handleUnrequestFriend() async {
-    bool success = await _friendsController.cancelRequest(_userID!,_otherUserID!);
+    bool success = await _friendsController.cancelRequest(_selfProfileNotifier.getUserID(),_otherUserID!);
     setState(() {
       if(success){
-        getUserProfile(_userID, _otherUserID);
+        getUserProfile(_selfProfileNotifier.getUserID(), _otherUserID);
         showDialog(
           context: context, 
           builder: (BuildContext context) {
             return SinglebuttonDialog(title: "Success", content: "Request cancelled successfully", onConfirm: ()=>Navigator.pop(context));
             }); 
         _userStatus = UserStatus.REQUESTSENT;
+        _selfProfileNotifier.updateProfile(); //notify other pages that user relationships has been changed
       }
       else{
         showDialog(
@@ -139,16 +148,17 @@ class _OtheruserPageState extends State<OtheruserPage> {
   }
 
   Future<void> _handleRemoveFriend() async {
-    bool success = await _friendsController.removeFriend(_userID!,_otherUserID!);
+    bool success = await _friendsController.removeFriend(_selfProfileNotifier.getUserID(),_otherUserID!);
     setState(() {
       if(success){
-        getUserProfile(_userID, _otherUserID);
+        getUserProfile(_selfProfileNotifier.getUserID(), _otherUserID);
         showDialog(
           context: context, 
           builder: (BuildContext context) {
             return SinglebuttonDialog(title: "Success", content: "Friend removed successfully", onConfirm: ()=>Navigator.pop(context));
             }); 
         _userStatus = UserStatus.STRANGER;
+        _selfProfileNotifier.updateProfile(); //notify other pages that user relationships has been changed
       }
       else{
         showDialog(
@@ -161,16 +171,17 @@ class _OtheruserPageState extends State<OtheruserPage> {
   }
 
   Future<void> _handleAccept() async {
-    bool success = await _friendsController.acceptFriend(_userID!,_otherUserID!);
+    bool success = await _friendsController.acceptFriend(_selfProfileNotifier.getUserID(),_otherUserID!);
     setState(() {
       if(success){
-        getUserProfile(_userID, _otherUserID);
+        getUserProfile(_selfProfileNotifier.getUserID(), _otherUserID);
         showDialog(
           context: context, 
           builder: (BuildContext context) {
             return SinglebuttonDialog(title: "Success", content: "Friend added successfully", onConfirm: ()=>Navigator.pop(context));
             }); 
         _userStatus = UserStatus.FRIEND;
+        _selfProfileNotifier.updateProfile(); //notify other pages that user relationships has been changed
       }
       else{
         showDialog(
@@ -183,16 +194,17 @@ class _OtheruserPageState extends State<OtheruserPage> {
   }
 
   Future<void> _handleReject() async {
-    bool success = await _friendsController.rejectFriend(_userID!,_otherUserID!);
+    bool success = await _friendsController.rejectFriend(_selfProfileNotifier.getUserID(),_otherUserID!);
     setState(() {
       if(success){
-        getUserProfile(_userID, _otherUserID);
+        getUserProfile(_selfProfileNotifier.getUserID(), _otherUserID);
         showDialog(
           context: context, 
           builder: (BuildContext context) {
             return SinglebuttonDialog(title: "Success", content: "Request rejected successfully", onConfirm: ()=>Navigator.pop(context));
             }); 
         _userStatus = UserStatus.STRANGER;
+        _selfProfileNotifier.updateProfile(); //notify other pages that user relationships has been changed
       }
       else{
         showDialog(
@@ -442,8 +454,8 @@ class _OtheruserPageState extends State<OtheruserPage> {
               padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
               child: Column(
                 children: [
-                  fieldBuilder("Name", _profile!.getName()),
-                  fieldBuilder("User ID", _profile!.getUserID()),
+                  fieldBuilder("Name", _profile.getName()),
+                  fieldBuilder("User ID", _profile.getUserID()),
                   Padding(
                     padding:
                         const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
@@ -470,7 +482,7 @@ class _OtheruserPageState extends State<OtheruserPage> {
                             child: Padding(
                               padding: const EdgeInsets.symmetric(
                                   vertical: 10, horizontal: 20),
-                              child: Text(_profile!.getBio(),
+                              child: Text(_profile.getBio(),
                                   style: PrimaryFonts.systemFont.copyWith(
                                       color: Colors.black, fontSize: 14)),
                             ),
@@ -510,11 +522,11 @@ class _OtheruserPageState extends State<OtheruserPage> {
                                   children: [
                                     fieldInContainerBuilder(
                                         "Total Carbon Saved",
-                                        _profile!.getCarbonSaved().toString(),
+                                        _profile.getCarbonSaved().toString(),
                                         "g"),
                                     fieldInContainerBuilder(
                                         "Total Calorie Burned",
-                                        _profile!.getCalorieBurn().toString(),
+                                        _profile.getCalorieBurn().toString(),
                                         "kcal")
                                   ],
                                 )),

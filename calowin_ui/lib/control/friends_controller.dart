@@ -180,7 +180,6 @@ class FriendsController {
         List<UserProfile> result = data
             .map((item) => UserProfile.userInfoFromJson(item))
             .toList();
-        
         return result;
       } else {
         // Handle error responses
