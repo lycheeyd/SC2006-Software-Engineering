@@ -1,5 +1,6 @@
 import 'package:calowin/common/colors_and_fonts.dart';
-import 'package:calowin/control/leaderboard_retriever.dart';
+import 'package:calowin/common/user_profile.dart';
+import 'package:calowin/control/friends_controller.dart';
 import 'package:calowin/control/page_navigator.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -13,9 +14,9 @@ class FriendsPage extends StatefulWidget {
 }
 
 class _FriendsPageState extends State<FriendsPage> {
-  final LeaderboardRetriever friendListRetriever = LeaderboardRetriever();
+  final FriendsController friendListRetriever = FriendsController();
   late String _userID;
-  List<LeaderboardItem> _friendlist = [];
+  List<UserProfile> _friendlist = [];
 
   @override
   void initState() {
@@ -24,9 +25,18 @@ class _FriendsPageState extends State<FriendsPage> {
     _getFriends();
   }
 
+  @override
+  void didUpdateWidget(FriendsPage oldWidget){
+    super.didUpdateWidget(oldWidget);
+    _getFriends();
+  }
+
   //handle the loading of friend list
   Future<void> _getFriends() async {
-    _friendlist = await friendListRetriever.retrieveCalorieLeaderboard(_userID);
+    _friendlist = await friendListRetriever.retrieveFriendList(_userID);
+    setState(() {
+      _friendlist = _friendlist;
+    });
   }
 
   //handle redirection to add friends page
@@ -40,17 +50,17 @@ class _FriendsPageState extends State<FriendsPage> {
   }
 
   //handle when friend is tapped
-  void _onListItemTap(LeaderboardItem friend) {
+  void _onListItemTap(UserProfile friend) {
     final pageNavigatorState =
         context.findAncestorStateOfType<PageNavigatorState>();
     //change here
     if (pageNavigatorState != null) {
       pageNavigatorState.navigateToPage(5,
-          params: {'userID': _userID,'otherUserID': friend.userId}); // Navigate to OtheruserPage
+          params: {'userID': _userID,'otherUserID': friend.getUserID()}); // Navigate to OtheruserPage
     }
   }
 
-  Widget _buildListItem(int index, LeaderboardItem friend) {
+  Widget _buildListItem(int index, UserProfile friend) {
     Color tileColor = const Color.fromARGB(255, 214, 241, 214);
     TextStyle fontStyle =
         GoogleFonts.aBeeZee(fontSize: 16, fontWeight: FontWeight.bold);
@@ -74,7 +84,7 @@ class _FriendsPageState extends State<FriendsPage> {
             size: 25,
           ),
           title: Text(
-            friend.name,
+            friend.getName(),
             style: fontStyle,
           ),
           trailing: SizedBox(
@@ -106,9 +116,10 @@ class _FriendsPageState extends State<FriendsPage> {
     return Scaffold(
       backgroundColor: PrimaryColors.dullGreen,
       appBar: AppBar(
-        toolbarHeight: 20,
+        toolbarHeight: 30,
         automaticallyImplyLeading: false,
         backgroundColor: PrimaryColors.dullGreen,
+        actions: [IconButton(onPressed: _getFriends, icon: Icon(Icons.refresh))],
       ),
       body: SingleChildScrollView(
         child: Padding(

@@ -4,7 +4,9 @@ import 'package:calowin/Pages/otheruser_page.dart';
 import 'package:calowin/Pages/profile/profile_page.dart';
 import 'package:calowin/Pages/wellnesszone_page.dart';
 import 'package:calowin/common/user_profile.dart';
+import 'package:calowin/control/friends_controller.dart';
 import 'package:calowin/control/notification_service.dart';
+import 'package:calowin/control/user_retriever.dart';
 import 'package:flutter/material.dart';
 import 'package:calowin/Pages/mapcalc_page.dart';
 import 'package:calowin/Pages/rank_page.dart';
@@ -27,17 +29,19 @@ class PageNavigatorState extends State<PageNavigator> {
   //this is to set the page index
   int _currentIndex = 0;
   UserProfile _profile = UserProfile(name: "Error loading user", userID: "Error loading user");
-  final NotificationService notificationService = NotificationService();
+  final FriendsController _friendsController = FriendsController();
+  final UserRetriever _userRetriever = UserRetriever();
 
   //this is to set parameters to pass to the pages
   Map<String, dynamic>? _currentParams;
 
   late List<Widget Function(Map<String, dynamic>?)> _pages;
 
-  List<String> listOfNotifications = [];
+  List<UserProfile> listOfNotifications = [];
 
   bool _showNotifications =
       false; // State to track if notifications are visible
+  bool _hasNoti = false;
 
   @override
   void initState() {
@@ -47,18 +51,33 @@ class PageNavigatorState extends State<PageNavigator> {
     (params) => MapcalcPage(
       targetName: params?['targetName'], targetLat: params?['targetLat'], targetLong: params?['targetLong'], profile: _profile,
     ),
-    (params) => RankPage(userID:  _profile.getUserID(),),
+    (params) => RankPage(
+      key: UniqueKey(), // Assign a unique key to force rebuild
+      userID:  _profile.getUserID(),),
     (params) => ProfilePage(profile: _profile),
-    (params) => FriendsPage(userID:  _profile.getUserID()),
+    (params) => FriendsPage(
+      key: UniqueKey(), // Assign a unique key to force rebuild
+      userID:  _profile.getUserID()),
     (params) => const WellnessZonePage(),
     //below are all not available in navigation bar
     (params) => OtheruserPage(
+          key: UniqueKey(), // Assign a unique key to force rebuild
           otherUserID: params?['otherUserID'], userID: params?['userID'], //passing the user's id to redirect
         ),
-    (params) => AddfriendsPage(userID:  _profile.getUserID()),
+    (params) => AddfriendsPage(
+      key: UniqueKey(), // Assign a unique key to force rebuild
+      userID:  _profile.getUserID()),
   ];
 
   _getNotifications();
+  }
+
+
+  Future<void> _getSelf() async {
+    _profile = await _userRetriever.retrieveSelf(_profile.getUserID());
+    setState(() {
+      _profile = _profile;
+    });
   }
 
   void navigateToPage(int index, {Map<String, dynamic>? params}) {
@@ -70,7 +89,13 @@ class PageNavigatorState extends State<PageNavigator> {
   }
 
   Future<void> _getNotifications() async {
-    listOfNotifications = await notificationService.fetchFriendRequests(_profile.getUserID());
+    listOfNotifications = await _friendsController.retrieveRequesterList(_profile.getUserID());
+    
+      setState(() {
+        if(listOfNotifications.isNotEmpty){
+        _hasNoti = true;}
+        else {_hasNoti = false;}
+      });
   }
 
   void _toggleNotifications() {
@@ -88,10 +113,8 @@ class PageNavigatorState extends State<PageNavigator> {
 
   void _handleNotificationTap(int index) {
     setState(() {
-      navigateToPage(5, params: {"userID": "888888"});
+      navigateToPage(5, params: {"otherUserID": listOfNotifications[index].getUserID(), "userID": _profile.getUserID()});
       _toggleNotifications();
-      //index should be passed to the profile page to be able to open the profile page of the person
-      //alternately can just open the friend request page
     });
   }
 
@@ -188,10 +211,18 @@ class PageNavigatorState extends State<PageNavigator> {
                   borderRadius: BorderRadius.circular(20),
                   color: _showNotifications ? Colors.black : lightgreen,
                 ),
-                child: IconButton(
-                  color: _showNotifications ? Colors.white : Colors.black,
-                  icon: const Icon(Icons.notifications),
-                  onPressed: _toggleNotifications,
+                child: Stack(
+                  children: [
+                    IconButton(
+                      color: _showNotifications ? Colors.white : Colors.black,
+                      icon: const Icon(Icons.notifications),
+                      onPressed: _toggleNotifications,
+                    ),
+                    if(_hasNoti)Align(
+                      alignment: Alignment.topLeft,
+                      child: Icon(Icons.circle, color: Colors.red,size: 15,),
+                    )
+                  ],
                 ),
               ),
             ),
@@ -253,7 +284,7 @@ class PageNavigatorState extends State<PageNavigator> {
                                 child: ListTile(
                                   onTap: () => _handleNotificationTap(index),
                                   title: Text(
-                                    listOfNotifications[index],
+                                    "${listOfNotifications[index].getName()} sent you a friend request",
                                     style: GoogleFonts.poppins(
                                         fontSize: 12,
                                         fontWeight: FontWeight.bold),

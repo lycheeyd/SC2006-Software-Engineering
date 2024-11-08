@@ -76,7 +76,7 @@ class _RankPageState extends State<RankPage> {
 
     //change here
     if (pageNavigatorState != null) {
-      print("otherID: ${user.userId}, userID: $userID");
+      //print("otherID: ${user.userId}, userID: $userID");
       pageNavigatorState.navigateToPage(5,
           params: {'otherUserID': user.userId,'userID':userID}); // Navigate to Profile tab
     }

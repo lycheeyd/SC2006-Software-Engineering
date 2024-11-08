@@ -112,7 +112,8 @@ class _EditprofilePageState extends State<EditprofilePage> {
 
         if (response.statusCode == 200) {
           _showSuccessDialog(responseData['message']);
-          final responseObject = UserProfile.fromJson(responseData['UserObject']);
+          //print(responseData);
+          final responseObject = UserProfile.editfromJson(responseData['UserObject']);
           setState(() {
             _profile.setName(responseObject.getName());
             _profile.setWeight(responseObject.getWeight());
@@ -122,7 +123,7 @@ class _EditprofilePageState extends State<EditprofilePage> {
           _showErrorDialog(responseMessage);
         }
       } catch (e) {
-        if(mounted)_showErrorDialog("Network error: ${e.toString()}");
+        _showErrorDialog("Network error: ${e.toString()}");
       }
     }
   }
@@ -173,7 +174,8 @@ class _EditprofilePageState extends State<EditprofilePage> {
       final responseMessage = response.body;
 
       if (response.statusCode == 200) {
-        _showSuccessDialog(responseMessage);
+        _showDeleteSuccessDialog(responseMessage);
+      
       } else {
         _showErrorDialog(responseMessage);
       }
@@ -211,7 +213,29 @@ class _EditprofilePageState extends State<EditprofilePage> {
         //content: Text(message),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () {
+              Navigator.pop(context);
+            }, 
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showDeleteSuccessDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(message),
+        //content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () {
+            Navigator.pop(context); //pop this dialog
+            Navigator.pop(context); //pop to profile
+            Navigator.pop(context); //pop to login
+            }, 
             child: const Text('OK'),
           ),
         ],
@@ -330,7 +354,7 @@ class _EditprofilePageState extends State<EditprofilePage> {
                         width: 400,
                         height: 45,
                         child: ElevatedButton(
-                            onPressed: (){_handleSaveChanges();Navigator.pop(context,_profile);},
+                            onPressed: (){_handleSaveChanges();},
                             style: ElevatedButton.styleFrom(
                               elevation: 0,
                               backgroundColor: PrimaryColors.brightGreen,

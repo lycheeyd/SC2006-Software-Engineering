@@ -1,4 +1,9 @@
+import 'dart:collection';
+
 import 'package:calowin/common/colors_and_fonts.dart';
+import 'package:calowin/common/singlebutton_dialog.dart';
+import 'package:calowin/common/user_profile.dart';
+import 'package:calowin/control/friends_controller.dart';
 import 'package:calowin/control/page_navigator.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -13,14 +18,30 @@ class AddfriendsPage extends StatefulWidget {
 
 class _AddfriendsPageState extends State<AddfriendsPage> {
   late String? _userID;
-  List<String> _searchList = [];
-  final List<String> _friendRequests = ['Mia', 'Khalifa', 'Cody'];
+  List<UserProfile> _searchList = [];
+  List<UserProfile> _friendRequests = [];
+  final FriendsController _friendsController = FriendsController();
 
   @override
   void initState() {
     super.initState();
     _userID = widget.userID;
+    _getRequesters();
   }
+
+  @override  
+  void didUpdateWidget(AddfriendsPage oldWidget){
+    super.didUpdateWidget(oldWidget);
+    _getRequesters();
+  }
+
+  Future<void> _getRequesters() async {
+    _friendRequests = await _friendsController.retrieveRequesterList(_userID!);
+    setState(() {
+      _friendRequests = _friendRequests;
+    });
+  }
+
 
   void _handleBack() {
     final pageNavigatorState =
@@ -30,21 +51,63 @@ class _AddfriendsPageState extends State<AddfriendsPage> {
     }
   }
 
-  void _handleSearch() {
+  void _handleSearch(String search) async {
+    _searchList = await _friendsController.searchUser(search,_userID!);
     setState(() {
-      _searchList = ['Alex', 'Derick', 'Bob'];
+      _searchList = _searchList;
     });
   }
 
-  void _onSearchItemTap() {}
+  void _onSearchItemTap(String id) {
+    final pageNavigatorState =
+        context.findAncestorStateOfType<PageNavigatorState>();
+    if (pageNavigatorState != null) {
+      pageNavigatorState.navigateToPage(5,params: {'otherUserID': id,'userID':_userID}); // Navigate to OtheruserPage
+    }
+  }
 
-  void _onRequestTap() {}
+  void _handleAccept(String id) async {
+    bool success = await _friendsController.acceptFriend(_userID!,id);
+    setState(() {
+      if(success){
+        _getRequesters();
+        showDialog(
+          context: context, 
+          builder: (BuildContext context) {
+            return SinglebuttonDialog(title: "Success", content: "Friend added successfully", onConfirm: ()=>Navigator.pop(context));
+            }); 
+      }
+      else{
+        showDialog(
+          context: context, 
+          builder: (BuildContext context) {
+            return SinglebuttonDialog(title: "Failed", content: "Failed to add friend, please try again later", onConfirm: ()=>Navigator.pop(context));
+            });
+      }
+    });
+  }
 
-  void _handleAccept() {}
+  void _handleReject(String id) async {
+    bool success = await _friendsController.rejectFriend(_userID!,id);
+    setState(() {
+      if(success){
+        showDialog(
+          context: context, 
+          builder: (BuildContext context) {
+            return SinglebuttonDialog(title: "Success", content: "Request rejected successfully", onConfirm: ()=>Navigator.pop(context));
+            }); 
+      }
+      else{
+        showDialog(
+          context: context, 
+          builder: (BuildContext context) {
+            return SinglebuttonDialog(title: "Failed", content: "Failed to reject request, please try again later", onConfirm: ()=>Navigator.pop(context));
+            });
+      }
+    });
+  }
 
-  void _handleReject() {}
-
-  Widget _buildSearchListItem(int index, String name) {
+  Widget _buildSearchListItem(int index, UserProfile user) {
     Color tileColor = const Color.fromARGB(255, 214, 241, 214);
     TextStyle fontStyle =
         GoogleFonts.aBeeZee(fontSize: 16, fontWeight: FontWeight.bold);
@@ -62,13 +125,13 @@ class _AddfriendsPageState extends State<AddfriendsPage> {
           ],
         ),
         child: ListTile(
-          onTap: () => _onSearchItemTap(),
+          onTap: () => _onSearchItemTap(user.getUserID()),
           leading: const Icon(
             Icons.person,
             size: 25,
           ),
           title: Text(
-            name,
+            user.getName(),
             style: fontStyle,
           ),
         ),
@@ -76,12 +139,12 @@ class _AddfriendsPageState extends State<AddfriendsPage> {
     );
   }
 
-  Widget _buildFriendRequests(int index, String name) {
+  Widget _buildFriendRequests(int index, UserProfile user) {
     Color tileColor = const Color.fromARGB(255, 214, 241, 214);
     TextStyle fontStyle =
         GoogleFonts.aBeeZee(fontSize: 16, fontWeight: FontWeight.bold);
     return GestureDetector(
-      onTap: _onRequestTap,
+      onTap: ()=>_onSearchItemTap(user.getUserID()),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Container(
@@ -113,7 +176,7 @@ class _AddfriendsPageState extends State<AddfriendsPage> {
                       width: 10,
                     ),
                     Text(
-                      name,
+                      user.getName(),
                       style: fontStyle,
                     ),
                   ],
@@ -129,7 +192,7 @@ class _AddfriendsPageState extends State<AddfriendsPage> {
                         width: 140,
                         height: 27,
                         child: ElevatedButton(
-                          onPressed: _handleAccept,
+                          onPressed: ()=>_handleAccept(user.getUserID()),
                           style: ElevatedButton.styleFrom(
                             elevation: 0,
                             backgroundColor: PrimaryColors.brightGreen,
@@ -152,7 +215,7 @@ class _AddfriendsPageState extends State<AddfriendsPage> {
                         width: 140,
                         height: 27,
                         child: ElevatedButton(
-                          onPressed: _handleReject,
+                          onPressed: ()=>_handleReject(user.getUserID()),
                           style: ElevatedButton.styleFrom(
                             elevation: 0,
                             backgroundColor: Colors.red,
@@ -224,9 +287,7 @@ class _AddfriendsPageState extends State<AddfriendsPage> {
                   border: InputBorder.none,
                   suffixIcon: IconButton(
                     icon: const Icon(Icons.search),
-                    onPressed: () {
-                      _handleSearch();
-                    },
+                    onPressed: ()=>_handleSearch(_searchController.text),
                   ),
                 ),
               ),

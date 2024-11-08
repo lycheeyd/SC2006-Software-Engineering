@@ -1,6 +1,4 @@
-import 'package:calowin/control/words2widget_converter.dart';
-
-enum UserStatus { friend, requested, stranger, friendrequest }
+enum UserStatus { FRIEND, REQUESTSENT, STRANGER, REQUESTRECIEVED }
 
 class UserProfile {
   late String _name;
@@ -36,6 +34,11 @@ class UserProfile {
     _status = status;
   }
 
+  static T stringToEnum<T>(String value, List<T> enumValues) {
+    return enumValues.firstWhere((e) => e.toString().split('.').last == value, orElse: () => throw ArgumentError('No matching enum value for $value'));
+  }
+
+
   // Factory constructor for deserialization from LoginResponseDTO
   factory UserProfile.fromJson(Map<String, dynamic> json) {
     return UserProfile(
@@ -50,13 +53,45 @@ class UserProfile {
     );
   }
 
-  factory UserProfile.othersFromJson(Map<String, dynamic> json) {
+  factory UserProfile.editfromJson(Map<String, dynamic> json) {
     return UserProfile(
       name: json['name'] as String,
-      email: json['email'] as String?,
       userID: json['userID'] as String,
       bio: json['bio'] as String?,
       weight: (json['weight'] as num?)?.toDouble(),  
+    );
+  }
+
+  factory UserProfile.othersFromJson(Map<String, dynamic> json) {
+    return UserProfile(
+      name: json['name'] as String,
+      userID: json['userID'] as String,
+      bio: json['bio'] as String?,
+      status:  stringToEnum((json['friendStatus']) as String,UserStatus.values),
+      carbonSaved: (json['totalCarbonSaved'] as num?)?.toInt(),
+      calorieBurn: (json['totalCalorieBurnt'] as num?)?.toInt(),
+      badges: [json['carbonMedal'] as String, json['calorieMedal'] as String]
+    );
+  }
+
+  factory UserProfile.receiverFromJson(Map<String, dynamic> json) {
+    return UserProfile(
+      name: json['friendUserName'] as String,
+      userID: json['friendUserId'] as String,
+    );
+  }
+
+  factory UserProfile.senderFromJson(Map<String, dynamic> json) {
+    return UserProfile(
+      name: json['userName'] as String,
+      userID: json['userId'] as String,
+    );
+  }
+
+  factory UserProfile.userInfoFromJson(Map<String, dynamic> json) {
+    return UserProfile(
+      name: json['name'] as String,
+      userID: json['userId'] as String,
     );
   }
 

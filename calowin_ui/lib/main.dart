@@ -11,13 +11,13 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return  MaterialApp(
       title: 'CaloWin',
       debugShowCheckedModeBanner: false,
       home: Loginpage(),
-      // initialRoute: '/',
-      // routes: {
-      //   '/login': (context) => const Loginpage(),
+      initialRoute: '/',
+      routes: {
+        '/login': (context) => const Loginpage(),}
       //   '/signup': (context) => const SignupPage(),
       //   '/home': (context) => const PageNavigator(
       //         startPage: 0,

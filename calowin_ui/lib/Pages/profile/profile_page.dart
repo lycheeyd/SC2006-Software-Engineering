@@ -40,13 +40,15 @@ class _ProfilePageState extends State<ProfilePage> {
     if (updatedProfile != null) {
       setState(() {
         //_profile = updatedProfile;
-        _profile.copyProfile(updatedProfile);
+        _profile.setName(updatedProfile.getName());
+        _profile.setBio(updatedProfile.getBio());
+        _profile.setWeight(updatedProfile.getWeight());
       });
     }
   }
 
   void _handleLogOut() {
-    Navigator.pop(context);
+    Navigator.of(context).pushNamedAndRemoveUntil('/login', (Route<dynamic> route) => false);
   }
 
   Widget fieldBuilder(String title, String content) {

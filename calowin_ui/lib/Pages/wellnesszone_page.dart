@@ -504,7 +504,7 @@ class _WellnessZonePageState extends State<WellnessZonePage> {
                                   Text(
                                     _weatherForecast,
                                     style: const TextStyle(
-                                        color: Colors.white, fontSize: 15),
+                                        color: Colors.white, fontSize: 12),
                                   ),
                                 ],
                               ),
