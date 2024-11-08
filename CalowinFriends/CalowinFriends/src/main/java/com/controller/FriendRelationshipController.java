@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ENUM.FriendStatus;
 import com.dto.FriendRelationshipDTO;
 import com.service.FriendRelationshipService;
 import com.service.UserInfoService;
@@ -119,12 +120,12 @@ public class FriendRelationshipController {
 
     // Get Relationship Status between two users
     @GetMapping("/status")
-    public ResponseEntity<String> getRelationshipStatus(
+    public ResponseEntity<FriendStatus> getRelationshipStatus(
             @RequestParam("userId1") String userId1,
             @RequestParam("userId2") String userId2) {
         
         try {
-            String status = friendService.getRelationshipStatus(userId1, userId2);
+            FriendStatus status = friendService.getRelationshipStatus(userId1, userId2);
             return ResponseEntity.ok(status);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);

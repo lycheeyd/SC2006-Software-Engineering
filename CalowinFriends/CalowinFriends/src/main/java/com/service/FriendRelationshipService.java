@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ENUM.FriendStatus;
 import com.dto.FriendRelationshipDTO;
 import com.models.FriendRelationship;
 import com.models.FriendRelationshipId;
@@ -57,10 +58,12 @@ public class FriendRelationshipService {
     }
 
     public List<FriendRelationshipDTO> getPendingRequests(String userId) {
+        // Fetch only requests where the userId is in the Friend_Unique_ID column and status is "PENDING"
         return repository.findByIdFriendUniqueIdAndStatus(userId, "PENDING").stream()
             .map(this::convertToDTO)
             .collect(Collectors.toList());
     }
+    
 
     public FriendRelationshipDTO respondToRequest(String senderId, String receiverId, String status) {
         FriendRelationshipId id = new FriendRelationshipId(senderId, receiverId);
@@ -81,11 +84,28 @@ public class FriendRelationshipService {
     }
 
     public List<FriendRelationshipDTO> getFriendList(String userId) {
+        // Retrieve relationships where the status is explicitly "ACCEPTED"
         return repository.findByIdUniqueIdOrIdFriendUniqueIdAndStatus(userId, userId, "ACCEPTED").stream()
-            .map(this::convertToDTO)
+            .filter(relationship -> "ACCEPTED".equals(relationship.getStatus())) // Ensure only accepted relationships
+            .map(relationship -> {
+                // Determine the friend’s ID based on the direction of the relationship
+                String friendId = relationship.getId().getUniqueId().equals(userId) 
+                    ? relationship.getId().getFriendUniqueId() 
+                    : relationship.getId().getUniqueId();
+                
+                // Convert to DTO using friend ID and name (prevent adding the userId itself to the friend list)
+                return new FriendRelationshipDTO(
+                    userId,
+                    userInfoService.getUserNameById(userId),
+                    friendId,
+                    userInfoService.getUserNameById(friendId),
+                    relationship.getStatus()
+                );
+            })
+            .distinct() // Ensure no duplicate entries in the list
             .collect(Collectors.toList());
     }
-
+    
     public FriendRelationshipDTO acceptFriendRequest(String senderId, String receiverId) {
         return respondToRequest(senderId, receiverId, "ACCEPTED");
     }
@@ -106,24 +126,31 @@ public class FriendRelationshipService {
         repository.delete(relationship);
     }
 
-    public String getRelationshipStatus(String userId1, String userId2) {
-        List<FriendRelationship> relationships = repository.findByIdUniqueIdOrIdFriendUniqueIdAndStatus(userId1, userId2, "ACCEPTED");
+    public FriendStatus getRelationshipStatus(String userId1, String userId2) {
+        Optional<FriendRelationship> directRelationship = repository.findById(new FriendRelationshipId(userId1, userId2));
+        Optional<FriendRelationship> reverseRelationship = repository.findById(new FriendRelationshipId(userId2, userId1));
     
-        for (FriendRelationship relationship : relationships) {
-            String uniqueId = relationship.getId().getUniqueId();
-            String friendUniqueId = relationship.getId().getFriendUniqueId();
-            String status = relationship.getStatus();
-    
-            if ("ACCEPTED".equals(status)) {
-                return "FRIEND";
-            } else if ("PENDING".equals(status)) {
-                return uniqueId.equals(userId1) ? "REQUESTSENT" : "REQUESTRECEIVED";
-            } else if ("REJECTED".equals(status)) {
-                return "STRANGER"; // Return STRANGER if status is REJECTED
-            }
+        // If there's an "ACCEPTED" relationship in either direction, they're friends
+        if (directRelationship.isPresent() && "ACCEPTED".equals(directRelationship.get().getStatus()) ||
+            reverseRelationship.isPresent() && "ACCEPTED".equals(reverseRelationship.get().getStatus())) {
+            return FriendStatus.FRIEND;
         }
     
-        return "STRANGER";
+        // Check for pending requests in both directions
+        if (directRelationship.isPresent() && "PENDING".equals(directRelationship.get().getStatus())) {
+            return FriendStatus.REQUESTSENT;
+        } else if (reverseRelationship.isPresent() && "PENDING".equals(reverseRelationship.get().getStatus())) {
+            return FriendStatus.REQUESTRECIEVED;
+        }
+    
+        // If there's a "REJECTED" relationship in either direction, they're strangers
+        if (directRelationship.isPresent() && "REJECTED".equals(directRelationship.get().getStatus()) ||
+            reverseRelationship.isPresent() && "REJECTED".equals(reverseRelationship.get().getStatus())) {
+            return FriendStatus.STRANGER;
+        }
+    
+        // Default to STRANGER if no relationship exists
+        return FriendStatus.STRANGER;
     }
     
 

@@ -1,4 +1,5 @@
 package com.controller;
+
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +19,16 @@ public class UserInfoController {
     @Autowired
     private UserInfoService userInfoService;
 
+    /**
+     * Endpoint to search for users by user ID or name, excluding the current user from the results.
+     * 
+     * @param searchTerm the term to search by (user ID or name)
+     * @param currentUserId the ID of the current user (to be excluded from results)
+     * @return a list of matching users excluding the current user
+     */
     @GetMapping("/search")
-    public ResponseEntity<List<UserInfo>> searchUsers(@RequestParam String searchTerm) {
-        List<UserInfo> results = userInfoService.searchByUserIdOrName(searchTerm);
+    public ResponseEntity<List<UserInfo>> searchUsers(@RequestParam String searchTerm, @RequestParam String currentUserId) {
+        List<UserInfo> results = userInfoService.searchByUserIdOrName(searchTerm, currentUserId);
         return ResponseEntity.ok(results);
     }
 }
-

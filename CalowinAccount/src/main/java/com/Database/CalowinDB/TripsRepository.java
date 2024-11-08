@@ -5,10 +5,11 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.Account.Entities.AchievementEntry;
+import com.Account.Entities.TripsEntry;
 
 @Repository
-public interface AchievementRepository extends JpaRepository<AchievementEntry, String> {
-    Optional<AchievementEntry> findByUserID(String userID);
+public interface TripsRepository extends JpaRepository<TripsEntry, String> {
+    Optional<TripsEntry> findByUserID(String userID);
     void deleteByUserID(String userID);
 }
+    
