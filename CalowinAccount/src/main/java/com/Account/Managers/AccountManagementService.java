@@ -124,7 +124,7 @@ public class AccountManagementService {
     }
 
     // Delete account method
-    @Transactional (transactionManager = "CalowinSecureDBTransactionManager", rollbackFor = Exception.class)
+    @Transactional (transactionManager = "chainedTransactionManager", rollbackFor = Exception.class)
     public void deleteAccount(String userID, String email, String otpCode) throws Exception {
         LOGGER.info("Starting account deletion for userID: {}", userID);
         
@@ -152,7 +152,7 @@ public class AccountManagementService {
             friendRelationshipRepository.deleteByUserID(userID); //FriendRelationshipEntry
 
             // ADD MORE FOR EACH TABLE 
-            LOGGER.info("Successfully deleted all associated records for userID: {}", userID);          
+            LOGGER.info("Successfully deleted all associated records for userID: {}", userID);
         } catch (Exception e) {
             LOGGER.error("Error during account deletion for userID: {}, rolling back. Reason: {}", userID, e.getMessage());
             throw e; // Trigger rollback

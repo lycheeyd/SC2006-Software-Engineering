@@ -46,7 +46,9 @@ public class LeaderboardService {
         List<FriendRelationship> relationships = friendRelationshipRepository
             .findByIdUniqueIdOrIdFriendUniqueIdAndStatus(userId, userId, "ACCEPTED");
     
+        // Filter by accepted status to ensure no pending relationships are included
         List<String> friendsIds = relationships.stream()
+            .filter(r -> "ACCEPTED".equals(r.getStatus())) // Double-check the status within the stream
             .map(r -> r.getId().getUniqueId().equals(userId) ? r.getId().getFriendUniqueId() : r.getId().getUniqueId())
             .distinct()
             .collect(Collectors.toList());
@@ -54,6 +56,7 @@ public class LeaderboardService {
         friendsIds.add(userId); // Optionally include the user itself
         return friendsIds;
     }
+    
 
     public List<AchievementDTO> getCarbonLeaderboard(String userId) {
         List<String> friendsIds = getFriendsIds(userId);
