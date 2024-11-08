@@ -19,12 +19,17 @@ class _FriendsPageState extends State<FriendsPage> {
   late String _userID;
   List<UserProfile> _friendlist = [];
   late UserProfile _notifier;
+  bool flag = false;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _notifier = Provider.of<UserProfile>(context,listen: true);
-    _notifier.addListener(_getFriends);
+    if(flag==false)
+    {
+      _notifier = Provider.of<UserProfile>(context,listen: true);
+      _notifier.addListener(_getFriends);
+      flag = true;
+   }
   }
 
   @override
@@ -48,6 +53,7 @@ class _FriendsPageState extends State<FriendsPage> {
 
   //handle the loading of friend list
   Future<void> _getFriends() async {
+    print("Get friends: Friends Page");
     _friendlist = await friendListRetriever.retrieveFriendList(_userID);
     if(mounted)
     {setState(() {

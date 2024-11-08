@@ -30,6 +30,7 @@ class PageNavigatorState extends State<PageNavigator> {
   UserProfile _profile = UserProfile(name: "Error loading user", userID: "Error loading user");
   late UserProfile _profileNotify;
   final FriendsController _friendsController = FriendsController();
+  bool flag = false;
 
   //this is to set parameters to pass to the pages
   Map<String, dynamic>? _currentParams;
@@ -71,14 +72,18 @@ class PageNavigatorState extends State<PageNavigator> {
     (params) => AddfriendsPage(
     profile:  _profileNotify),
   ];
+  _getNotifications();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _profileNotify = Provider.of<UserProfile>(context,listen: true);
-    _profileNotify.addListener(_getNotifications);
-    _getNotifications();
+    if(flag == false)
+    {
+      _profileNotify = Provider.of<UserProfile>(context,listen: true);
+      _profileNotify.addListener(_getNotifications);
+      flag = true;
+    }
   }
 
   @override
@@ -104,8 +109,8 @@ class PageNavigatorState extends State<PageNavigator> {
   }
 
   Future<void> _getNotifications() async {
+    print("Get Notification: Page Navigator");
     listOfNotifications = await _friendsController.retrieveRequesterList(_profile.getUserID());
-    
       if(mounted){
         setState(() {
         if(listOfNotifications.isNotEmpty){
@@ -200,11 +205,14 @@ class PageNavigatorState extends State<PageNavigator> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                SizedBox(
-                  height: 50,
-                  width: 50,
-                  child: Image.asset('assets/images/CalowinNoBackground.png',
-                      fit: BoxFit.contain),
+                GestureDetector(
+                  onTap: () {_profileNotify.updateProfile();print("refresh tapped");},
+                  child: SizedBox(
+                    height: 50,
+                    width: 50,
+                    child: Image.asset('assets/images/CalowinNoBackground.png',
+                        fit: BoxFit.contain),
+                  ),
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 17),

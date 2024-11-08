@@ -21,12 +21,17 @@ class _AddfriendsPageState extends State<AddfriendsPage> {
   List<UserProfile> _friendRequests = [];
   final FriendsController _friendsController = FriendsController();
   late UserProfile _notifier;
+  bool flag = false;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _notifier = Provider.of<UserProfile>(context,listen: true);
-    _notifier.addListener(_getRequesters);
+    if(flag == false)
+    {
+      _notifier = Provider.of<UserProfile>(context,listen: true);
+      _notifier.addListener(_getRequesters);
+      flag = true;
+    }
   }
 
   @override
@@ -49,6 +54,7 @@ class _AddfriendsPageState extends State<AddfriendsPage> {
   // }
 
   Future<void> _getRequesters() async {
+    print("getRequester: AddFriendsPage");
     _friendRequests = await _friendsController.retrieveRequesterList(_profile.getUserID());
     if(mounted)
    { setState(() {

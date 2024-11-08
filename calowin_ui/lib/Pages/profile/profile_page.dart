@@ -18,13 +18,23 @@ class _ProfilePageState extends State<ProfilePage> {
   //define retrieve logic here
   late UserProfile _profile;
   late List<Image?> _badges = [];
+  bool flag = false;
+
+  @override
+  void initState() {
+    super.initState();
+    getUserProfile();
+  }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _profile = Provider.of<UserProfile>(context);
-    _profile.addListener(getUserProfile); // Add listener for profile changes
-    getUserProfile();
+    if(flag == false)
+    {
+      _profile = Provider.of<UserProfile>(context);
+      _profile.addListener(getUserProfile);
+      flag = true;
+    } // Add listener for profile changes
   }
 
   @override
@@ -34,6 +44,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void getUserProfile() {
+    print("GetUserProfile: Profile Page");
     _badges = [];
     for (int i = 0; i < _profile.getBadges().length; i++) {
       if (Words2widgetConverter.convert(_profile.getBadges()[i]) != null) {

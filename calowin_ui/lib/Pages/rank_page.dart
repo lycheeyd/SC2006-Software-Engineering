@@ -21,6 +21,7 @@ class _RankPageState extends State<RankPage> {
   List<LeaderboardItem> caloriesleaderBoard = [];
   List<LeaderboardItem> carbonleaderBoard = [];
   late UserProfile _profile;
+  bool flag = false;
 
   //to be retrieved from backend
   // List<Map<String, dynamic>> caloriesleaderBoard = [
@@ -50,6 +51,7 @@ class _RankPageState extends State<RankPage> {
   // ];
 
   Future<void> _retrieveLeaderboards() async {
+    print("RetrieveLeaderBoards: rank page");
     caloriesleaderBoard = await retriever.retrieveCalorieLeaderboard(userID);
     carbonleaderBoard = await retriever.retrieveCarbonLeaderboard(userID);
     if(mounted) {setState(() {
@@ -69,8 +71,12 @@ class _RankPageState extends State<RankPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _profile = Provider.of<UserProfile>(context, listen: true); // Listen false for initialization
-    _profile.addListener(_retrieveLeaderboards); // Add listener for profile changes
+    if(flag == false)
+    {
+      _profile = Provider.of<UserProfile>(context, listen: true); // Listen false for initialization
+      _profile.addListener(_retrieveLeaderboards);
+      flag = true;
+    } // Add listener for profile changes
   }
 
   @override
