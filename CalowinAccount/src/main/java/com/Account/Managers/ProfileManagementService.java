@@ -9,16 +9,26 @@ import com.Account.ExternalServiceClient;
 import com.Account.Entities.AchievementEntry;
 import com.Account.Entities.FriendStatus;
 import com.Account.Entities.ProfileEntity;
+import com.Account.Entities.UserEntity;
+import com.DataTransferObject.LoginResponseDTO;
 import com.DataTransferObject.ViewProfileResponseDTO;
 import com.Database.CalowinDB.AchievementRepository;
 import com.Database.CalowinDB.UserInfoRepository;
+import com.Database.CalowinSecureDB.SecureInfoDBRepository;
 
 @Service
 public class ProfileManagementService {
 
     @Autowired
+    @Qualifier("calowinSecureDBTransactionManager")
+    private PlatformTransactionManager calowinSecureDBTransactionManager;
+
+    @Autowired
     @Qualifier("calowinDBTransactionManager")
     private PlatformTransactionManager calowinDBTransactionManager;
+
+    @Autowired
+    private SecureInfoDBRepository secureInfoRepository;
     
     @Autowired
     private UserInfoRepository userInfoRepository;
@@ -42,7 +52,7 @@ public class ProfileManagementService {
 
     }
 
-    // View account method
+    // View other's account method
     public ViewProfileResponseDTO viewProfile(String selfID, String otherID) throws Exception {
         ProfileEntity profile = userInfoRepository.findByUserID(otherID)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -55,6 +65,22 @@ public class ProfileManagementService {
 
         return new ViewProfileResponseDTO(profile.getUserID(), profile.getName(), profile.getBio(), friendStatus,
                                         achievement.getTotalCarbonSaved(), achievement.getTotalCalorieBurnt(), achievement.getCarbonMedal(), achievement.getCalorieMedal());
+
+    }
+
+    // View self account method
+    public LoginResponseDTO viewProfile(String selfID) throws Exception {
+        UserEntity user = secureInfoRepository.findByUserID(selfID)
+                .orElseThrow(() -> new RuntimeException("Invalid email or password"));
+
+        ProfileEntity profile = userInfoRepository.findByUserID(selfID)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        AchievementEntry achievement = achievementRepository.findByUserID(profile.getUserID())
+                .orElseThrow(() -> new RuntimeException("Failed to retrieve achievement data"));
+        
+        return new LoginResponseDTO(user.getUserID(), user.getEmail(), profile.getName(), profile.getWeight(), profile.getBio(), 
+                                achievement.getTotalCarbonSaved(), achievement.getTotalCalorieBurnt(), achievement.getCarbonMedal(), achievement.getCalorieMedal());
 
     }
 

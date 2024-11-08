@@ -228,4 +228,26 @@ public class HttpReqController {
         }
     }
 
+    @GetMapping("/view-profile/{selfID}")
+    public ResponseEntity<?> viewProfile(@PathVariable String selfID) {
+        // View account logic
+        try {
+            LoginResponseDTO profile = profileManagementService.viewProfile(selfID);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Self Profile retrieved successfully");
+            response.put("UserObject", profile);
+
+            System.out.println(response);
+            return ResponseEntity.ok(response);
+
+        } catch (RuntimeException e) {
+            // Return unauthorized error for invalid credentials
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            // Handle other exceptions
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + e.getMessage());
+        }
+    }
+
 }

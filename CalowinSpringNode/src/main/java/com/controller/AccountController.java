@@ -192,6 +192,18 @@ public class AccountController extends HttpReqController{
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + ex.getMessage());
         }
     }
+
+    @GetMapping("/view-profile/{selfID}")
+    public ResponseEntity<?> viewProfile(@PathVariable String selfID) {
+        // Forward view self profile request to AccountModule
+        try {
+            String url = urlPrefix + "/account/view-profile/" + selfID;
+            return restTemplate.getForEntity(url, Map.class);
+        } catch (Exception ex)  {
+            System.out.println(ex);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + ex.getMessage());
+        }
+    }
     
 }
 
