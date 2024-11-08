@@ -31,6 +31,7 @@ class _AddfriendsPageState extends State<AddfriendsPage> {
       _notifier = Provider.of<UserProfile>(context,listen: true);
       _notifier.addListener(_getRequesters);
       flag = true;
+      _getRequesters();
     }
   }
 
@@ -44,7 +45,6 @@ class _AddfriendsPageState extends State<AddfriendsPage> {
   void initState() {
     super.initState();
     _profile = widget.profile;
-    _getRequesters();
   }
 
   // @override  

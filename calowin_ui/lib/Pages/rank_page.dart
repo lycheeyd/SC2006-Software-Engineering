@@ -65,7 +65,6 @@ class _RankPageState extends State<RankPage> {
   void initState() {
     super.initState();
     userID = widget.userID;
-    _retrieveLeaderboards();
   }
 
   @override
@@ -76,6 +75,7 @@ class _RankPageState extends State<RankPage> {
       _profile = Provider.of<UserProfile>(context, listen: true); // Listen false for initialization
       _profile.addListener(_retrieveLeaderboards);
       flag = true;
+      _retrieveLeaderboards();
     } // Add listener for profile changes
   }
 

@@ -582,7 +582,7 @@ class _OtheruserPageState extends State<OtheruserPage> {
                     ),
                   ),
                   SizedBox(
-                    height: 170,
+                    height: 100,
                     child: Align(
                       alignment: Alignment.bottomCenter,
                       child: Padding(

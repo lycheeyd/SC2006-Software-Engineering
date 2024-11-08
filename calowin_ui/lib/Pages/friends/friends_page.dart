@@ -29,6 +29,7 @@ class _FriendsPageState extends State<FriendsPage> {
       _notifier = Provider.of<UserProfile>(context,listen: true);
       _notifier.addListener(_getFriends);
       flag = true;
+      _getFriends();
    }
   }
 
@@ -42,7 +43,6 @@ class _FriendsPageState extends State<FriendsPage> {
   void initState() {
     super.initState();
     _userID = widget.userID;
-    _getFriends();
   }
 
   // @override

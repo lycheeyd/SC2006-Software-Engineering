@@ -23,7 +23,6 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
-    getUserProfile();
   }
 
   @override
@@ -34,6 +33,7 @@ class _ProfilePageState extends State<ProfilePage> {
       _profile = Provider.of<UserProfile>(context);
       _profile.addListener(getUserProfile);
       flag = true;
+      getUserProfile();
     } // Add listener for profile changes
   }
 
