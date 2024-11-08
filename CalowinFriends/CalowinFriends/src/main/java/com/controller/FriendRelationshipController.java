@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ENUM.FriendStatus;
 import com.dto.FriendRelationshipDTO;
 import com.service.FriendRelationshipService;
-import com.service.UserInfoService;
 
 @RestController
 @RequestMapping("/friend-requests")
@@ -24,12 +23,10 @@ public class FriendRelationshipController {
     @Autowired
     private FriendRelationshipService friendService;
 
-    @Autowired
-    private UserInfoService userInfoService;
-
     // Send Friend Request
     @PostMapping("/send")
-    public ResponseEntity<FriendRelationshipDTO> sendRequest(@RequestParam String senderId, @RequestParam String receiverId) {
+    public ResponseEntity<FriendRelationshipDTO> sendRequest(@RequestParam String senderId,
+            @RequestParam String receiverId) {
         try {
             FriendRelationshipDTO result = friendService.sendFriendRequest(senderId, receiverId);
             return ResponseEntity.ok(result);
@@ -52,8 +49,8 @@ public class FriendRelationshipController {
     // Respond to Friend Request (Accept or Reject)
     @PostMapping("/respond")
     public ResponseEntity<FriendRelationshipDTO> respondToRequest(
-            @RequestParam String senderId, 
-            @RequestParam String receiverId, 
+            @RequestParam String senderId,
+            @RequestParam String receiverId,
             @RequestParam String status) {
         try {
             FriendRelationshipDTO result = friendService.respondToRequest(senderId, receiverId, status);
@@ -76,7 +73,8 @@ public class FriendRelationshipController {
 
     // Accept Friend Request
     @PostMapping("/accept")
-    public ResponseEntity<FriendRelationshipDTO> acceptFriendRequest(@RequestParam String senderId, @RequestParam String receiverId) {
+    public ResponseEntity<FriendRelationshipDTO> acceptFriendRequest(@RequestParam String senderId,
+            @RequestParam String receiverId) {
         try {
             FriendRelationshipDTO result = friendService.acceptFriendRequest(senderId, receiverId);
             return ResponseEntity.ok(result);
@@ -87,7 +85,8 @@ public class FriendRelationshipController {
 
     // Reject Friend Request
     @PostMapping("/reject")
-    public ResponseEntity<FriendRelationshipDTO> rejectFriendRequest(@RequestParam String senderId, @RequestParam String receiverId) {
+    public ResponseEntity<FriendRelationshipDTO> rejectFriendRequest(@RequestParam String senderId,
+            @RequestParam String receiverId) {
         try {
             FriendRelationshipDTO result = friendService.rejectFriendRequest(senderId, receiverId);
             return ResponseEntity.ok(result);
@@ -123,7 +122,7 @@ public class FriendRelationshipController {
     public ResponseEntity<FriendStatus> getRelationshipStatus(
             @RequestParam("userId1") String userId1,
             @RequestParam("userId2") String userId2) {
-        
+
         try {
             FriendStatus status = friendService.getRelationshipStatus(userId1, userId2);
             return ResponseEntity.ok(status);

@@ -10,7 +10,6 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-
 import com.dto.AchievementDTO;
 import com.models.Achievement;
 import com.models.FriendRelationship;
@@ -23,11 +22,8 @@ public class LeaderboardService {
     private FriendRelationshipRepository friendRelationshipRepository;
 
     @Autowired
-    private UserInfoService userInfoService;
+    private JdbcTemplate jdbcTemplate;
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;  
-    
     // Achievement RowMapper remains the same
     private RowMapper<Achievement> achievementRowMapper = new RowMapper<Achievement>() {
         @Override
@@ -44,76 +40,74 @@ public class LeaderboardService {
 
     public List<String> getFriendsIds(String userId) {
         List<FriendRelationship> relationships = friendRelationshipRepository
-            .findByIdUniqueIdOrIdFriendUniqueIdAndStatus(userId, userId, "ACCEPTED");
-    
+                .findByIdUniqueIdOrIdFriendUniqueIdAndStatus(userId, userId, "ACCEPTED");
+
         // Filter by accepted status to ensure no pending relationships are included
         List<String> friendsIds = relationships.stream()
-            .filter(r -> "ACCEPTED".equals(r.getStatus())) // Double-check the status within the stream
-            .map(r -> r.getId().getUniqueId().equals(userId) ? r.getId().getFriendUniqueId() : r.getId().getUniqueId())
-            .distinct()
-            .collect(Collectors.toList());
-    
+                .filter(r -> "ACCEPTED".equals(r.getStatus())) // Double-check the status within the stream
+                .map(r -> r.getId().getUniqueId().equals(userId) ? r.getId().getFriendUniqueId()
+                        : r.getId().getUniqueId())
+                .distinct()
+                .collect(Collectors.toList());
+
         friendsIds.add(userId); // Optionally include the user itself
         return friendsIds;
     }
-    
 
     public List<AchievementDTO> getCarbonLeaderboard(String userId) {
         List<String> friendsIds = getFriendsIds(userId);
 
         String sql = "SELECT * FROM Achievement WHERE user_id IN (" +
-                     friendsIds.stream().map(id -> "?").collect(Collectors.joining(", ")) + ")";
+                friendsIds.stream().map(id -> "?").collect(Collectors.joining(", ")) + ")";
 
         List<Achievement> achievements = jdbcTemplate.query(
-            sql,
-            friendsIds.toArray(),
-            achievementRowMapper
-        );
+                sql,
+                friendsIds.toArray(),
+                achievementRowMapper);
 
         return achievements.stream()
-            .sorted((a, b) -> Integer.compare(b.getTotalCarbonSaved(), a.getTotalCarbonSaved()))
-            .map(a -> {
-                AchievementDTO dto = new AchievementDTO();
-                dto.setUserId(a.getUserId());
-                dto.setUserName(getUserNameById(a.getUserId()));
-                dto.setTotalCarbonSaved(a.getTotalCarbonSaved());
-                dto.setTotalCalorieBurnt(a.getTotalCalorieBurnt());
-                dto.setCarbonMedal(a.getCarbonMedal());
-                dto.setCalorieMedal(a.getCalorieMedal());
-                return dto;
-            })
-            .collect(Collectors.toList());
+                .sorted((a, b) -> Integer.compare(b.getTotalCarbonSaved(), a.getTotalCarbonSaved()))
+                .map(a -> {
+                    AchievementDTO dto = new AchievementDTO();
+                    dto.setUserId(a.getUserId());
+                    dto.setUserName(getUserNameById(a.getUserId()));
+                    dto.setTotalCarbonSaved(a.getTotalCarbonSaved());
+                    dto.setTotalCalorieBurnt(a.getTotalCalorieBurnt());
+                    dto.setCarbonMedal(a.getCarbonMedal());
+                    dto.setCalorieMedal(a.getCalorieMedal());
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 
     public List<AchievementDTO> getCaloriesLeaderboard(String userId) {
         List<String> friendsIds = getFriendsIds(userId);
 
         String sql = "SELECT * FROM Achievement WHERE user_id IN (" +
-                     friendsIds.stream().map(id -> "?").collect(Collectors.joining(", ")) + ")";
+                friendsIds.stream().map(id -> "?").collect(Collectors.joining(", ")) + ")";
 
         List<Achievement> achievements = jdbcTemplate.query(
-            sql,
-            friendsIds.toArray(),
-            achievementRowMapper
-        );
+                sql,
+                friendsIds.toArray(),
+                achievementRowMapper);
 
         return achievements.stream()
-            .sorted((a, b) -> Integer.compare(b.getTotalCalorieBurnt(), a.getTotalCalorieBurnt()))
-            .map(a -> {
-                AchievementDTO dto = new AchievementDTO();
-                dto.setUserId(a.getUserId());
-                dto.setUserName(getUserNameById(a.getUserId()));
-                dto.setTotalCarbonSaved(a.getTotalCarbonSaved());
-                dto.setTotalCalorieBurnt(a.getTotalCalorieBurnt());
-                dto.setCarbonMedal(a.getCarbonMedal());
-                dto.setCalorieMedal(a.getCalorieMedal());
-                return dto;
-            })
-            .collect(Collectors.toList());
+                .sorted((a, b) -> Integer.compare(b.getTotalCalorieBurnt(), a.getTotalCalorieBurnt()))
+                .map(a -> {
+                    AchievementDTO dto = new AchievementDTO();
+                    dto.setUserId(a.getUserId());
+                    dto.setUserName(getUserNameById(a.getUserId()));
+                    dto.setTotalCarbonSaved(a.getTotalCarbonSaved());
+                    dto.setTotalCalorieBurnt(a.getTotalCalorieBurnt());
+                    dto.setCarbonMedal(a.getCarbonMedal());
+                    dto.setCalorieMedal(a.getCalorieMedal());
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 
     public String getUserNameById(String userId) {
         String sql = "SELECT name FROM UserInfo WHERE user_id = ?";
-        return jdbcTemplate.queryForObject(sql, new Object[]{userId}, String.class);
+        return jdbcTemplate.queryForObject(sql, new Object[] { userId }, String.class);
     }
 }
