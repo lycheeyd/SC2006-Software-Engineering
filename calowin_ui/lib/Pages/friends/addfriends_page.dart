@@ -67,6 +67,7 @@ class _AddfriendsPageState extends State<AddfriendsPage> {
     final pageNavigatorState =
         context.findAncestorStateOfType<PageNavigatorState>();
     if (pageNavigatorState != null) {
+      FocusScope.of(context).unfocus();
       pageNavigatorState.navigateToPage(3); // Navigate to AddFriendsPage
     }
   }
@@ -82,6 +83,7 @@ class _AddfriendsPageState extends State<AddfriendsPage> {
     final pageNavigatorState =
         context.findAncestorStateOfType<PageNavigatorState>();
     if (pageNavigatorState != null) {
+      FocusScope.of(context).unfocus();
       pageNavigatorState.navigateToPage(5,params: {'otherUserID': id,'userID':_profile.getUserID()}); // Navigate to OtheruserPage
     }
   }

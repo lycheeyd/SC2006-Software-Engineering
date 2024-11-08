@@ -97,6 +97,7 @@ class _OtheruserPageState extends State<OtheruserPage> {
         context.findAncestorStateOfType<PageNavigatorState>();
     //change here
     if (pageNavigatorState != null) {
+      FocusScope.of(context).unfocus();
       pageNavigatorState.navigateToPage(3); // Navigate to AddFriendsPage
     }
   }

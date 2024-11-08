@@ -129,6 +129,7 @@ class _EditprofilePageState extends State<EditprofilePage> {
   }
 
   void _handleChangePassword() {
+    FocusScope.of(context).unfocus();
     Navigator.push(context,
         MaterialPageRoute(builder: (context) => ChangepasswordPage(userID: _profile.getUserID())));
   }

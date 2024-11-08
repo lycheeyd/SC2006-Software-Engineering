@@ -430,7 +430,8 @@ Future<void> _retrieveMetrics() async {// Update with the actual user ID
         // Send trip metrics to the backend
         await apiService.addTripMetrics(carbonSaved, caloriesBurnt,profile.getUserID());
         //print('Trip metrics sent successfully.');
-
+        if(mounted)
+        {FocusScope.of(context).unfocus();
         // Navigate to AchievementScreen and pass metrics
         Navigator.push(
           context,
@@ -447,7 +448,7 @@ Future<void> _retrieveMetrics() async {// Update with the actual user ID
           ),
         ).then((_) {
           _resetState(); // Reset state when coming back to home screen
-        });
+        });}
       } catch (e) {
         print('Error sending trip metrics: $e');
       }

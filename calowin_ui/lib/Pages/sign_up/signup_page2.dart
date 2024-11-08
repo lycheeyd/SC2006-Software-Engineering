@@ -140,6 +140,7 @@ class _SignupPage2State extends State<SignupPage2> {
         actions: [
           TextButton(
             onPressed: (){
+              FocusScope.of(context).unfocus();
               Navigator.of(context).push(
                 PageRouteBuilder(
                   pageBuilder: (context, animation, secondaryAnimation) =>

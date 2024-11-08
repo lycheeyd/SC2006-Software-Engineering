@@ -54,6 +54,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _handleEditProfile() async {
+    FocusScope.of(context).unfocus();
     final updatedProfile = await Navigator.push<UserProfile>(context,
         MaterialPageRoute(builder: (context) => EditprofilePage(profile: _profile)));
       
@@ -69,6 +70,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _handleLogOut() {
+    FocusScope.of(context).unfocus();
     Navigator.of(context).pushNamedAndRemoveUntil('/login', (Route<dynamic> route) => false);
   }
 

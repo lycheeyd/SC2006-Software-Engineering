@@ -191,6 +191,7 @@ class _SignupPageState extends State<SignupPage> {
         _confirmPasswordError == null &&
         _otpError == null &&
         _isOTPRequested) {
+          FocusScope.of(context).unfocus();
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
