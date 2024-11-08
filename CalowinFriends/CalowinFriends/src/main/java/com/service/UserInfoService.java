@@ -2,6 +2,7 @@ package com.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,13 +17,16 @@ public class UserInfoService {
     private UserInfoRepository userInfoRepository;
 
     /**
-     * Searches for users by user ID or name.
+     * Searches for users by user ID or name, excluding the current user from the results.
      * 
      * @param searchTerm the search term (user ID or name)
-     * @return a list of UserInfo matching the search term
+     * @param currentUserId the ID of the current user
+     * @return a list of UserInfo matching the search term, excluding the current user
      */
-    public List<UserInfo> searchByUserIdOrName(String searchTerm) {
-        return userInfoRepository.searchByUserIdOrName(searchTerm);
+    public List<UserInfo> searchByUserIdOrName(String searchTerm, String currentUserId) {
+        return userInfoRepository.searchByUserIdOrName(searchTerm).stream()
+            .filter(userInfo -> !userInfo.getUserId().equals(currentUserId)) // Exclude the current user
+            .collect(Collectors.toList());
     }
 
     /**
