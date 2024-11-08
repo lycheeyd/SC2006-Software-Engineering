@@ -17,16 +17,23 @@ public class UserInfoService {
     private UserInfoRepository userInfoRepository;
 
     /**
-     * Searches for users by user ID or name, excluding the current user from the results.
+     * Searches for users by user ID or name, excluding the current user from the
+     * results.
      * 
-     * @param searchTerm the search term (user ID or name)
+     * @param searchTerm    the search term (user ID or name)
      * @param currentUserId the ID of the current user
-     * @return a list of UserInfo matching the search term, excluding the current user
+     * @return a list of UserInfo matching the search term, excluding the current
+     *         user
      */
     public List<UserInfo> searchByUserIdOrName(String searchTerm, String currentUserId) {
+        // Return an empty list if the search term is empty
+        if (searchTerm == null || searchTerm.trim().isEmpty()) {
+            return List.of();
+        }
+
         return userInfoRepository.searchByUserIdOrName(searchTerm).stream()
-            .filter(userInfo -> !userInfo.getUserId().equals(currentUserId)) // Exclude the current user
-            .collect(Collectors.toList());
+                .filter(userInfo -> !userInfo.getUserId().equals(currentUserId)) // Exclude the current user
+                .collect(Collectors.toList());
     }
 
     /**
