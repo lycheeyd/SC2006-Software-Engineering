@@ -21,7 +21,7 @@ public interface FriendRelationshipRepository extends JpaRepository<FriendRelati
     Optional<FriendRelationship> findById(FriendRelationshipId id);
     
     // Find relationships by either UniqueId or FriendUniqueId and status (using composite key fields)
-    List<FriendRelationship> findByIdUniqueIdOrIdFriendUniqueIdAndStatus(String idUniqueId, String idFriendUniqueId, String status);
+    List<FriendRelationship> findByIdUniqueIdOrIdFriendUniqueIdAndStatus(String uniqueId, String friendUniqueId, String status);
 
     List<FriendRelationship> findByIdUniqueIdOrIdFriendUniqueId(String uniqueId, String friendUniqueId);
 
