@@ -5,6 +5,7 @@ import 'package:calowin/control/friends_controller.dart';
 import 'package:calowin/control/page_navigator.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 class AddfriendsPage extends StatefulWidget {
   final UserProfile profile;
@@ -19,6 +20,20 @@ class _AddfriendsPageState extends State<AddfriendsPage> {
   List<UserProfile> _searchList = [];
   List<UserProfile> _friendRequests = [];
   final FriendsController _friendsController = FriendsController();
+  late UserProfile _notifier;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _notifier = Provider.of<UserProfile>(context,listen: true);
+    _notifier.addListener(_getRequesters);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _notifier.removeListener(_getRequesters);
+  }
 
   @override
   void initState() {

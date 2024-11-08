@@ -581,8 +581,10 @@ class _OtheruserPageState extends State<OtheruserPage> {
                       ),
                     ),
                   ),
-                  Expanded(
-                    child: SizedBox(
+                  SizedBox(
+                    height: 170,
+                    child: Align(
+                      alignment: Alignment.bottomCenter,
                       child: Padding(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 10, vertical: 2),

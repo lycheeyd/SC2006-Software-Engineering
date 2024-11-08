@@ -61,6 +61,7 @@ class _FriendsPageState extends State<FriendsPage> {
         context.findAncestorStateOfType<PageNavigatorState>();
     //change here
     if (pageNavigatorState != null) {
+      _notifier.updateProfile();
       pageNavigatorState.navigateToPage(6); // Navigate to AddFriendsPage
     }
   }
