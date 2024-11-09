@@ -15,6 +15,6 @@ public interface FriendRelationshipRepository extends JpaRepository<FriendRelati
     Optional<FriendRelationshipEntry> findByUserID(String userID);
 
     @Modifying
-    @Query("DELETE FROM FriendRelationshipEntry f WHERE f.Unique_ID = :Unique_ID")
-    void deleteByUserID(@Param("Unique_ID") String userID);
+    @Query("DELETE FROM FriendRelationshipEntry f WHERE f.userID = :userID")
+    void deleteByUserID(@Param("userID") String userID);
 }
