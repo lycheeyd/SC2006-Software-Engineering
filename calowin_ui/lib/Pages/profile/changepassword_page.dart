@@ -91,6 +91,7 @@ class _ChangepasswordPageState extends State<ChangepasswordPage> {
       final String url = "http://172.21.146.188:8080/central/account/change-password";
 
       try {
+        print("called");
         final response = await http.post(
           Uri.parse(url),
           headers: {"Content-Type": "application/json"},
@@ -113,11 +114,6 @@ class _ChangepasswordPageState extends State<ChangepasswordPage> {
       } catch (e) {
         _showErrorDialog("Network error: ${e.toString()}");
       }
-    }
-    if(mounted)
-    {
-      Navigator.pop(context);
-      Navigator.pop(context);
     }
   }
 
@@ -155,6 +151,11 @@ class _ChangepasswordPageState extends State<ChangepasswordPage> {
         ],
       ),
     );
+    if(mounted)
+    {
+      Navigator.pop(context);
+      Navigator.pop(context);
+    }
   }
 
   @override

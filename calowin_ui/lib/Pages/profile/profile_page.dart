@@ -76,7 +76,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget fieldBuilder(String title, String content) {
     return SizedBox(
-      height: 47,
+      height: 50,
       width: 400,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
@@ -99,7 +99,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     width: 200,
                     child: Text(
                       content,
-                      style: const TextStyle(color: Colors.black),
+                      style: const TextStyle(color: Colors.black,fontSize: 12),
                     )),
               ],
             ),

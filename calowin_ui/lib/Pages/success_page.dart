@@ -152,6 +152,7 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
                     medal: carbonSavedMedal,
                     gainedExp: widget.carbonSaved,
                     threshold: maxCarbon,
+                    medalType: "Eco"
                   ),
                   SizedBox(height: 15),
                   _buildProgressSection(
@@ -160,6 +161,7 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
                     medal: calorieBurntMedal,
                     gainedExp: widget.caloriesBurnt,
                     threshold: maxCalorie,
+                    medalType: "Calorie"
                   ),
                   SizedBox(height: 20),
                   ElevatedButton(
@@ -208,6 +210,7 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
   required String medal,
   required int gainedExp,
   required int threshold,
+  required String medalType,
 }) {
   double progress = (value >= threshold) ? 1.0 : value / threshold;
   progress = progress.clamp(0.0, 1.0);
@@ -217,7 +220,7 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
   String bgToDisplay = _getBG(value, threshold);
 
   // Select the correct medal image based on the threshold medal
-  Image? medalImage = _getMedalImage(value,threshold,medal);
+  Image? medalImage = _getMedalImage(value,threshold,medal,medalType);
 
   return Container(
     decoration: _getCardBackgroundImage(bgToDisplay),
@@ -279,10 +282,7 @@ class _SuccessPageState extends State<SuccessPage> with SingleTickerProviderStat
   );
 }
 
-Image? _getMedalImage(int value, int threshold,String medal) {
-  String type;
-  if(medal.contains("Eco")) {type = "Eco";}
-  else {type = "Calorie";}
+Image? _getMedalImage(int value, int threshold,String medal,String type) {
 
   if (value < pointsToNextBronze) {
     return Words2widgetConverter.convert("${type}Bronze");  // Below Bronze level, show Bronze
